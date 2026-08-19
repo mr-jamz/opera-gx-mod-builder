@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
+    <meta name="theme-color" content="#09090d">
+    <title>GX Mod Builder</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="glow glow-one" aria-hidden="true"></div>
+    <div class="glow glow-two" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="GX Mod Builder home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>GX <b>MOD BUILDER</b></span>
+      </a>
+      <span class="status"><i aria-hidden="true"></i> Builder alpha</span>
+    </header>
+
+    <main>
+      <section class="view landing is-active" id="home" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>01</span> Make the browser yours</p>
+          <h1 id="hero-title">Build your own<br><em>Opera GX mod.</em></h1>
+          <p class="hero-description">
+            Shape the colors, visuals, and sound of your browser through one guided workspace.
+            No manual manifest editing required.
+          </p>
+          <button class="primary-action" id="start-modding" type="button">
+            <span>Start modding</span>
+            <span class="action-arrow" aria-hidden="true">→</span>
+          </button>
+          <p class="local-note">Your files stay in your browser.</p>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orbit orbit-outer"></div>
+          <div class="orbit orbit-inner"></div>
+          <div class="gx-core"><span>GX</span><small>MOD</small></div>
+          <div class="data-tag tag-one">THEME<span>READY</span></div>
+          <div class="data-tag tag-two">MEDIA<span>LOCAL</span></div>
+          <div class="scan-line"></div>
+        </div>
+      </section>
+
+      <section class="view creator" id="creator" aria-labelledby="creator-title" aria-hidden="true">
+        <div class="creator-heading">
+          <button class="back-button" id="back-home" type="button" aria-label="Return to landing page">←</button>
+          <div>
+            <p class="eyebrow"><span>02</span> Choose a starting point</p>
+            <h2 id="creator-title">Create your mod</h2>
+            <p>Select a category. We’ll guide you through each setting and required file.</p>
+          </div>
+          <div class="progress-chip"><span>0</span> / 3 core sections</div>
+        </div>
+
+        <section class="category-section" aria-labelledby="core-heading">
+          <div class="section-heading">
+            <div>
+              <p class="section-index">01</p>
+              <h3 id="core-heading">Core modding</h3>
+            </div>
+            <p>Start with the essentials that define your mod.</p>
+          </div>
+
+          <div class="card-grid core-grid">
+            <button class="category-card core-card" type="button" data-category="Theme editor">
+              <span class="card-icon icon-theme" aria-hidden="true"><i></i></span>
+              <span class="card-copy"><strong>Theme editor</strong><small>Light and dark browser colors</small></span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button class="category-card core-card" type="button" data-category="Wallpaper editor">
+              <span class="card-icon icon-wallpaper" aria-hidden="true"><i></i></span>
+              <span class="card-copy"><strong>Wallpaper editor</strong><small>Static or animated backgrounds</small></span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button class="category-card core-card" type="button" data-category="Music editor">
+              <span class="card-icon icon-music" aria-hidden="true"><i></i></span>
+              <span class="card-copy"><strong>Music editor</strong><small>Looping background tracks</small></span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="category-section additional-section" aria-labelledby="additional-heading">
+          <div class="section-heading">
+            <div>
+              <p class="section-index">02</p>
+              <h3 id="additional-heading">Additional modding</h3>
+            </div>
+            <p>Optional components for a more complete browser experience.</p>
+          </div>
+
+          <div class="card-grid additional-grid">
+            <button class="category-card" type="button" data-category="App icon"><span class="mini-index">01</span><span class="card-copy"><strong>App icon</strong><small>Desktop identity</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Fonts"><span class="mini-index">02</span><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Game strips"><span class="mini-index">03</span><span class="card-copy"><strong>Game strips</strong><small>Game page visuals</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Stickers"><span class="mini-index">04</span><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Icons"><span class="mini-index">05</span><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Splash screen"><span class="mini-index">06</span><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Cursors"><span class="mini-index">07</span><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Shaders"><span class="mini-index">08</span><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Web modding"><span class="mini-index">09</span><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Speed Dial effects"><span class="mini-index">10</span><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page details</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Browser sounds"><span class="mini-index">11</span><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Keyboard sounds"><span class="mini-index">12</span><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
+          </div>
+        </section>
+
+        <p class="editor-notice" id="editor-notice" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Community-built tool</span>
+      <span>Not affiliated with Opera</span>
+    </footer>
+  </body>
+</html>
