@@ -276,6 +276,30 @@ h1 em {
   font-size: 0.78rem;
 }
 
+.creator-credit {
+  margin: 6px 0 0;
+  color: #696570;
+  font-size: 0.78rem;
+}
+
+.creator-credit a {
+  color: inherit;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+
+.creator-credit a:hover {
+  color: var(--muted);
+  text-decoration-color: currentColor;
+}
+
+.creator-credit a:focus-visible {
+  color: var(--text);
+  outline: 1px solid var(--red);
+  outline-offset: 3px;
+}
+
 .hero-visual {
   position: relative;
   width: min(100%, 500px);
