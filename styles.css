@@ -277,27 +277,21 @@ h1 em {
   line-height: 0;
 }
 
-.local-note {
-  margin: 14px 0 0;
-  color: #696570;
-  font-size: 0.78rem;
-}
-
 .creator-credit {
   margin: 6px 0 0;
-  color: #696570;
-  font-size: 0.78rem;
+  color: var(--red);
+  font-size: 0.84rem;
 }
 
 .creator-credit a {
-  color: inherit;
+  color: var(--text);
   text-decoration-color: transparent;
   text-underline-offset: 3px;
   transition: color 160ms ease, text-decoration-color 160ms ease;
 }
 
 .creator-credit a:hover {
-  color: var(--muted);
+  color: var(--red-bright);
   text-decoration-color: currentColor;
 }
 
