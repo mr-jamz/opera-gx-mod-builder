@@ -116,9 +116,16 @@ button {
   height: 30px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--red);
   border-radius: 50%;
   box-shadow: 0 0 22px rgba(255, 27, 77, 0.35);
+}
+
+.brand-mark::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border: 2px solid var(--red);
+  border-radius: 50%;
 }
 
 .brand-mark span {
@@ -126,7 +133,7 @@ button {
   height: 18px;
   border-inline: 2px solid var(--red);
   border-radius: 50%;
-  transform: rotate(16deg);
+  animation: brand-inner-ring-spin 3s linear infinite;
 }
 
 .status {
@@ -463,11 +470,15 @@ h1 em {
   line-height: 1;
 }
 
-.creator-heading > div > p:last-child {
+.creator-heading .creator-intro {
   max-width: 600px;
   margin: 18px 0 0;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.creator-heading .creator-credit {
+  margin-top: 8px;
 }
 
 .progress-chip {
@@ -845,5 +856,15 @@ h1 em {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes brand-inner-ring-spin {
+  from {
+    transform: rotate(16deg);
+  }
+
+  to {
+    transform: rotate(376deg);
   }
 }
