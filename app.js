@@ -92,18 +92,23 @@ function hslString(color) {
 
 function applyPageTheme() {
   const values = themeValues[activeThemeMode];
+  const pageLightness = activeThemeMode === "dark" ? 4 : 98;
   document.body.classList.add("theme-preview-active");
   document.body.classList.toggle("theme-mode-dark", activeThemeMode === "dark");
   document.body.classList.toggle("theme-mode-light", activeThemeMode === "light");
   document.body.style.setProperty("--opera-gx-accent-color", hslString(values.accent));
   document.body.style.setProperty("--opera-gx-background-color", hslString(values.secondary));
-  themeColorMeta.setAttribute("content", hslString(values.secondary));
+  document.body.style.setProperty("--gx-secondary-h", values.secondary.h);
+  document.body.style.setProperty("--gx-secondary-s", `${values.secondary.s}%`);
+  themeColorMeta.setAttribute("content", `hsl(${values.secondary.h} ${values.secondary.s}% ${pageLightness}%)`);
 }
 
 function resetPageTheme() {
   document.body.classList.remove("theme-preview-active", "theme-mode-dark", "theme-mode-light");
   document.body.style.removeProperty("--opera-gx-accent-color");
   document.body.style.removeProperty("--opera-gx-background-color");
+  document.body.style.removeProperty("--gx-secondary-h");
+  document.body.style.removeProperty("--gx-secondary-s");
   themeColorMeta.setAttribute("content", "#251f33");
 }
 

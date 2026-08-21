@@ -2,17 +2,18 @@
   color-scheme: dark;
   --opera-gx-accent-color: hsl(347 96% 55%);
   --opera-gx-background-color: hsl(258 24% 16%);
-  --theme-surface-mix: black;
-  --bg: var(--opera-gx-background-color);
-  --surface: color-mix(in hsl, var(--opera-gx-background-color) 86%, black);
-  --surface-raised: color-mix(in hsl, var(--opera-gx-background-color) 72%, black);
-  --line: color-mix(in hsl, var(--opera-gx-accent-color) 17%, transparent);
-  --line-strong: color-mix(in hsl, var(--opera-gx-accent-color) 32%, transparent);
-  --text: var(--opera-gx-accent-color);
-  --muted: color-mix(in hsl, var(--opera-gx-accent-color) 62%, var(--opera-gx-background-color));
+  --gx-secondary-h: 258;
+  --gx-secondary-s: 24%;
+  --bg: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 4%);
+  --surface: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 8%);
+  --surface-raised: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 12%);
+  --line: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 32% / 0.38);
+  --line-strong: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 32% / 0.7);
+  --text: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 100%);
+  --muted: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 76%);
   --red: var(--opera-gx-accent-color);
-  --red-bright: color-mix(in hsl, var(--opera-gx-accent-color) 82%, white);
-  --red-dark: color-mix(in hsl, var(--opera-gx-accent-color) 70%, black);
+  --red-bright: color-mix(in srgb, var(--opera-gx-accent-color) 80%, white);
+  --red-dark: color-mix(in srgb, var(--opera-gx-accent-color) 80%, black);
   --max-width: 1240px;
   --header-height: 88px;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
@@ -39,30 +40,31 @@ body {
 }
 
 body.theme-preview-active {
-  --bg: var(--opera-gx-background-color);
-  --surface: color-mix(in hsl, var(--opera-gx-background-color) 86%, var(--theme-surface-mix));
-  --surface-raised: color-mix(in hsl, var(--opera-gx-background-color) 72%, var(--theme-surface-mix));
-  --line: color-mix(in hsl, var(--opera-gx-accent-color) 17%, transparent);
-  --line-strong: color-mix(in hsl, var(--opera-gx-accent-color) 32%, transparent);
-  --text: var(--opera-gx-accent-color);
-  --muted: color-mix(in hsl, var(--opera-gx-accent-color) 62%, var(--opera-gx-background-color));
   --red: var(--opera-gx-accent-color);
-  --red-bright: color-mix(in hsl, var(--opera-gx-accent-color) 82%, white);
-  --red-dark: color-mix(in hsl, var(--opera-gx-accent-color) 70%, black);
-  color: var(--opera-gx-accent-color);
-  background:
-    radial-gradient(circle at 78% 22%, color-mix(in hsl, var(--opera-gx-accent-color) 16%, transparent), transparent 28rem),
-    var(--opera-gx-background-color);
+  --red-bright: color-mix(in srgb, var(--opera-gx-accent-color) 80%, white);
+  --red-dark: color-mix(in srgb, var(--opera-gx-accent-color) 80%, black);
   transition: color 140ms ease, background 140ms ease;
 }
 
 body.theme-mode-dark {
-  --theme-surface-mix: black;
+  --bg: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 4%);
+  --surface: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 8%);
+  --surface-raised: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 12%);
+  --line: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 32% / 0.38);
+  --line-strong: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 32% / 0.7);
+  --text: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 100%);
+  --muted: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 76%);
   color-scheme: dark;
 }
 
 body.theme-mode-light {
-  --theme-surface-mix: white;
+  --bg: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 98%);
+  --surface: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 96%);
+  --surface-raised: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 92%);
+  --line: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 80% / 0.7);
+  --line-strong: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 76% / 0.9);
+  --text: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 0%);
+  --muted: hsl(var(--gx-secondary-h) var(--gx-secondary-s) 24%);
   color-scheme: light;
 }
 
