@@ -12,12 +12,12 @@ let noticeTimer;
 
 const themeValues = {
   dark: {
-    accent: { h: 4, s: 83, l: 72 },
-    secondary: { h: 20, s: 27, l: 32 }
+    accent: { h: 347, s: 96, l: 55 },
+    secondary: { h: 258, s: 24, l: 16 }
   },
   light: {
-    accent: { h: 327, s: 80, l: 57 },
-    secondary: { h: 6, s: 15, l: 25 }
+    accent: { h: 347, s: 96, l: 55 },
+    secondary: { h: 258, s: 22, l: 91 }
   }
 };
 
@@ -63,6 +63,7 @@ backButton.addEventListener("click", () => {
 categoryButtons.forEach((button) => {
   button.addEventListener("click", () => {
     if (button.dataset.category === "Theme editor") {
+      applyPageTheme();
       switchView(creatorView, themeEditorView);
       window.history.replaceState(null, "", "#theme-editor");
       return;
@@ -73,18 +74,37 @@ categoryButtons.forEach((button) => {
 });
 
 backCreatorButton.addEventListener("click", () => {
+  resetPageTheme();
   switchView(themeEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
 const modeTabs = document.querySelectorAll(".mode-tab");
 const colorInputs = document.querySelectorAll(".hsl-picker input");
-const browserPreview = document.querySelector("#browser-preview");
-const previewMode = document.querySelector("#preview-mode");
 const themeControls = document.querySelector("#theme-controls");
+const secondaryLockValue = document.querySelector("#secondary-lock-value");
+const secondaryLockNote = document.querySelector("#secondary-lock-note");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
 function hslString(color) {
   return `hsl(${color.h} ${color.s}% ${color.l}%)`;
+}
+
+function applyPageTheme() {
+  const values = themeValues[activeThemeMode];
+  document.body.classList.add("theme-preview-active");
+  document.body.classList.toggle("theme-mode-dark", activeThemeMode === "dark");
+  document.body.classList.toggle("theme-mode-light", activeThemeMode === "light");
+  document.body.style.setProperty("--opera-gx-accent-color", hslString(values.accent));
+  document.body.style.setProperty("--opera-gx-background-color", hslString(values.secondary));
+  themeColorMeta.setAttribute("content", hslString(values.secondary));
+}
+
+function resetPageTheme() {
+  document.body.classList.remove("theme-preview-active", "theme-mode-dark", "theme-mode-light");
+  document.body.style.removeProperty("--opera-gx-accent-color");
+  document.body.style.removeProperty("--opera-gx-background-color");
+  themeColorMeta.setAttribute("content", "#251f33");
 }
 
 function updateRangeAppearance(input, color) {
@@ -104,10 +124,8 @@ function updateRangeAppearance(input, color) {
 
 function renderThemeEditor() {
   const values = themeValues[activeThemeMode];
-  const secondary = values.secondary;
-  const surfaceLightness = activeThemeMode === "dark"
-    ? Math.max(4, Math.round(secondary.l * 0.26))
-    : Math.min(97, Math.round(92 + secondary.l * 0.08));
+  const lockedLightness = activeThemeMode === "dark" ? 16 : 91;
+  values.secondary.l = lockedLightness;
 
   ["accent", "secondary"].forEach((colorName) => {
     const color = values[colorName];
@@ -120,13 +138,12 @@ function renderThemeEditor() {
     document.querySelector(`#${colorName}-output`).textContent = hslString(color);
   });
 
-  browserPreview.style.setProperty("--preview-accent", hslString(values.accent));
-  browserPreview.style.setProperty("--preview-secondary-h", values.secondary.h);
-  browserPreview.style.setProperty("--preview-secondary-s", `${values.secondary.s}%`);
-  browserPreview.style.setProperty("--preview-secondary-l", `${values.secondary.l}%`);
-  browserPreview.style.setProperty("--preview-surface", `hsl(${secondary.h} ${secondary.s}% ${surfaceLightness}%)`);
-  browserPreview.dataset.mode = activeThemeMode;
-  previewMode.textContent = `${activeThemeMode[0].toUpperCase()}${activeThemeMode.slice(1)} mode`;
+  secondaryLockValue.textContent = `${lockedLightness}%`;
+  secondaryLockNote.lastChild.textContent = ` in ${activeThemeMode} mode.`;
+
+  if (document.body.classList.contains("theme-preview-active")) {
+    applyPageTheme();
+  }
 }
 
 modeTabs.forEach((tab) => {
@@ -158,4 +175,7 @@ if (window.location.hash === "#creator" || window.location.hash === "#theme-edit
   const initialView = window.location.hash === "#theme-editor" ? themeEditorView : creatorView;
   initialView.removeAttribute("aria-hidden");
   initialView.classList.add("is-active");
+  if (initialView === themeEditorView) {
+    applyPageTheme();
+  }
 }

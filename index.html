@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
-    <meta name="theme-color" content="#09090d">
+    <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
     <link rel="stylesheet" href="styles.css">
     <script src="app.js" defer></script>
@@ -134,6 +134,11 @@
           <button class="mode-tab" id="light-tab" type="button" role="tab" aria-selected="false" aria-controls="theme-controls" data-mode="light">Light mode</button>
         </div>
 
+        <div class="live-theme-note" role="status">
+          <i aria-hidden="true"></i>
+          <div><strong>Live page preview</strong><span>The active page now uses GX accent for its foreground and GX secondary base for its background, matching Opera’s CSS environment colors.</span></div>
+        </div>
+
         <div class="theme-workspace">
           <section class="theme-controls" id="theme-controls" role="tabpanel" aria-labelledby="dark-tab">
             <div class="control-heading">
@@ -141,13 +146,13 @@
                 <p class="section-index">COLOR 01</p>
                 <h3>GX accent</h3>
               </div>
-              <output class="hsl-output" id="accent-output" for="accent-h accent-s accent-l">hsl(4 83% 72%)</output>
+              <output class="hsl-output" id="accent-output" for="accent-h accent-s accent-l">hsl(347 96% 55%)</output>
             </div>
             <p class="control-description">Buttons, active tabs, outlines, and browser highlights.</p>
             <div class="hsl-picker" data-color="accent">
-              <label><span>Hue <b id="accent-h-value">4°</b></span><input id="accent-h" type="range" min="0" max="360" value="4" data-channel="h"></label>
-              <label><span>Saturation <b id="accent-s-value">83%</b></span><input id="accent-s" type="range" min="0" max="100" value="83" data-channel="s"></label>
-              <label><span>Lightness <b id="accent-l-value">72%</b></span><input id="accent-l" type="range" min="0" max="100" value="72" data-channel="l"></label>
+              <label><span>Hue <b id="accent-h-value">347°</b></span><input id="accent-h" type="range" min="0" max="360" value="347" data-channel="h"></label>
+              <label><span>Saturation <b id="accent-s-value">96%</b></span><input id="accent-s" type="range" min="0" max="100" value="96" data-channel="s"></label>
+              <label><span>Lightness <b id="accent-l-value">55%</b></span><input id="accent-l" type="range" min="0" max="100" value="55" data-channel="l"></label>
             </div>
 
             <div class="control-divider"></div>
@@ -157,52 +162,15 @@
                 <p class="section-index">COLOR 02</p>
                 <h3>GX secondary base</h3>
               </div>
-              <output class="hsl-output" id="secondary-output" for="secondary-h secondary-s secondary-l">hsl(20 27% 32%)</output>
+              <output class="hsl-output" id="secondary-output" for="secondary-h secondary-s secondary-l">hsl(258 24% 16%)</output>
             </div>
             <p class="control-description">The foundation Opera GX uses for browser surfaces and panels.</p>
             <div class="hsl-picker" data-color="secondary">
-              <label><span>Hue <b id="secondary-h-value">20°</b></span><input id="secondary-h" type="range" min="0" max="360" value="20" data-channel="h"></label>
-              <label><span>Saturation <b id="secondary-s-value">27%</b></span><input id="secondary-s" type="range" min="0" max="100" value="27" data-channel="s"></label>
-              <label><span>Lightness <b id="secondary-l-value">32%</b></span><input id="secondary-l" type="range" min="0" max="100" value="32" data-channel="l"></label>
+              <label><span>Hue <b id="secondary-h-value">258°</b></span><input id="secondary-h" type="range" min="0" max="360" value="258" data-channel="h"></label>
+              <label><span>Saturation <b id="secondary-s-value">24%</b></span><input id="secondary-s" type="range" min="0" max="100" value="24" data-channel="s"></label>
+              <label><span>Lightness <b id="secondary-l-value">16%</b></span><input id="secondary-l" type="range" min="0" max="100" value="16" data-channel="l" disabled aria-describedby="secondary-lock-note"></label>
             </div>
-          </section>
-
-          <section class="theme-preview-panel" aria-labelledby="preview-heading">
-            <div class="preview-heading-row">
-              <div>
-                <p class="section-index">LIVE PREVIEW</p>
-                <h3 id="preview-heading">Opera GX browser</h3>
-              </div>
-              <span class="preview-mode" id="preview-mode">Dark mode</span>
-            </div>
-
-            <div class="browser-preview" id="browser-preview">
-              <div class="browser-sidebar">
-                <span class="opera-ring" aria-hidden="true"></span>
-                <span class="sidebar-item is-selected" aria-label="GX Corner">GX</span>
-                <span class="sidebar-item" aria-label="Messenger">●</span>
-                <span class="sidebar-item" aria-label="Music">♫</span>
-                <span class="sidebar-spacer"></span>
-                <span class="sidebar-item" aria-label="Settings">⚙</span>
-              </div>
-              <div class="browser-shell">
-                <div class="browser-tabs">
-                  <div class="browser-tab is-current"><span></span>GX Corner <b>×</b></div>
-                  <div class="new-tab">+</div>
-                  <div class="window-actions">— □ ×</div>
-                </div>
-                <div class="browser-toolbar"><span>←</span><span>→</span><span>↻</span><div class="address-bar"><i></i> Search or enter an address</div><span>♡</span></div>
-                <div class="browser-page">
-                  <div class="preview-kicker">GX CORNER</div>
-                  <h4>Your gaming universe.</h4>
-                  <div class="preview-cards">
-                    <article><span>RELEASE RADAR</span><strong>Upcoming games</strong><b class="preview-button">Explore</b></article>
-                    <article><span>GX PICKS</span><strong>Play something new</strong><b class="preview-button">Browse</b></article>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p class="preview-note">This preview approximates how Opera GX derives interface surfaces from the secondary base and applies the accent to active controls.</p>
+            <p class="locked-value-note" id="secondary-lock-note"><span aria-hidden="true">◆</span> Opera GX locks GX secondary base lightness to <strong id="secondary-lock-value">16%</strong> in dark mode.</p>
           </section>
         </div>
       </section>

@@ -1,15 +1,18 @@
 :root {
   color-scheme: dark;
-  --bg: #08080c;
-  --surface: #101016;
-  --surface-raised: #15151d;
-  --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --text: #f7f5f7;
-  --muted: #9995a2;
-  --red: #ff1b4d;
-  --red-bright: #ff3b64;
-  --red-dark: #8d0829;
+  --opera-gx-accent-color: hsl(347 96% 55%);
+  --opera-gx-background-color: hsl(258 24% 16%);
+  --theme-surface-mix: black;
+  --bg: var(--opera-gx-background-color);
+  --surface: color-mix(in hsl, var(--opera-gx-background-color) 86%, black);
+  --surface-raised: color-mix(in hsl, var(--opera-gx-background-color) 72%, black);
+  --line: color-mix(in hsl, var(--opera-gx-accent-color) 17%, transparent);
+  --line-strong: color-mix(in hsl, var(--opera-gx-accent-color) 32%, transparent);
+  --text: var(--opera-gx-accent-color);
+  --muted: color-mix(in hsl, var(--opera-gx-accent-color) 62%, var(--opera-gx-background-color));
+  --red: var(--opera-gx-accent-color);
+  --red-bright: color-mix(in hsl, var(--opera-gx-accent-color) 82%, white);
+  --red-dark: color-mix(in hsl, var(--opera-gx-accent-color) 70%, black);
   --max-width: 1240px;
   --header-height: 88px;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
@@ -31,9 +34,36 @@ body {
   overflow-x: hidden;
   color: var(--text);
   background:
-    radial-gradient(circle at 78% 22%, rgba(148, 4, 40, 0.18), transparent 28rem),
-    radial-gradient(circle at 20% 90%, rgba(70, 8, 28, 0.16), transparent 30rem),
+    radial-gradient(circle at 78% 22%, color-mix(in hsl, var(--red) 16%, transparent), transparent 28rem),
     var(--bg);
+}
+
+body.theme-preview-active {
+  --bg: var(--opera-gx-background-color);
+  --surface: color-mix(in hsl, var(--opera-gx-background-color) 86%, var(--theme-surface-mix));
+  --surface-raised: color-mix(in hsl, var(--opera-gx-background-color) 72%, var(--theme-surface-mix));
+  --line: color-mix(in hsl, var(--opera-gx-accent-color) 17%, transparent);
+  --line-strong: color-mix(in hsl, var(--opera-gx-accent-color) 32%, transparent);
+  --text: var(--opera-gx-accent-color);
+  --muted: color-mix(in hsl, var(--opera-gx-accent-color) 62%, var(--opera-gx-background-color));
+  --red: var(--opera-gx-accent-color);
+  --red-bright: color-mix(in hsl, var(--opera-gx-accent-color) 82%, white);
+  --red-dark: color-mix(in hsl, var(--opera-gx-accent-color) 70%, black);
+  color: var(--opera-gx-accent-color);
+  background:
+    radial-gradient(circle at 78% 22%, color-mix(in hsl, var(--opera-gx-accent-color) 16%, transparent), transparent 28rem),
+    var(--opera-gx-background-color);
+  transition: color 140ms ease, background 140ms ease;
+}
+
+body.theme-mode-dark {
+  --theme-surface-mix: black;
+  color-scheme: dark;
+}
+
+body.theme-mode-light {
+  --theme-surface-mix: white;
+  color-scheme: light;
 }
 
 button,
@@ -514,31 +544,27 @@ h1 em {
 
 .theme-workspace {
   display: grid;
-  grid-template-columns: minmax(300px, 0.78fr) minmax(500px, 1.42fr);
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: minmax(0, 760px);
+  justify-content: center;
 }
 
-.theme-controls,
-.theme-preview-panel {
+.theme-controls {
   border: 1px solid var(--line);
-  background: rgba(16, 16, 22, 0.82);
+  background: color-mix(in hsl, var(--surface) 94%, transparent);
 }
 
 .theme-controls {
   padding: clamp(22px, 3vw, 34px);
 }
 
-.control-heading,
-.preview-heading-row {
+.control-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.control-heading h3,
-.preview-heading-row h3 {
+.control-heading h3 {
   margin: 5px 0 0;
   font-size: 1.35rem;
   letter-spacing: -0.03em;
@@ -615,6 +641,62 @@ h1 em {
   height: 1px;
   margin: 32px 0;
   background: var(--line);
+}
+
+.live-theme-note {
+  max-width: 760px;
+  margin: 0 auto 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line-strong);
+  background: color-mix(in hsl, var(--surface) 90%, transparent);
+}
+
+.live-theme-note i {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 12px var(--red);
+}
+
+.live-theme-note div {
+  display: grid;
+  gap: 3px;
+}
+
+.live-theme-note strong {
+  font-size: 0.76rem;
+}
+
+.live-theme-note span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.locked-value-note {
+  margin: 18px 0 0;
+  padding: 11px 12px;
+  color: var(--muted);
+  border-left: 2px solid var(--red);
+  background: color-mix(in hsl, var(--red) 7%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.locked-value-note span,
+.locked-value-note strong {
+  color: var(--red);
+}
+
+.hsl-picker input:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.55);
+  opacity: 0.58;
 }
 
 .theme-preview-panel {
