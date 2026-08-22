@@ -30,6 +30,12 @@ const savedThemeValues = {
   light: null
 };
 
+const modBuildState = {
+  music: {
+    tracks: []
+  }
+};
+
 let activeThemeMode = "dark";
 
 function switchView(fromView, toView) {
@@ -502,7 +508,6 @@ const addMusicTrackButton = document.querySelector("#add-music-track");
 const saveMusicTracksButton = document.querySelector("#save-music-tracks");
 const musicSaveStatus = document.querySelector("#music-save-status");
 const musicMediaSelections = new WeakMap();
-let savedMusicTracks = [];
 let musicTrackUid = 1;
 let musicConversionUid = 0;
 let musicConverterPromise;
@@ -529,27 +534,22 @@ function clearMusicMedia(card) {
   card.querySelector(".music-media-name").textContent = "";
   card.querySelector(".music-media-status").textContent = "";
   card.querySelector(".music-media-input").value = "";
-  card.querySelector('[data-music-action="preview"]').textContent = "Play";
   setMusicSaveAvailability();
 }
 
-function showMusicMedia(card, file, convertedFromMp4 = false) {
+function showMusicMedia(card, file, convertedFromMp4 = false, sourceFile = file) {
   const previewUrl = URL.createObjectURL(file);
   musicMediaSelections.set(card, {
+    convertedFromMp4,
     file,
     isConverting: false,
-    previewUrl
+    previewUrl,
+    sourceName: sourceFile.name,
+    sourceType: sourceFile.type
   });
 
   const audio = card.querySelector("audio");
-  const previewButton = card.querySelector('[data-music-action="preview"]');
   audio.src = previewUrl;
-  audio.onplay = () => {
-    previewButton.textContent = "Pause";
-  };
-  audio.onpause = () => {
-    previewButton.textContent = "Play";
-  };
   card.querySelector(".music-media-name").textContent = file.name;
   card.querySelector(".music-media-selection").hidden = false;
   card.querySelector(".music-media-status").textContent = convertedFromMp4
@@ -644,7 +644,7 @@ async function selectMusicMedia(card, file) {
     if (musicMediaSelections.get(card)?.token !== conversionToken) {
       return;
     }
-    showMusicMedia(card, convertedFile, true);
+    showMusicMedia(card, convertedFile, true, file);
   } catch (error) {
     if (musicMediaSelections.get(card)?.token !== conversionToken) {
       return;
@@ -693,10 +693,9 @@ function createMusicTrack() {
       <div class="music-media-selection" hidden>
         <div><span>Audio ready</span><strong class="music-media-name"></strong></div>
         <div class="music-media-actions">
-          <button type="button" data-music-action="preview">Play</button>
           <button type="button" data-music-action="remove-media">Remove file</button>
         </div>
-        <audio preload="metadata"></audio>
+        <audio controls preload="metadata"></audio>
       </div>
     </div>`;
 
@@ -764,7 +763,7 @@ musicTrackList.addEventListener("drop", (event) => {
   }
 });
 
-musicTrackList.addEventListener("click", async (event) => {
+musicTrackList.addEventListener("click", (event) => {
   const actionButton = event.target.closest("[data-music-action]");
   if (!actionButton) {
     return;
@@ -774,25 +773,19 @@ musicTrackList.addEventListener("click", async (event) => {
   if (actionButton.dataset.musicAction === "remove-media") {
     clearMusicMedia(card);
     musicSaveStatus.textContent = "";
-    return;
-  }
-
-  const audio = card.querySelector("audio");
-  if (audio.paused) {
-    musicTrackList.querySelectorAll("audio").forEach((otherAudio) => {
-      if (otherAudio !== audio) {
-        otherAudio.pause();
-      }
-    });
-    try {
-      await audio.play();
-    } catch (error) {
-      card.querySelector(".music-media-status").textContent = "The audio preview could not start.";
-    }
-  } else {
-    audio.pause();
   }
 });
+
+musicTrackList.addEventListener("play", (event) => {
+  if (!event.target.matches("audio")) {
+    return;
+  }
+  musicTrackList.querySelectorAll("audio").forEach((audio) => {
+    if (audio !== event.target) {
+      audio.pause();
+    }
+  });
+}, true);
 
 saveMusicTracksButton.addEventListener("click", () => {
   const cards = [...musicTrackList.querySelectorAll(".music-track-card")];
@@ -816,13 +809,22 @@ saveMusicTracksButton.addEventListener("click", () => {
     return;
   }
 
-  savedMusicTracks = cards.map((card) => ({
-    author: card.querySelector('input[name="author"]').value.trim(),
-    songName: card.querySelector('input[name="song-name"]').value.trim(),
-    file: musicMediaSelections.get(card)?.file ?? null
-  }));
-  const trackLabel = savedMusicTracks.length === 1 ? "track" : "tracks";
-  musicSaveStatus.textContent = `${savedMusicTracks.length} ${trackLabel} saved for this visit.`;
+  modBuildState.music.tracks = cards.map((card) => {
+    const media = musicMediaSelections.get(card);
+    return {
+      author: card.querySelector('input[name="author"]').value.trim(),
+      songName: card.querySelector('input[name="song-name"]').value.trim(),
+      media: media ? {
+        convertedFromMp4: media.convertedFromMp4,
+        file: media.file,
+        sourceName: media.sourceName,
+        sourceType: media.sourceType
+      } : null
+    };
+  });
+  const trackCount = modBuildState.music.tracks.length;
+  const trackLabel = trackCount === 1 ? "track" : "tracks";
+  musicSaveStatus.textContent = `${trackCount} ${trackLabel} saved for this visit.`;
 });
 
 renderThemeEditor();

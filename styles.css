@@ -1490,9 +1490,9 @@ h1 em {
 .music-media-selection {
   margin-top: 12px;
   padding: 15px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 18px;
   border: 1px solid var(--line);
   background: var(--surface-deep);
@@ -1544,7 +1544,12 @@ h1 em {
 }
 
 .music-media-selection audio {
-  display: none;
+  width: 100%;
+  height: 40px;
+  grid-column: 1 / -1;
+  display: block;
+  accent-color: var(--red);
+  color-scheme: dark;
 }
 
 .add-track-button {
@@ -2328,8 +2333,7 @@ h1 em {
   }
 
   .music-media-selection {
-    align-items: stretch;
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .music-media-actions button {
