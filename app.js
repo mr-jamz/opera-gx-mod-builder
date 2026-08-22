@@ -9,6 +9,7 @@ const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
+const createModButton = document.querySelector("#create-mod");
 const editorNotice = document.querySelector("#editor-notice");
 const categoryButtons = document.querySelectorAll("[data-category]");
 
@@ -173,6 +174,7 @@ function updateSavedThemeSummary(mode) {
   const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
   savedThemeBox.hidden = !hasSavedTheme;
   themeCategoryCard.classList.toggle("has-saved-data", hasSavedTheme);
+  updateCreateModAvailability();
 }
 
 function applyPageTheme() {
@@ -339,6 +341,7 @@ function updateSavedWallpaperSummary(mode) {
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   savedWallpaperBox.hidden = !hasSavedWallpaper;
   wallpaperCategoryCard.classList.toggle("has-saved-data", hasSavedWallpaper);
+  updateCreateModAvailability();
 }
 
 function renderWallpaperMedia() {
@@ -552,6 +555,14 @@ function updateSavedMusicSummary() {
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
   savedMusicBox.hidden = !hasSavedMusic;
   musicCategoryCard.classList.toggle("has-saved-data", hasSavedMusic);
+  updateCreateModAvailability();
+}
+
+function updateCreateModAvailability() {
+  const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
+  const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
+  const hasSavedMusic = modBuildState.music.tracks.length > 0;
+  createModButton.disabled = !(hasSavedTheme || hasSavedWallpaper || hasSavedMusic);
 }
 
 function setMusicSaveAvailability() {

@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-13">
-    <script src="app.js?v=20260822-13" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-15">
+    <script src="app.js?v=20260822-15" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -19,7 +19,7 @@
         <span class="brand-mark" aria-hidden="true"><span></span></span>
         <span>GX <b>MOD BUILDER</b></span>
       </a>
-      <span class="status"><i aria-hidden="true"></i> Builder alpha</span>
+      <span class="status"><span class="header-affiliation">Not affiliated with Opera</span><i aria-hidden="true"></i> Builder alpha</span>
     </header>
 
     <main>
@@ -60,6 +60,7 @@
             <h2 id="creator-title">Create your mod</h2>
             <p class="creator-intro">Choose the categories you want to mod and we will walk you through the rest.</p>
           </div>
+          <button class="create-mod-button" id="create-mod" type="button" disabled><span>Create Mod</span><b aria-hidden="true">→</b></button>
         </div>
 
         <section class="category-section" aria-labelledby="core-heading">
@@ -383,8 +384,5 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <span>Not affiliated with Opera</span>
-    </footer>
   </body>
 </html>
