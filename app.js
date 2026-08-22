@@ -13,6 +13,10 @@ const backMusicButton = document.querySelector("#back-music");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
 const buildSummaryGroups = document.querySelector("#build-summary-groups");
+const buildModButton = document.querySelector("#build-mod");
+const buildDonationDialog = document.querySelector("#build-donation-dialog");
+const downloadModButton = document.querySelector("#download-mod");
+const downloadModStatus = document.querySelector("#download-mod-status");
 const editorNotice = document.querySelector("#editor-notice");
 const categoryButtons = document.querySelectorAll("[data-category]");
 
@@ -147,6 +151,21 @@ backMusicButton.addEventListener("click", () => {
 backBuildReviewButton.addEventListener("click", () => {
   switchView(buildReviewView, creatorView);
   window.history.replaceState(null, "", "#creator");
+});
+
+buildModButton.addEventListener("click", () => {
+  downloadModStatus.textContent = "";
+  buildDonationDialog.showModal();
+});
+
+buildDonationDialog.addEventListener("click", (event) => {
+  if (event.target === buildDonationDialog) {
+    buildDonationDialog.close();
+  }
+});
+
+downloadModButton.addEventListener("click", () => {
+  downloadModStatus.textContent = "Mod packaging will be connected in the next build step";
 });
 
 const modeTabs = document.querySelectorAll(".mode-tab");

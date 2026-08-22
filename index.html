@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-18">
-    <script src="app.js?v=20260822-18" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-21">
+    <script src="app.js?v=20260822-21" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -129,7 +129,7 @@
           <div class="card-grid additional-grid">
             <button class="category-card" type="button" data-category="App icon"><span class="card-copy"><strong>App icon</strong><small>Desktop identity</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Game strips"><span class="card-copy"><strong>Game strips</strong><small>Game page visuals</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Game strips" disabled><span class="card-copy"><strong>Game strips</strong><small>Not supported yet</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
@@ -395,8 +395,23 @@
         </div>
 
         <div class="build-summary-groups" id="build-summary-groups" aria-live="polite"></div>
+        <div class="build-review-action">
+          <button class="build-mod-button" id="build-mod" type="button"><span>Build Mod</span><b aria-hidden="true">→</b></button>
+        </div>
       </section>
     </main>
+
+    <dialog class="build-donation-dialog" id="build-donation-dialog" aria-labelledby="donation-dialog-title" aria-describedby="donation-dialog-description">
+      <form method="dialog">
+        <button class="dialog-close-button" type="submit" aria-label="Close donation request">×</button>
+      </form>
+      <p class="eyebrow">One last step</p>
+      <h2 id="donation-dialog-title">Support the project</h2>
+      <p id="donation-dialog-description">This builder is free to use and maintained independently so please consider helping fund its continued development</p>
+      <a class="donation-link" href="https://github.com/sponsors/mr-jamz" target="_blank" rel="noopener noreferrer">Donate to the project</a>
+      <button class="download-mod-button" id="download-mod" type="button"><span>Download your mod</span><b aria-hidden="true">↓</b></button>
+      <p class="download-mod-status" id="download-mod-status" role="status" aria-live="polite"></p>
+    </dialog>
 
   </body>
 </html>

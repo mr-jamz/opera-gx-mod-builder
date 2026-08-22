@@ -45,13 +45,15 @@ DESCRIPTIONS GO HERE
 |_____|_| |___|___|_|_| |___|
 ...............................................................................
 
-This template used code from the following mods to teach you guys how to make your own:
+This template referenced code from the following mods to teach you guys how to make your own:
 
 https://store.gx.me
 https://store.gx.me/mods/a7t0tm/official-cyberpunk-2077
 https://store.gx.me/mods/595tdx/gauntlet
 https://store.gx.me/mods/0xp7sv/gx-aura
 https://store.gx.me/mods/8x5hvv/anime
+https://store.gx.me/mods/y08p2o/idle-clicker/
+
 
 CREDITS GO HERE
                                                               

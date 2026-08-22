@@ -156,7 +156,7 @@ button {
 
 .brand-byline {
   margin-left: 4px;
-  color: #5f5b65;
+  color: #817b88;
   font-size: 0.68em;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -2093,6 +2093,116 @@ h1 em {
   overflow-wrap: anywhere;
 }
 
+.build-review-action {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.build-mod-button,
+.download-mod-button {
+  min-width: 210px;
+  padding: 17px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  color: white;
+  border: 1px solid var(--red);
+  background: var(--red);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.build-mod-button:hover,
+.download-mod-button:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+}
+
+.build-mod-button:focus-visible,
+.download-mod-button:focus-visible,
+.dialog-close-button:focus-visible,
+.donation-link:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.build-donation-dialog {
+  width: min(calc(100% - 32px), 560px);
+  padding: 42px;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: 0 28px 90px rgb(0 0 0 / 0.62), 0 0 42px color-mix(in hsl, var(--red) 18%, transparent);
+}
+
+.build-donation-dialog::backdrop {
+  background: rgb(0 0 0 / 0.76);
+  backdrop-filter: blur(7px);
+}
+
+.build-donation-dialog[open] {
+  animation: dialog-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.build-donation-dialog form {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.dialog-close-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.build-donation-dialog h2 {
+  margin: 10px 0 16px;
+  font-size: clamp(2rem, 8vw, 3.3rem);
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.build-donation-dialog > p:not(.eyebrow, .download-mod-status) {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.donation-link {
+  width: fit-content;
+  margin: 20px 0 28px;
+  display: inline-block;
+  color: var(--red-bright);
+  font-size: 0.82rem;
+  font-weight: 750;
+  text-underline-offset: 4px;
+}
+
+.download-mod-button {
+  width: 100%;
+}
+
+.download-mod-status {
+  min-height: 1.3em;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
 .category-section {
   padding: 0 0 64px;
 }
@@ -2195,6 +2305,36 @@ h1 em {
 
 .category-card:hover::after {
   opacity: 1;
+}
+
+.category-card.is-not-supported {
+  color: #77727e;
+  border-color: color-mix(in hsl, var(--line) 70%, transparent);
+  background: color-mix(in hsl, var(--surface) 72%, transparent);
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: 0.56;
+}
+
+.category-card.is-not-supported:hover {
+  z-index: auto;
+  border-color: color-mix(in hsl, var(--line) 70%, transparent);
+  background: color-mix(in hsl, var(--surface) 72%, transparent);
+  transform: none;
+}
+
+.category-card.is-not-supported::after {
+  display: none;
+}
+
+.category-card.is-not-supported small {
+  color: #8d8792;
+}
+
+.unsupported-mark {
+  margin-left: auto;
+  color: #77727e;
+  font-weight: 700;
 }
 
 .core-card {
@@ -2611,6 +2751,18 @@ h1 em {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
