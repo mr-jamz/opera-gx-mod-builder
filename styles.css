@@ -490,8 +490,8 @@ h1 em {
   margin: 0;
   padding: 10px 12px;
   color: var(--red-bright);
-  border: 1px solid rgba(255, 27, 77, 0.35);
-  background: rgba(255, 27, 77, 0.06);
+  border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
+  background: color-mix(in srgb, var(--red) 6%, transparent);
   font: 700 0.64rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
