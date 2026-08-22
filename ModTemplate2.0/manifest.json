@@ -287,7 +287,7 @@
             "name": "InsertModNameOrSomethingHere",
             "dark": {
                "first_frame": "wallpaper/first_frame_dark.jpg",
-               "image": "wallpaper/animated_dark.webm",
+               "image": "wallpaper/dark_logo_animated.mp4",
                "image_mobile": "wallpaper/mobile_dark.mp4",
                "speeddial_position": "top",
                "text_color": "#f0f0f0",
@@ -302,7 +302,7 @@
             },
             "light": {
                "first_frame": "wallpaper/first_frame_light.jpg",
-               "image": "wallpaper/animated_light.webm",
+               "image": "wallpaper/light_logo_animated.webm",
                "image_mobile": "wallpaper/mobile_light.mp4",
                "speeddial_position": "top",
                "text_color": "#f0f0f0",
@@ -321,23 +321,19 @@
             "id": "Webmodding1",
             "matches": [ "https://*.opera.com/*" ],
             "name": "InsertModNameOrSomethingHere"
-         }, {
-            "css": [ "webmodding/main.theme.css", "webmodding/changecolors.css" ],
-            "id": "Webmodding2",
-            "matches": [ "https://*.discord.com/*" ],
-            "name": "InsertModNameOrSomethingHere"
-         }],
+         }
+		],
         "fonts": [ {
             "body": {
                "name": "NameOfFontGoesHere",
                "variants": [ {
-                  "path": "font/blender-book.ttf"
+                  "path": "fonts/blender-book.ttf"
                } ]
             },
             "header": {
                "name": "NameOfFontGoesHere",
                "variants": [ {
-                  "path": "font/blender-bold.ttf"
+                  "path": "fonts/blender-bold.ttf"
                } ]
             },
             "id": "Fonts",
