@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
+    <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-16">
-    <script src="app.js?v=20260822-16" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-18">
+    <script src="app.js?v=20260822-18" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -17,18 +17,18 @@
     <header class="site-header">
       <a class="brand" href="#home" aria-label="GX Mod Builder home">
         <span class="brand-mark" aria-hidden="true"><span></span></span>
-        <span>GX <b>MOD BUILDER</b></span>
+        <span>GX <b>MOD BUILDER</b> <small class="brand-byline">by MrJamz</small></span>
       </a>
-      <span class="status"><span class="header-affiliation">Not affiliated with Opera</span><i aria-hidden="true"></i> Builder alpha</span>
+      <span class="status"><span class="header-affiliation">Not affiliated with Opera</span><i aria-hidden="true"></i> Build v0.99</span>
     </header>
 
     <main>
       <section class="view landing is-active" id="home" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow">Make the browser yours</p>
-          <h1 id="hero-title">Build your own<br><em>Opera GX mod.</em></h1>
+          <h1 id="hero-title">Build your own<br><em>Opera GX mod</em></h1>
           <p class="hero-description">
-            Shape the colors, visuals, and sound of your browser through one guided workspace.
+            Shape the colors, visuals, and sounds of your browser through one guided workspace
           </p>
           <button class="primary-action" id="start-modding" type="button">
             <span>Start modding</span>
@@ -58,7 +58,7 @@
           <div>
             <p class="eyebrow">Choose a starting point</p>
             <h2 id="creator-title">Create your mod</h2>
-            <p class="creator-intro">Choose the categories you want to mod and we will walk you through the rest.</p>
+            <p class="creator-intro">Choose the categories you want to include in your mod</p>
           </div>
           <button class="create-mod-button" id="create-mod" type="button" disabled><span>Create Mod</span><b aria-hidden="true">→</b></button>
         </div>
@@ -68,7 +68,7 @@
             <div>
               <h3 id="core-heading">Popular choices</h3>
             </div>
-            <p>Start with the essentials that define your mod.</p>
+            <p>Start with the essentials that define your mod</p>
           </div>
 
           <div class="card-grid core-grid">
@@ -123,7 +123,7 @@
             <div>
               <h3 id="additional-heading">More modding</h3>
             </div>
-            <p>Optional components for a more complete browser experience.</p>
+            <p>Optional components for a more complete browser experience</p>
           </div>
 
           <div class="card-grid additional-grid">
@@ -162,7 +162,7 @@
 
         <div class="live-theme-note" role="status">
           <i aria-hidden="true"></i>
-          <div><strong>Live GX palette preview</strong><span>Opera uses the accent selectively and derives fixed surface and text shades from the secondary hue and saturation. This page attempts to follow that same behavior.</span></div>
+          <div><strong>Live GX palette preview</strong><span>Opera uses the accent selectively and derives fixed surface and text shades from the secondary hue and saturation. This page attempts to follow that same behavior</span></div>
         </div>
 
         <div class="theme-workspace">
@@ -174,7 +174,7 @@
               </div>
               <output class="hsl-output" id="accent-output" for="accent-h accent-s accent-l">hsl(347 96% 55%)</output>
             </div>
-            <p class="control-description">Buttons, active tabs, outlines, and browser highlights.</p>
+            <p class="control-description">Buttons, active tabs, outlines, and browser highlights</p>
             <div class="hsl-picker" data-color="accent">
               <label><span>Hue <b id="accent-h-value">347°</b></span><input id="accent-h" type="range" min="0" max="360" value="347" data-channel="h"></label>
               <label><span>Saturation <b id="accent-s-value">96%</b></span><input id="accent-s" type="range" min="0" max="100" value="96" data-channel="s"></label>
@@ -190,13 +190,13 @@
               </div>
               <output class="hsl-output" id="secondary-output" for="secondary-h secondary-s secondary-l">hsl(258 24% 16%)</output>
             </div>
-            <p class="control-description">The foundation Opera GX uses for browser surfaces and panels.</p>
+            <p class="control-description">The foundation Opera GX uses for browser surfaces and panels</p>
             <div class="hsl-picker" data-color="secondary">
               <label><span>Hue <b id="secondary-h-value">258°</b></span><input id="secondary-h" type="range" min="0" max="360" value="258" data-channel="h"></label>
               <label><span>Saturation <b id="secondary-s-value">24%</b></span><input id="secondary-s" type="range" min="0" max="100" value="24" data-channel="s"></label>
               <label><span>Lightness <b id="secondary-l-value">16%</b></span><input id="secondary-l" type="range" min="0" max="100" value="16" data-channel="l" disabled aria-describedby="secondary-lock-note"></label>
             </div>
-            <p class="locked-value-note" id="secondary-lock-note"><span aria-hidden="true">◆</span> Opera GX locks GX secondary base lightness to <strong id="secondary-lock-value">16%</strong> in dark mode.</p>
+            <p class="locked-value-note" id="secondary-lock-note"><span aria-hidden="true">◆</span> Opera GX locks GX secondary base lightness to <strong id="secondary-lock-value">16%</strong> in dark mode</p>
             <button class="save-theme-button" id="save-theme-colors" type="button"><span>Save dark colors</span><b aria-hidden="true">→</b></button>
             <p class="theme-save-status" id="theme-save-status" role="status" aria-live="polite"></p>
           </section>
@@ -222,7 +222,7 @@
           <section class="wallpaper-controls" aria-labelledby="wallpaper-media-heading">
             <p class="section-index">MEDIA</p>
             <h3 id="wallpaper-media-heading">Choose wallpaper media</h3>
-            <p class="control-description">Add a static image or animated file for the selected browser mode. Files remain only in this browser visit.</p>
+            <p class="control-description">Add a static image or animated file for the selected browser mode. Files remain only in this browser visit</p>
 
             <input class="wallpaper-file-input" id="wallpaper-file" type="file" accept="image/png,image/jpeg,image/webp,video/webm,video/mp4">
             <label class="wallpaper-file-button" id="wallpaper-dropzone" for="wallpaper-file">
@@ -255,7 +255,7 @@
 
             <div class="wallpaper-theme-status" hidden style="display: none;">
               <strong id="wallpaper-theme-label">Dark theme preview</strong>
-              <span id="wallpaper-theme-detail">Using the current GX dark palette.</span>
+              <span id="wallpaper-theme-detail">Using the current GX dark palette</span>
             </div>
 
           </section>
@@ -319,7 +319,7 @@
                 </div>
               </div>
             </div>
-            <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors.</p>
+            <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors</p>
           </section>
         </div>
       </section>
@@ -340,7 +340,7 @@
               <p class="section-index">AUDIO</p>
               <h3 id="music-tracks-heading">Background music tracks</h3>
             </div>
-            <p>Add the names and authors that Opera GX should show for your mod’s music.</p>
+            <p>Add the names and authors that Opera GX should show for your mod’s music</p>
           </div>
 
           <div class="music-track-list" id="music-track-list">
@@ -364,7 +364,7 @@
                   <span><strong>Drop MP3 or MP4 here</strong><small>or choose a local file</small></span>
                   <b aria-hidden="true">＋</b>
                 </label>
-                <p class="music-media-note">MP4 audio will be converted to MP3 in this browser.</p>
+                <p class="music-media-note">MP4 audio will be converted to MP3 in this browser</p>
                 <p class="music-media-status" role="status" aria-live="polite"></p>
                 <div class="music-media-selection" hidden>
                   <div><span>Audio ready</span><strong class="music-media-name"></strong></div>
@@ -389,7 +389,7 @@
           <div>
             <p class="eyebrow">Build review</p>
             <h2 id="build-review-title">Create Mod</h2>
-            <p class="build-review-intro">Review the saved choices that will be included in your mod.</p>
+            <p class="build-review-intro">Review the saved choices that will be included in your mod</p>
           </div>
           <p class="schema-chip">Schema v2</p>
         </div>

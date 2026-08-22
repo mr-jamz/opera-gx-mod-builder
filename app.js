@@ -62,7 +62,7 @@ function switchView(fromView, toView) {
 
 function showEditorNotice(category) {
   window.clearTimeout(noticeTimer);
-  editorNotice.innerHTML = `<strong>${category}</strong> is mapped and ready for its editor in the next build step.`;
+  editorNotice.innerHTML = `<strong>${category}</strong> is mapped and ready for its editor in the next build step`;
   editorNotice.classList.add("is-visible");
 
   noticeTimer = window.setTimeout(() => {
@@ -248,7 +248,7 @@ function renderThemeEditor() {
   });
 
   secondaryLockValue.textContent = `${lockedLightness}%`;
-  secondaryLockNote.lastChild.textContent = ` in ${activeThemeMode} mode.`;
+  secondaryLockNote.lastChild.textContent = ` in ${activeThemeMode} mode`;
   saveThemeButtonLabel.textContent = `Save ${activeThemeMode} colors`;
   themeSaveStatus.textContent = "";
 
@@ -282,7 +282,7 @@ saveThemeButton.addEventListener("click", () => {
   savedThemeValues[activeThemeMode] = copyThemeValues(themeValues[activeThemeMode]);
   updateSavedThemeSummary(activeThemeMode);
   const modeLabel = activeThemeMode[0].toUpperCase() + activeThemeMode.slice(1);
-  themeSaveStatus.textContent = `${modeLabel} colors saved for this visit.`;
+  themeSaveStatus.textContent = `${modeLabel} colors saved for this visit`;
 });
 
 const wallpaperModeTabs = document.querySelectorAll("[data-wallpaper-mode]");
@@ -431,7 +431,7 @@ function selectWallpaperFile(file) {
   const isVideo = file.type.startsWith("video/") || supportedVideos.includes(extension);
 
   if (!isImage && !isVideo) {
-    wallpaperDropStatus.textContent = "That file type is not supported.";
+    wallpaperDropStatus.textContent = "That file type is not supported";
     return;
   }
 
@@ -449,8 +449,8 @@ function selectWallpaperFile(file) {
     url: URL.createObjectURL(file)
   };
   wallpaperDropStatus.textContent = isVideo
-    ? "Animated wallpaper ready for preview."
-    : "Static wallpaper ready for preview.";
+    ? "Animated wallpaper ready for preview"
+    : "Static wallpaper ready for preview";
   wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
 }
@@ -471,8 +471,8 @@ function selectIncludedWallpaper(kind) {
     url: preset.url
   };
   wallpaperDropStatus.textContent = kind === "video"
-    ? "Sample animated wallpaper ready for preview."
-    : "Sample static wallpaper ready for preview.";
+    ? "Sample animated wallpaper ready for preview"
+    : "Sample static wallpaper ready for preview";
   wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
 }
@@ -544,7 +544,7 @@ saveWallpaperButton.addEventListener("click", () => {
   };
   updateSavedWallpaperSummary(activeWallpaperMode);
   const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
-  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit.`;
+  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit`;
 });
 
 const musicTrackList = document.querySelector("#music-track-list");
@@ -715,8 +715,8 @@ function showMusicMedia(card, file, convertedFromMp4 = false, sourceFile = file)
   card.querySelector(".music-media-name").textContent = file.name;
   card.querySelector(".music-media-selection").hidden = false;
   card.querySelector(".music-media-status").textContent = convertedFromMp4
-    ? "MP4 audio converted to MP3 and ready to preview."
-    : "MP3 ready to preview.";
+    ? "MP4 audio converted to MP3 and ready to preview"
+    : "MP3 ready to preview";
   setMusicSaveAvailability();
 }
 
@@ -759,7 +759,7 @@ async function convertMp4ToMp3(file) {
       outputName
     ]);
     if (exitCode !== 0) {
-      throw new Error("FFmpeg could not extract an MP3 audio track.");
+      throw new Error("FFmpeg could not extract an MP3 audio track");
     }
     const data = await ffmpeg.readFile(outputName);
     const displayName = `${file.name.replace(/\.[^.]+$/, "")}.mp3`;
@@ -779,7 +779,7 @@ function queueMp4Conversion(file) {
 async function selectMusicMedia(card, file) {
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (!["mp3", "mp4"].includes(extension)) {
-    card.querySelector(".music-media-status").textContent = "Choose an MP3 or MP4 file.";
+    card.querySelector(".music-media-status").textContent = "Choose an MP3 or MP4 file";
     return;
   }
 
@@ -812,7 +812,7 @@ async function selectMusicMedia(card, file) {
       return;
     }
     musicMediaSelections.delete(card);
-    card.querySelector(".music-media-status").textContent = "This MP4 could not be converted. Make sure it contains an audio track.";
+    card.querySelector(".music-media-status").textContent = "This MP4 could not be converted. Make sure it contains an audio track";
     setMusicSaveAvailability();
   }
 }
@@ -850,7 +850,7 @@ function createMusicTrack() {
         <span><strong>Drop MP3 or MP4 here</strong><small>or choose a local file</small></span>
         <b aria-hidden="true">＋</b>
       </label>
-      <p class="music-media-note">MP4 audio will be converted to MP3 in this browser.</p>
+      <p class="music-media-note">MP4 audio will be converted to MP3 in this browser</p>
       <p class="music-media-status" role="status" aria-live="polite"></p>
       <div class="music-media-selection" hidden>
         <div><span>Audio ready</span><strong class="music-media-name"></strong></div>
@@ -961,13 +961,13 @@ saveMusicTracksButton.addEventListener("click", () => {
   });
 
   if (missingSongName) {
-    musicSaveStatus.textContent = "Add a song name for every track before saving.";
+    musicSaveStatus.textContent = "Add a song name for every track before saving";
     missingSongName.focus();
     return;
   }
 
   if (cards.some((card) => musicMediaSelections.get(card)?.isConverting)) {
-    musicSaveStatus.textContent = "Wait for MP4 conversion to finish before saving.";
+    musicSaveStatus.textContent = "Wait for MP4 conversion to finish before saving";
     return;
   }
 
@@ -987,7 +987,7 @@ saveMusicTracksButton.addEventListener("click", () => {
   const trackCount = modBuildState.music.tracks.length;
   const trackLabel = trackCount === 1 ? "track" : "tracks";
   updateSavedMusicSummary();
-  musicSaveStatus.textContent = `${trackCount} ${trackLabel} saved for this visit.`;
+  musicSaveStatus.textContent = `${trackCount} ${trackLabel} saved for this visit`;
 });
 
 renderThemeEditor();

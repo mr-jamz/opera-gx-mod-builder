@@ -154,6 +154,15 @@ button {
   font-weight: 600;
 }
 
+.brand-byline {
+  margin-left: 4px;
+  color: #5f5b65;
+  font-size: 0.68em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
 .brand-mark {
   position: relative;
   width: 30px;
@@ -2426,6 +2435,7 @@ h1 em {
   }
 
   .brand b,
+  .brand-byline,
   .status {
     display: none;
   }
