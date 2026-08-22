@@ -119,6 +119,10 @@ button {
   margin-inline: auto;
 }
 
+.wallpaper-editor {
+  width: min(calc(100% - 48px), 1440px);
+}
+
 .site-header {
   height: var(--header-height);
   display: flex;
@@ -1286,41 +1290,6 @@ h1 em {
   font-weight: 750;
 }
 
-.wallpaper-theme-status {
-  margin-top: 22px;
-  padding: 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  border-left: 2px solid var(--red);
-  background: color-mix(in hsl, var(--red) 6%, transparent);
-}
-
-.wallpaper-theme-status i {
-  width: 7px;
-  height: 7px;
-  margin-top: 3px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--red);
-  box-shadow: 0 0 10px var(--red);
-}
-
-.wallpaper-theme-status div {
-  display: grid;
-  gap: 4px;
-}
-
-.wallpaper-theme-status strong {
-  font-size: 0.7rem;
-}
-
-.wallpaper-theme-status span {
-  color: var(--muted);
-  font-size: 0.65rem;
-  line-height: 1.45;
-}
-
 .speed-dial-panel {
   padding: clamp(16px, 2vw, 22px);
 }
@@ -1349,6 +1318,7 @@ h1 em {
   --speed-bg: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 4%);
   --speed-shell: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 2% / 0.98);
   --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / 0.88);
+  --speed-search-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / 0.96);
   --speed-panel-strong: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 12% / 0.94);
   --speed-text: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 94%);
   --speed-muted: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 72%);
@@ -1369,6 +1339,7 @@ h1 em {
   --speed-bg: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 98%);
   --speed-shell: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 94% / 0.98);
   --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / 0.88);
+  --speed-search-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / 0.96);
   --speed-panel-strong: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 90% / 0.94);
   --speed-text: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 10%);
   --speed-muted: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 34%);
@@ -1558,7 +1529,7 @@ h1 em {
   color: var(--speed-muted);
   border-bottom: 1px solid var(--speed-accent);
   border-radius: 6px 6px 0 0;
-  background: var(--speed-panel);
+  background: var(--speed-search-panel);
   font-size: clamp(0.52rem, 1vw, 0.7rem);
 }
 

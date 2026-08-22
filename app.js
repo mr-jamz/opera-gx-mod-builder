@@ -245,9 +245,6 @@ const wallpaperPreview = document.querySelector("#wallpaper-preview");
 const wallpaperPreviewMode = document.querySelector("#wallpaper-preview-mode");
 const wallpaperPreviewImage = document.querySelector("#speed-wallpaper-image");
 const wallpaperPreviewVideo = document.querySelector("#speed-wallpaper-video");
-const wallpaperThemeLabel = document.querySelector("#wallpaper-theme-label");
-const wallpaperThemeDetail = document.querySelector("#wallpaper-theme-detail");
-
 const wallpaperSelections = {
   dark: null,
   light: null
@@ -331,17 +328,11 @@ function renderWallpaperMedia() {
 function renderWallpaperEditor() {
   const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
   const values = getWallpaperTheme(activeWallpaperMode);
-  const hasSavedTheme = Boolean(savedThemeValues[activeWallpaperMode]);
-
   wallpaperPreview.dataset.mode = activeWallpaperMode;
   wallpaperPreview.style.setProperty("--speed-accent", hslString(values.accent));
   wallpaperPreview.style.setProperty("--speed-secondary-h", values.secondary.h);
   wallpaperPreview.style.setProperty("--speed-secondary-s", `${values.secondary.s}%`);
   wallpaperPreviewMode.textContent = modeLabel;
-  wallpaperThemeLabel.textContent = `${modeLabel} theme preview`;
-  wallpaperThemeDetail.textContent = hasSavedTheme
-    ? `Using your saved ${activeWallpaperMode} HSL palette.`
-    : `Using the current GX ${activeWallpaperMode} palette.`;
   saveWallpaperButton.disabled = !wallpaperSelections[activeWallpaperMode];
   saveWallpaperButtonLabel.textContent = `Save ${activeWallpaperMode} wallpaper`;
 
@@ -417,8 +408,8 @@ function selectIncludedWallpaper(kind) {
     url: preset.url
   };
   wallpaperDropStatus.textContent = kind === "video"
-    ? "Included animated wallpaper ready for preview."
-    : "Included static wallpaper ready for preview.";
+    ? "Sample animated wallpaper ready for preview."
+    : "Sample static wallpaper ready for preview.";
   wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
 }
