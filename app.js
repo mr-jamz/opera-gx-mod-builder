@@ -21,6 +21,11 @@ const themeValues = {
   }
 };
 
+const savedThemeValues = {
+  dark: null,
+  light: null
+};
+
 let activeThemeMode = "dark";
 
 function switchView(fromView, toView) {
@@ -85,9 +90,37 @@ const themeControls = document.querySelector("#theme-controls");
 const secondaryLockValue = document.querySelector("#secondary-lock-value");
 const secondaryLockNote = document.querySelector("#secondary-lock-note");
 const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+const saveThemeButton = document.querySelector("#save-theme-colors");
+const saveThemeButtonLabel = saveThemeButton.querySelector("span");
+const themeSaveStatus = document.querySelector("#theme-save-status");
+const savedThemeSummaries = {
+  dark: document.querySelector("#saved-dark-summary"),
+  light: document.querySelector("#saved-light-summary")
+};
 
 function hslString(color) {
   return `hsl(${color.h} ${color.s}% ${color.l}%)`;
+}
+
+function copyThemeValues(values) {
+  return {
+    accent: { ...values.accent },
+    secondary: { ...values.secondary }
+  };
+}
+
+function formatSavedTheme(mode, values) {
+  const label = mode[0].toUpperCase() + mode.slice(1);
+  const accent = values.accent;
+  const secondary = values.secondary;
+  return `${label} · Accent H${accent.h} S${accent.s} L${accent.l} · Base H${secondary.h} S${secondary.s} L${secondary.l}`;
+}
+
+function updateSavedThemeSummary(mode) {
+  const summary = savedThemeSummaries[mode];
+  const values = savedThemeValues[mode];
+  summary.hidden = !values;
+  summary.textContent = values ? formatSavedTheme(mode, values) : "";
 }
 
 function applyPageTheme() {
@@ -145,6 +178,8 @@ function renderThemeEditor() {
 
   secondaryLockValue.textContent = `${lockedLightness}%`;
   secondaryLockNote.lastChild.textContent = ` in ${activeThemeMode} mode.`;
+  saveThemeButtonLabel.textContent = `Save ${activeThemeMode} colors`;
+  themeSaveStatus.textContent = "";
 
   if (document.body.classList.contains("theme-preview-active")) {
     applyPageTheme();
@@ -170,6 +205,13 @@ colorInputs.forEach((input) => {
     themeValues[activeThemeMode][colorName][input.dataset.channel] = Number(input.value);
     renderThemeEditor();
   });
+});
+
+saveThemeButton.addEventListener("click", () => {
+  savedThemeValues[activeThemeMode] = copyThemeValues(themeValues[activeThemeMode]);
+  updateSavedThemeSummary(activeThemeMode);
+  const modeLabel = activeThemeMode[0].toUpperCase() + activeThemeMode.slice(1);
+  themeSaveStatus.textContent = `${modeLabel} colors saved for this visit.`;
 });
 
 renderThemeEditor();

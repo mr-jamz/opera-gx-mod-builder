@@ -701,6 +701,45 @@ h1 em {
   opacity: 0.58;
 }
 
+.save-theme-button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 15px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--red);
+  color: var(--text);
+  background: color-mix(in srgb, var(--red) 16%, var(--surface));
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.save-theme-button:hover {
+  background: color-mix(in srgb, var(--red) 25%, var(--surface));
+  transform: translateY(-2px);
+}
+
+.save-theme-button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.save-theme-button b {
+  color: var(--red);
+  font-size: 1.15rem;
+}
+
+.theme-save-status {
+  min-height: 1.1em;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font: 650 0.68rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
 .theme-preview-panel {
   position: sticky;
   top: 18px;
@@ -1161,6 +1200,12 @@ h1 em {
   font-size: 0.78rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.saved-theme-summary {
+  color: var(--red);
+  font: 650 0.62rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0;
 }
 
 .card-arrow {

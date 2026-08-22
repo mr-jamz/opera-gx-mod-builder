@@ -75,7 +75,12 @@
           <div class="card-grid core-grid">
             <button class="category-card core-card" type="button" data-category="Theme editor">
               <span class="card-icon icon-theme" aria-hidden="true"><i></i></span>
-              <span class="card-copy"><strong>Theme editor</strong><small>Light and dark browser colors</small></span>
+              <span class="card-copy">
+                <strong>Theme editor</strong>
+                <small>Light and dark browser colors</small>
+                <span class="saved-theme-summary" id="saved-dark-summary" hidden></span>
+                <span class="saved-theme-summary" id="saved-light-summary" hidden></span>
+              </span>
               <span class="card-arrow" aria-hidden="true">↗</span>
             </button>
             <button class="category-card core-card" type="button" data-category="Wallpaper editor">
@@ -171,6 +176,8 @@
               <label><span>Lightness <b id="secondary-l-value">16%</b></span><input id="secondary-l" type="range" min="0" max="100" value="16" data-channel="l" disabled aria-describedby="secondary-lock-note"></label>
             </div>
             <p class="locked-value-note" id="secondary-lock-note"><span aria-hidden="true">◆</span> Opera GX locks GX secondary base lightness to <strong id="secondary-lock-value">16%</strong> in dark mode.</p>
+            <button class="save-theme-button" id="save-theme-colors" type="button"><span>Save dark colors</span><b aria-hidden="true">→</b></button>
+            <p class="theme-save-status" id="theme-save-status" role="status" aria-live="polite"></p>
           </section>
         </div>
       </section>
