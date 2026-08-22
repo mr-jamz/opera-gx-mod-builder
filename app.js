@@ -230,9 +230,12 @@ saveThemeButton.addEventListener("click", () => {
 
 const wallpaperModeTabs = document.querySelectorAll("[data-wallpaper-mode]");
 const wallpaperFileInput = document.querySelector("#wallpaper-file");
+const wallpaperDropzone = document.querySelector("#wallpaper-dropzone");
+const wallpaperDropStatus = document.querySelector("#wallpaper-drop-status");
 const wallpaperSelection = document.querySelector("#wallpaper-selection");
 const wallpaperSelectionMode = document.querySelector("#wallpaper-selection-mode");
 const wallpaperFileName = document.querySelector("#wallpaper-file-name");
+const wallpaperAnimationNotice = document.querySelector("#wallpaper-animation-notice");
 const clearWallpaperButton = document.querySelector("#clear-wallpaper");
 const wallpaperPreview = document.querySelector("#wallpaper-preview");
 const wallpaperPreviewMode = document.querySelector("#wallpaper-preview-mode");
@@ -268,6 +271,7 @@ function renderWallpaperMedia() {
   wallpaperSelection.hidden = false;
   wallpaperSelectionMode.textContent = activeWallpaperMode;
   wallpaperFileName.textContent = selection.name;
+  wallpaperAnimationNotice.hidden = selection.kind !== "video";
 
   if (selection.kind === "video") {
     wallpaperPreviewVideo.src = selection.url;
@@ -309,25 +313,66 @@ wallpaperModeTabs.forEach((tab) => {
   });
 });
 
-wallpaperFileInput.addEventListener("change", () => {
-  const file = wallpaperFileInput.files?.[0];
-  if (!file) {
+function selectWallpaperFile(file) {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  const supportedImages = ["png", "jpg", "jpeg", "webp"];
+  const supportedVideos = ["webm", "mp4"];
+  const isImage = file.type.startsWith("image/") || supportedImages.includes(extension);
+  const isVideo = file.type.startsWith("video/") || supportedVideos.includes(extension);
+
+  if (!isImage && !isVideo) {
+    wallpaperDropStatus.textContent = "That file type is not supported.";
     return;
   }
 
-  const kind = file.type.startsWith("video/") ? "video" : "image";
   const previousSelection = wallpaperSelections[activeWallpaperMode];
   if (previousSelection) {
     URL.revokeObjectURL(previousSelection.url);
   }
 
   wallpaperSelections[activeWallpaperMode] = {
-    kind,
+    kind: isVideo ? "video" : "image",
     name: file.name,
     url: URL.createObjectURL(file)
   };
-  wallpaperFileInput.value = "";
+  wallpaperDropStatus.textContent = isVideo
+    ? "Animated wallpaper ready for preview."
+    : "Static wallpaper ready for preview.";
   renderWallpaperEditor();
+}
+
+wallpaperFileInput.addEventListener("change", () => {
+  const file = wallpaperFileInput.files?.[0];
+  if (file) {
+    selectWallpaperFile(file);
+  }
+  wallpaperFileInput.value = "";
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  wallpaperDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    wallpaperDropzone.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "dragend"].forEach((eventName) => {
+  wallpaperDropzone.addEventListener(eventName, (event) => {
+    if (eventName === "dragleave" && wallpaperDropzone.contains(event.relatedTarget)) {
+      return;
+    }
+    wallpaperDropzone.classList.remove("is-dragging");
+  });
+});
+
+wallpaperDropzone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  wallpaperDropzone.classList.remove("is-dragging");
+  const file = event.dataTransfer.files?.[0];
+  if (file) {
+    selectWallpaperFile(file);
+  }
 });
 
 clearWallpaperButton.addEventListener("click", () => {
@@ -336,6 +381,7 @@ clearWallpaperButton.addEventListener("click", () => {
     URL.revokeObjectURL(selection.url);
     wallpaperSelections[activeWallpaperMode] = null;
   }
+  wallpaperDropStatus.textContent = "";
   renderWallpaperEditor();
 });
 

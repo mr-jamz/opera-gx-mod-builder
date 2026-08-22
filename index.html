@@ -204,15 +204,17 @@
             <p class="control-description">Add a static image or animated file for the selected browser mode. Files remain only in this browser visit.</p>
 
             <input class="wallpaper-file-input" id="wallpaper-file" type="file" accept="image/png,image/jpeg,image/webp,video/webm,video/mp4">
-            <label class="wallpaper-file-button" for="wallpaper-file">
-              <span>Choose local file</span>
+            <label class="wallpaper-file-button" id="wallpaper-dropzone" for="wallpaper-file">
+              <span><strong>Drop media here</strong><small>or choose a local file</small></span>
               <b aria-hidden="true">＋</b>
             </label>
             <p class="wallpaper-file-types">PNG · JPG · WEBP · WEBM · MP4</p>
+            <p class="wallpaper-drop-status" id="wallpaper-drop-status" role="status" aria-live="polite"></p>
 
             <div class="wallpaper-selection" id="wallpaper-selection" hidden>
               <span>Selected for <b id="wallpaper-selection-mode">dark</b></span>
               <strong id="wallpaper-file-name"></strong>
+              <p class="wallpaper-animation-notice" id="wallpaper-animation-notice" hidden><i aria-hidden="true"></i> Animated wallpaper detected</p>
               <button id="clear-wallpaper" type="button">Remove file</button>
             </div>
 

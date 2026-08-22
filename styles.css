@@ -1048,7 +1048,7 @@ h1 em {
 }
 
 .wallpaper-file-button {
-  min-height: 58px;
+  min-height: 112px;
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -1065,9 +1065,32 @@ h1 em {
   transition: background 160ms ease, transform 160ms ease;
 }
 
-.wallpaper-file-button:hover {
+.wallpaper-file-button:hover,
+.wallpaper-file-button.is-dragging {
   background: color-mix(in hsl, var(--red) 18%, var(--surface));
   transform: translateY(-2px);
+}
+
+.wallpaper-file-button.is-dragging {
+  border-style: dashed;
+  box-shadow: inset 0 0 26px color-mix(in hsl, var(--red) 14%, transparent), 0 0 18px color-mix(in hsl, var(--red) 15%, transparent);
+}
+
+.wallpaper-file-button > span {
+  display: grid;
+  gap: 6px;
+}
+
+.wallpaper-file-button strong {
+  font-size: 0.78rem;
+}
+
+.wallpaper-file-button small {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .wallpaper-file-button b {
@@ -1082,6 +1105,14 @@ h1 em {
   letter-spacing: 0.08em;
 }
 
+.wallpaper-drop-status {
+  min-height: 1.2em;
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.64rem;
+  line-height: 1.4;
+}
+
 .wallpaper-selection {
   margin-top: 18px;
   padding: 14px;
@@ -1092,6 +1123,7 @@ h1 em {
 }
 
 .wallpaper-selection[hidden],
+.wallpaper-animation-notice[hidden],
 .speed-wallpaper-media[hidden] {
   display: none !important;
 }
@@ -1111,6 +1143,24 @@ h1 em {
   font-size: 0.72rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.wallpaper-animation-notice {
+  margin: 4px 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--red);
+  font: 700 0.62rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.wallpaper-animation-notice i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 9px var(--red);
 }
 
 .wallpaper-selection button {
