@@ -539,7 +539,7 @@ function updateSavedMusicSummary() {
     const summary = document.createElement("span");
     const author = track.author ? ` · ${track.author}` : "";
     const mediaName = track.media ? ` · ${track.media.file.name}` : " · No media selected";
-    summary.textContent = `Track ${String(index + 1).padStart(2, "0")} · ${track.songName}${author}${mediaName}`;
+    summary.textContent = `Track ${index + 1} · ${track.songName}${author}${mediaName}`;
     savedMusicSummary.append(summary);
   });
   savedMusicBox.hidden = modBuildState.music.tracks.length === 0;
@@ -690,7 +690,7 @@ async function selectMusicMedia(card, file) {
 function renumberMusicTracks() {
   musicTrackList.querySelectorAll(".music-track-card").forEach((card, index) => {
     card.dataset.trackIndex = String(index + 1);
-    card.querySelector(".music-track-heading strong").textContent = `Track ${String(index + 1).padStart(2, "0")}`;
+    card.querySelector(".music-track-heading strong").textContent = `Track ${index + 1}`;
   });
 }
 

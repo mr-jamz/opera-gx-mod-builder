@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-9">
-    <script src="app.js?v=20260822-9" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-11">
+    <script src="app.js?v=20260822-11" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -25,7 +25,7 @@
     <main>
       <section class="view landing is-active" id="home" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span>01</span> Make the browser yours</p>
+          <p class="eyebrow">Make the browser yours</p>
           <h1 id="hero-title">Build your own<br><em>Opera GX mod.</em></h1>
           <p class="hero-description">
             Shape the colors, visuals, and sound of your browser through one guided workspace.
@@ -56,18 +56,16 @@
         <div class="creator-heading">
           <button class="back-button" id="back-home" type="button" aria-label="Return to landing page">←</button>
           <div>
-            <p class="eyebrow"><span>02</span> Choose a starting point</p>
+            <p class="eyebrow">Choose a starting point</p>
             <h2 id="creator-title">Create your mod</h2>
             <p class="creator-intro">Select a category. We’ll guide you through each setting and required file.</p>
           </div>
-          <div class="progress-chip"><span>0</span> / 3 core sections</div>
         </div>
 
         <section class="category-section" aria-labelledby="core-heading">
           <div class="section-heading">
             <div>
-              <p class="section-index">01</p>
-              <h3 id="core-heading">Core modding</h3>
+              <h3 id="core-heading">Popular modding</h3>
             </div>
             <p>Start with the essentials that define your mod.</p>
           </div>
@@ -122,25 +120,24 @@
         <section class="category-section additional-section" aria-labelledby="additional-heading">
           <div class="section-heading">
             <div>
-              <p class="section-index">02</p>
-              <h3 id="additional-heading">Additional modding</h3>
+              <h3 id="additional-heading">More modding</h3>
             </div>
             <p>Optional components for a more complete browser experience.</p>
           </div>
 
           <div class="card-grid additional-grid">
-            <button class="category-card" type="button" data-category="App icon"><span class="mini-index">01</span><span class="card-copy"><strong>App icon</strong><small>Desktop identity</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Fonts"><span class="mini-index">02</span><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Game strips"><span class="mini-index">03</span><span class="card-copy"><strong>Game strips</strong><small>Game page visuals</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Stickers"><span class="mini-index">04</span><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Icons"><span class="mini-index">05</span><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Splash screen"><span class="mini-index">06</span><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Cursors"><span class="mini-index">07</span><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Shaders"><span class="mini-index">08</span><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Web modding"><span class="mini-index">09</span><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Speed Dial effects"><span class="mini-index">10</span><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page details</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Browser sounds"><span class="mini-index">11</span><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Keyboard sounds"><span class="mini-index">12</span><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="App icon"><span class="card-copy"><strong>App icon</strong><small>Desktop identity</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Game strips"><span class="card-copy"><strong>Game strips</strong><small>Game page visuals</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Cursors"><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Shaders"><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Web modding"><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page details</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Browser sounds"><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Keyboard sounds"><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
           </div>
         </section>
 
@@ -151,7 +148,7 @@
         <div class="editor-topbar">
           <button class="back-button" id="back-creator" type="button" aria-label="Return to mod categories">←</button>
           <div>
-            <p class="eyebrow"><span>03</span> Core modding / Theme</p>
+            <p class="eyebrow">Popular modding / Theme</p>
             <h2 id="theme-editor-title">Theme editor</h2>
           </div>
           <p class="schema-chip">Schema v2</p>
@@ -171,7 +168,7 @@
           <section class="theme-controls" id="theme-controls" role="tabpanel" aria-labelledby="dark-tab">
             <div class="control-heading">
               <div>
-                <p class="section-index">COLOR 01</p>
+                <p class="section-index">COLOR</p>
                 <h3>GX accent</h3>
               </div>
               <output class="hsl-output" id="accent-output" for="accent-h accent-s accent-l">hsl(347 96% 55%)</output>
@@ -187,7 +184,7 @@
 
             <div class="control-heading">
               <div>
-                <p class="section-index">COLOR 02</p>
+                <p class="section-index">COLOR</p>
                 <h3>GX secondary base</h3>
               </div>
               <output class="hsl-output" id="secondary-output" for="secondary-h secondary-s secondary-l">hsl(258 24% 16%)</output>
@@ -209,7 +206,7 @@
         <div class="editor-topbar">
           <button class="back-button" id="back-wallpaper" type="button" aria-label="Return to mod categories">←</button>
           <div>
-            <p class="eyebrow"><span>03</span> Core modding / Wallpaper</p>
+            <p class="eyebrow">Popular modding / Wallpaper</p>
             <h2 id="wallpaper-editor-title">Wallpaper editor</h2>
           </div>
           <p class="schema-chip">Schema v2</p>
@@ -222,7 +219,7 @@
 
         <div class="wallpaper-workspace">
           <section class="wallpaper-controls" aria-labelledby="wallpaper-media-heading">
-            <p class="section-index">MEDIA 01</p>
+            <p class="section-index">MEDIA</p>
             <h3 id="wallpaper-media-heading">Choose wallpaper media</h3>
             <p class="control-description">Add a static image or animated file for the selected browser mode. Files remain only in this browser visit.</p>
 
@@ -330,7 +327,7 @@
         <div class="editor-topbar">
           <button class="back-button" id="back-music" type="button" aria-label="Return to mod categories">←</button>
           <div>
-            <p class="eyebrow"><span>03</span> Core modding / Music</p>
+            <p class="eyebrow">Popular modding / Music</p>
             <h2 id="music-editor-title">Music editor</h2>
           </div>
           <p class="schema-chip">Schema v2</p>
@@ -339,7 +336,7 @@
         <section class="music-track-panel" aria-labelledby="music-tracks-heading">
           <div class="music-panel-heading">
             <div>
-              <p class="section-index">AUDIO 01</p>
+              <p class="section-index">AUDIO</p>
               <h3 id="music-tracks-heading">Background music tracks</h3>
             </div>
             <p>Add the names and authors that Opera GX should show for your mod’s music.</p>
@@ -348,7 +345,7 @@
           <div class="music-track-list" id="music-track-list">
             <article class="music-track-card" data-track-index="1">
               <div class="music-track-heading">
-                <strong>Track 01</strong>
+                <strong>Track 1</strong>
               </div>
               <div class="music-track-fields">
                 <label>

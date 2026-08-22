@@ -234,10 +234,6 @@ main {
   text-transform: uppercase;
 }
 
-.eyebrow span {
-  color: var(--red);
-}
-
 h1,
 h2,
 h3,
@@ -1899,7 +1895,7 @@ h1 em {
 
 .creator-heading {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: start;
   gap: 24px;
   margin-bottom: 72px;
@@ -1942,19 +1938,6 @@ h1 em {
 
 .creator-heading .creator-credit {
   margin-top: 8px;
-}
-
-.progress-chip {
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  font: 600 0.68rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.progress-chip span {
-  color: var(--red);
 }
 
 .category-section {
@@ -2194,11 +2177,6 @@ h1 em {
   transform: translate(2px, -2px);
 }
 
-.mini-index {
-  color: var(--red);
-  font: 700 0.64rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-}
-
 .editor-notice {
   position: fixed;
   right: 24px;
@@ -2298,9 +2276,6 @@ h1 em {
     position: static;
   }
 
-  .progress-chip {
-    display: none;
-  }
 }
 
 @media (max-width: 620px) {
