@@ -489,8 +489,8 @@ h1 em {
 .preview-mode {
   margin: 0;
   padding: 10px 12px;
-  color: var(--red-bright);
-  border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
+  color: var(--red);
+  border: 1px solid currentColor;
   background: color-mix(in srgb, var(--red) 6%, transparent);
   font: 700 0.64rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
   letter-spacing: 0.1em;
