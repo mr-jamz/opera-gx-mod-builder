@@ -1,5 +1,6 @@
 :root {
   color-scheme: dark;
+  font-size: 17px;
   --opera-gx-accent-color: hsl(347 96% 55%);
   --opera-gx-background-color: hsl(258 24% 16%);
   --gx-secondary-h: 258;
@@ -1053,7 +1054,7 @@ h1 em {
   padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
   color: var(--text);
   border: 1px solid var(--red);
@@ -1078,10 +1079,16 @@ h1 em {
 }
 
 .wallpaper-file-button > span {
-  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 96px);
   display: grid;
+  justify-items: center;
   gap: 6px;
   text-align: center;
+  transform: translate(-50%, -50%);
 }
 
 .wallpaper-file-button strong {
@@ -1098,17 +1105,20 @@ h1 em {
 
 .wallpaper-file-button b {
   position: absolute;
+  top: 50%;
   right: 16px;
   color: var(--red);
   font-size: 1.2rem;
+  transform: translateY(-50%);
 }
 
 .wallpaper-file-types {
+  width: 100%;
   margin: 9px 0 0;
   color: var(--muted);
   font: 600 0.58rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
   letter-spacing: 0.08em;
-  text-align: center;
+  text-align: center !important;
 }
 
 .wallpaper-drop-status {
@@ -1188,9 +1198,21 @@ h1 em {
   text-align: center;
 }
 
+.wallpaper-save-button > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 88px);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
 .wallpaper-save-button b {
   position: absolute;
+  top: 50%;
   right: 16px;
+  transform: translateY(-50%);
 }
 
 .wallpaper-selection button {
