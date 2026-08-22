@@ -1048,6 +1048,7 @@ h1 em {
 }
 
 .wallpaper-file-button {
+  position: relative;
   min-height: 112px;
   padding: 0 16px;
   display: flex;
@@ -1077,8 +1078,10 @@ h1 em {
 }
 
 .wallpaper-file-button > span {
+  width: 100%;
   display: grid;
   gap: 6px;
+  text-align: center;
 }
 
 .wallpaper-file-button strong {
@@ -1094,6 +1097,8 @@ h1 em {
 }
 
 .wallpaper-file-button b {
+  position: absolute;
+  right: 16px;
   color: var(--red);
   font-size: 1.2rem;
 }
@@ -1103,6 +1108,7 @@ h1 em {
   color: var(--muted);
   font: 600 0.58rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
   letter-spacing: 0.08em;
+  text-align: center;
 }
 
 .wallpaper-drop-status {
@@ -1174,6 +1180,17 @@ h1 em {
 .wallpaper-save-button:disabled:hover {
   background: var(--surface);
   transform: none;
+}
+
+.wallpaper-save-button {
+  position: relative;
+  justify-content: center;
+  text-align: center;
+}
+
+.wallpaper-save-button b {
+  position: absolute;
+  right: 16px;
 }
 
 .wallpaper-selection button {
