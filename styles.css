@@ -123,6 +123,10 @@ button {
   width: min(calc(100% - 48px), 1440px);
 }
 
+.music-editor {
+  width: min(calc(100% - 48px), 980px);
+}
+
 .site-header {
   height: var(--header-height);
   display: flex;
@@ -467,7 +471,8 @@ h1 em {
 }
 
 .theme-editor.is-active,
-.wallpaper-editor.is-active {
+.wallpaper-editor.is-active,
+.music-editor.is-active {
   display: block;
   padding-block: 48px 100px;
 }
@@ -1290,6 +1295,300 @@ h1 em {
   font-weight: 750;
 }
 
+.music-track-panel {
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface) 94%, transparent);
+}
+
+.music-panel-heading {
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.music-panel-heading h3 {
+  margin: 6px 0 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.03em;
+}
+
+.music-panel-heading > p {
+  max-width: 390px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.music-track-list {
+  display: grid;
+  gap: 16px;
+}
+
+.music-track-card {
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface-deep) 90%, transparent);
+}
+
+.music-track-heading {
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.music-track-heading strong {
+  color: var(--red);
+  font: 800 0.68rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.music-track-heading button {
+  padding: 0;
+  color: var(--muted);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: 750 0.7rem/1 Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.music-track-heading button:hover {
+  color: var(--red);
+}
+
+.music-track-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.music-track-fields label {
+  display: grid;
+  gap: 9px;
+}
+
+.music-track-fields label > span {
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.music-track-fields label b,
+.music-track-fields label small {
+  margin-left: 6px;
+  color: var(--red);
+  font: 700 0.55rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.music-track-fields label small {
+  color: var(--muted);
+}
+
+.music-track-fields input {
+  width: 100%;
+  padding: 14px 15px;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  outline: 0;
+  background: var(--surface-deep);
+  font: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.music-track-fields input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in hsl, var(--red) 20%, transparent);
+}
+
+.music-track-fields input[aria-invalid="true"] {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in hsl, var(--red) 18%, transparent);
+}
+
+.music-media-control {
+  margin-top: 18px;
+}
+
+.music-media-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.music-media-dropzone {
+  min-height: 92px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--text);
+  border: 1px dashed var(--line-strong);
+  background: color-mix(in hsl, var(--red) 4%, transparent);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.music-media-dropzone:hover,
+.music-media-dropzone.is-dragging,
+.music-media-input:focus-visible + .music-media-dropzone {
+  border-color: var(--red);
+  background: color-mix(in hsl, var(--red) 9%, transparent);
+}
+
+.music-media-input:focus-visible + .music-media-dropzone {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.music-media-dropzone span {
+  display: grid;
+  gap: 5px;
+}
+
+.music-media-dropzone strong {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.music-media-dropzone small {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+.music-media-dropzone b {
+  color: var(--red);
+  font-size: 1.2rem;
+}
+
+.music-media-note,
+.music-media-status {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.music-media-status:not(:empty) {
+  color: var(--red);
+}
+
+.music-media-selection {
+  margin-top: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--line);
+  background: var(--surface-deep);
+}
+
+.music-media-selection[hidden] {
+  display: none;
+}
+
+.music-media-selection > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.music-media-selection span {
+  color: var(--red);
+  font: 700 0.55rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.music-media-name {
+  overflow: hidden;
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.music-media-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.music-media-actions button {
+  padding: 9px 11px;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.music-media-actions button:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.music-media-selection audio {
+  display: none;
+}
+
+.add-track-button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 15px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text);
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.add-track-button:hover {
+  border-color: var(--red);
+  background: color-mix(in hsl, var(--red) 7%, transparent);
+}
+
+.add-track-button b {
+  color: var(--red);
+  font-size: 1.1rem;
+}
+
+.music-save-button {
+  margin-top: 16px;
+}
+
+.music-save-button:disabled,
+.music-save-button:disabled:hover {
+  color: var(--muted);
+  border-color: var(--line);
+  background: var(--surface);
+  cursor: wait;
+  opacity: 0.56;
+  transform: none;
+}
+
 .speed-dial-panel {
   padding: clamp(16px, 2vw, 22px);
 }
@@ -1995,7 +2294,8 @@ h1 em {
   }
 
   .theme-editor.is-active,
-  .wallpaper-editor.is-active {
+  .wallpaper-editor.is-active,
+  .music-editor.is-active {
     padding-block: 36px 70px;
   }
 
@@ -2015,6 +2315,24 @@ h1 em {
 
   .wallpaper-mode-tab {
     min-width: 0;
+    flex: 1;
+  }
+
+  .music-panel-heading {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .music-track-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .music-media-selection {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .music-media-actions button {
     flex: 1;
   }
 

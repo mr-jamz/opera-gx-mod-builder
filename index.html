@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-1">
-    <script src="app.js?v=20260822-1" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-3">
+    <script src="app.js?v=20260822-3" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -306,6 +306,66 @@
             <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors.</p>
           </section>
         </div>
+      </section>
+
+      <section class="view music-editor" id="music-editor" aria-labelledby="music-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-music" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow"><span>03</span> Core modding / Music</p>
+            <h2 id="music-editor-title">Music editor</h2>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <section class="music-track-panel" aria-labelledby="music-tracks-heading">
+          <div class="music-panel-heading">
+            <div>
+              <p class="section-index">AUDIO 01</p>
+              <h3 id="music-tracks-heading">Background music tracks</h3>
+            </div>
+            <p>Add the names and authors that Opera GX should show for your mod’s music.</p>
+          </div>
+
+          <div class="music-track-list" id="music-track-list">
+            <article class="music-track-card" data-track-index="1">
+              <div class="music-track-heading">
+                <strong>Track 01</strong>
+              </div>
+              <div class="music-track-fields">
+                <label>
+                  <span>Song name <b>Required</b></span>
+                  <input type="text" name="song-name" autocomplete="off" required placeholder="Enter a song name">
+                </label>
+                <label>
+                  <span>Author <small>Optional</small></span>
+                  <input type="text" name="author" autocomplete="off" placeholder="Enter an author">
+                </label>
+              </div>
+              <div class="music-media-control">
+                <input class="music-media-input" id="track-media-1" type="file" accept=".mp3,.mp4,audio/mpeg,video/mp4">
+                <label class="music-media-dropzone" for="track-media-1">
+                  <span><strong>Drop MP3 or MP4 here</strong><small>or choose a local file</small></span>
+                  <b aria-hidden="true">＋</b>
+                </label>
+                <p class="music-media-note">MP4 audio will be converted to MP3 in this browser.</p>
+                <p class="music-media-status" role="status" aria-live="polite"></p>
+                <div class="music-media-selection" hidden>
+                  <div><span>Audio ready</span><strong class="music-media-name"></strong></div>
+                  <div class="music-media-actions">
+                    <button type="button" data-music-action="preview">Play</button>
+                    <button type="button" data-music-action="remove-media">Remove file</button>
+                  </div>
+                  <audio preload="metadata"></audio>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <button class="add-track-button" id="add-music-track" type="button"><span>Add another track</span><b aria-hidden="true">＋</b></button>
+          <button class="save-theme-button music-save-button" id="save-music-tracks" type="button"><span>Save music tracks</span><b aria-hidden="true">→</b></button>
+          <p class="theme-save-status" id="music-save-status" role="status" aria-live="polite"></p>
+        </section>
       </section>
     </main>
 

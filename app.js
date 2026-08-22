@@ -2,10 +2,12 @@ const landingView = document.querySelector("#home");
 const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
+const musicEditorView = document.querySelector("#music-editor");
 const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
+const backMusicButton = document.querySelector("#back-music");
 const editorNotice = document.querySelector("#editor-notice");
 const categoryButtons = document.querySelectorAll("[data-category]");
 
@@ -83,6 +85,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Music editor") {
+      switchView(creatorView, musicEditorView);
+      window.history.replaceState(null, "", "#music-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -95,6 +103,11 @@ backCreatorButton.addEventListener("click", () => {
 
 backWallpaperButton.addEventListener("click", () => {
   switchView(wallpaperEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backMusicButton.addEventListener("click", () => {
+  switchView(musicEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -484,16 +497,345 @@ saveWallpaperButton.addEventListener("click", () => {
   wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit.`;
 });
 
+const musicTrackList = document.querySelector("#music-track-list");
+const addMusicTrackButton = document.querySelector("#add-music-track");
+const saveMusicTracksButton = document.querySelector("#save-music-tracks");
+const musicSaveStatus = document.querySelector("#music-save-status");
+const musicMediaSelections = new WeakMap();
+let savedMusicTracks = [];
+let musicTrackUid = 1;
+let musicConversionUid = 0;
+let musicConverterPromise;
+let musicConversionQueue = Promise.resolve();
+
+function setMusicSaveAvailability() {
+  const isConverting = [...musicTrackList.querySelectorAll(".music-track-card")]
+    .some((card) => musicMediaSelections.get(card)?.isConverting);
+  saveMusicTracksButton.disabled = isConverting;
+}
+
+function clearMusicMedia(card) {
+  const selection = musicMediaSelections.get(card);
+  if (selection?.previewUrl) {
+    URL.revokeObjectURL(selection.previewUrl);
+  }
+
+  musicMediaSelections.delete(card);
+  const audio = card.querySelector("audio");
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
+  card.querySelector(".music-media-selection").hidden = true;
+  card.querySelector(".music-media-name").textContent = "";
+  card.querySelector(".music-media-status").textContent = "";
+  card.querySelector(".music-media-input").value = "";
+  card.querySelector('[data-music-action="preview"]').textContent = "Play";
+  setMusicSaveAvailability();
+}
+
+function showMusicMedia(card, file, convertedFromMp4 = false) {
+  const previewUrl = URL.createObjectURL(file);
+  musicMediaSelections.set(card, {
+    file,
+    isConverting: false,
+    previewUrl
+  });
+
+  const audio = card.querySelector("audio");
+  const previewButton = card.querySelector('[data-music-action="preview"]');
+  audio.src = previewUrl;
+  audio.onplay = () => {
+    previewButton.textContent = "Pause";
+  };
+  audio.onpause = () => {
+    previewButton.textContent = "Play";
+  };
+  card.querySelector(".music-media-name").textContent = file.name;
+  card.querySelector(".music-media-selection").hidden = false;
+  card.querySelector(".music-media-status").textContent = convertedFromMp4
+    ? "MP4 audio converted to MP3 and ready to preview."
+    : "MP3 ready to preview.";
+  setMusicSaveAvailability();
+}
+
+async function getMusicConverter() {
+  if (!musicConverterPromise) {
+    musicConverterPromise = (async () => {
+      const [{ FFmpeg }, { fetchFile }] = await Promise.all([
+        import("./vendor/ffmpeg/ffmpeg/index.js"),
+        import("./vendor/ffmpeg/util/index.js")
+      ]);
+      const ffmpeg = new FFmpeg();
+      const coreBaseUrl = new URL("./vendor/ffmpeg/core/", document.baseURI);
+      await ffmpeg.load({
+        coreURL: new URL("ffmpeg-core.js", coreBaseUrl).href,
+        wasmURL: new URL("ffmpeg-core.wasm", coreBaseUrl).href
+      });
+      return { ffmpeg, fetchFile };
+    })().catch((error) => {
+      musicConverterPromise = null;
+      throw error;
+    });
+  }
+
+  return musicConverterPromise;
+}
+
+async function convertMp4ToMp3(file) {
+  const conversionId = ++musicConversionUid;
+  const inputName = `music-input-${conversionId}.mp4`;
+  const outputName = `music-output-${conversionId}.mp3`;
+  const { ffmpeg, fetchFile } = await getMusicConverter();
+
+  try {
+    await ffmpeg.writeFile(inputName, await fetchFile(file));
+    const exitCode = await ffmpeg.exec([
+      "-i", inputName,
+      "-vn",
+      "-codec:a", "libmp3lame",
+      "-q:a", "2",
+      outputName
+    ]);
+    if (exitCode !== 0) {
+      throw new Error("FFmpeg could not extract an MP3 audio track.");
+    }
+    const data = await ffmpeg.readFile(outputName);
+    const displayName = `${file.name.replace(/\.[^.]+$/, "")}.mp3`;
+    return new File([data], displayName, { type: "audio/mpeg" });
+  } finally {
+    await ffmpeg.deleteFile(inputName).catch(() => {});
+    await ffmpeg.deleteFile(outputName).catch(() => {});
+  }
+}
+
+function queueMp4Conversion(file) {
+  const conversion = musicConversionQueue.then(() => convertMp4ToMp3(file));
+  musicConversionQueue = conversion.catch(() => {});
+  return conversion;
+}
+
+async function selectMusicMedia(card, file) {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (!["mp3", "mp4"].includes(extension)) {
+    card.querySelector(".music-media-status").textContent = "Choose an MP3 or MP4 file.";
+    return;
+  }
+
+  clearMusicMedia(card);
+  musicSaveStatus.textContent = "";
+
+  if (extension === "mp3") {
+    showMusicMedia(card, file);
+    return;
+  }
+
+  const conversionToken = Symbol("music-conversion");
+  musicMediaSelections.set(card, {
+    file: null,
+    isConverting: true,
+    previewUrl: null,
+    token: conversionToken
+  });
+  card.querySelector(".music-media-status").textContent = "Loading the audio converter and creating an MP3…";
+  setMusicSaveAvailability();
+
+  try {
+    const convertedFile = await queueMp4Conversion(file);
+    if (musicMediaSelections.get(card)?.token !== conversionToken) {
+      return;
+    }
+    showMusicMedia(card, convertedFile, true);
+  } catch (error) {
+    if (musicMediaSelections.get(card)?.token !== conversionToken) {
+      return;
+    }
+    musicMediaSelections.delete(card);
+    card.querySelector(".music-media-status").textContent = "This MP4 could not be converted. Make sure it contains an audio track.";
+    setMusicSaveAvailability();
+  }
+}
+
+function renumberMusicTracks() {
+  musicTrackList.querySelectorAll(".music-track-card").forEach((card, index) => {
+    card.dataset.trackIndex = String(index + 1);
+    card.querySelector(".music-track-heading strong").textContent = `Track ${String(index + 1).padStart(2, "0")}`;
+  });
+}
+
+function createMusicTrack() {
+  musicTrackUid += 1;
+  const mediaInputId = `track-media-${musicTrackUid}`;
+  const card = document.createElement("article");
+  card.className = "music-track-card";
+  card.innerHTML = `
+    <div class="music-track-heading">
+      <strong>Track</strong>
+      <button type="button" aria-label="Remove track">Remove track</button>
+    </div>
+    <div class="music-track-fields">
+      <label>
+        <span>Song name <b>Required</b></span>
+        <input type="text" name="song-name" autocomplete="off" required placeholder="Enter a song name">
+      </label>
+      <label>
+        <span>Author <small>Optional</small></span>
+        <input type="text" name="author" autocomplete="off" placeholder="Enter an author">
+      </label>
+    </div>
+    <div class="music-media-control">
+      <input class="music-media-input" id="${mediaInputId}" type="file" accept=".mp3,.mp4,audio/mpeg,video/mp4">
+      <label class="music-media-dropzone" for="${mediaInputId}">
+        <span><strong>Drop MP3 or MP4 here</strong><small>or choose a local file</small></span>
+        <b aria-hidden="true">＋</b>
+      </label>
+      <p class="music-media-note">MP4 audio will be converted to MP3 in this browser.</p>
+      <p class="music-media-status" role="status" aria-live="polite"></p>
+      <div class="music-media-selection" hidden>
+        <div><span>Audio ready</span><strong class="music-media-name"></strong></div>
+        <div class="music-media-actions">
+          <button type="button" data-music-action="preview">Play</button>
+          <button type="button" data-music-action="remove-media">Remove file</button>
+        </div>
+        <audio preload="metadata"></audio>
+      </div>
+    </div>`;
+
+  card.querySelector("button").addEventListener("click", () => {
+    clearMusicMedia(card);
+    card.remove();
+    renumberMusicTracks();
+    musicSaveStatus.textContent = "";
+  });
+
+  return card;
+}
+
+addMusicTrackButton.addEventListener("click", () => {
+  const card = createMusicTrack();
+  musicTrackList.append(card);
+  renumberMusicTracks();
+  musicSaveStatus.textContent = "";
+  card.querySelector('input[name="song-name"]').focus();
+});
+
+musicTrackList.addEventListener("input", (event) => {
+  if (event.target.matches('input[name="song-name"]')) {
+    event.target.removeAttribute("aria-invalid");
+  }
+  musicSaveStatus.textContent = "";
+});
+
+musicTrackList.addEventListener("change", (event) => {
+  if (!event.target.matches(".music-media-input")) {
+    return;
+  }
+  const file = event.target.files?.[0];
+  if (file) {
+    selectMusicMedia(event.target.closest(".music-track-card"), file);
+  }
+});
+
+musicTrackList.addEventListener("dragover", (event) => {
+  const dropzone = event.target.closest(".music-media-dropzone");
+  if (!dropzone) {
+    return;
+  }
+  event.preventDefault();
+  dropzone.classList.add("is-dragging");
+});
+
+musicTrackList.addEventListener("dragleave", (event) => {
+  const dropzone = event.target.closest(".music-media-dropzone");
+  if (dropzone && !dropzone.contains(event.relatedTarget)) {
+    dropzone.classList.remove("is-dragging");
+  }
+});
+
+musicTrackList.addEventListener("drop", (event) => {
+  const dropzone = event.target.closest(".music-media-dropzone");
+  if (!dropzone) {
+    return;
+  }
+  event.preventDefault();
+  dropzone.classList.remove("is-dragging");
+  const file = event.dataTransfer?.files?.[0];
+  if (file) {
+    selectMusicMedia(dropzone.closest(".music-track-card"), file);
+  }
+});
+
+musicTrackList.addEventListener("click", async (event) => {
+  const actionButton = event.target.closest("[data-music-action]");
+  if (!actionButton) {
+    return;
+  }
+
+  const card = actionButton.closest(".music-track-card");
+  if (actionButton.dataset.musicAction === "remove-media") {
+    clearMusicMedia(card);
+    musicSaveStatus.textContent = "";
+    return;
+  }
+
+  const audio = card.querySelector("audio");
+  if (audio.paused) {
+    musicTrackList.querySelectorAll("audio").forEach((otherAudio) => {
+      if (otherAudio !== audio) {
+        otherAudio.pause();
+      }
+    });
+    try {
+      await audio.play();
+    } catch (error) {
+      card.querySelector(".music-media-status").textContent = "The audio preview could not start.";
+    }
+  } else {
+    audio.pause();
+  }
+});
+
+saveMusicTracksButton.addEventListener("click", () => {
+  const cards = [...musicTrackList.querySelectorAll(".music-track-card")];
+  const missingSongName = cards
+    .map((card) => card.querySelector('input[name="song-name"]'))
+    .find((input) => !input.value.trim());
+
+  cards.forEach((card) => {
+    const songInput = card.querySelector('input[name="song-name"]');
+    songInput.setAttribute("aria-invalid", String(!songInput.value.trim()));
+  });
+
+  if (missingSongName) {
+    musicSaveStatus.textContent = "Add a song name for every track before saving.";
+    missingSongName.focus();
+    return;
+  }
+
+  if (cards.some((card) => musicMediaSelections.get(card)?.isConverting)) {
+    musicSaveStatus.textContent = "Wait for MP4 conversion to finish before saving.";
+    return;
+  }
+
+  savedMusicTracks = cards.map((card) => ({
+    author: card.querySelector('input[name="author"]').value.trim(),
+    songName: card.querySelector('input[name="song-name"]').value.trim(),
+    file: musicMediaSelections.get(card)?.file ?? null
+  }));
+  const trackLabel = savedMusicTracks.length === 1 ? "track" : "tracks";
+  musicSaveStatus.textContent = `${savedMusicTracks.length} ${trackLabel} saved for this visit.`;
+});
+
 renderThemeEditor();
 renderWallpaperEditor();
 
-if (["#creator", "#theme-editor", "#wallpaper-editor"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#wallpaper-editor", "#music-editor"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
     "#creator": creatorView,
     "#theme-editor": themeEditorView,
-    "#wallpaper-editor": wallpaperEditorView
+    "#wallpaper-editor": wallpaperEditorView,
+    "#music-editor": musicEditorView
   };
   const initialView = initialViews[window.location.hash];
   initialView.removeAttribute("aria-hidden");
