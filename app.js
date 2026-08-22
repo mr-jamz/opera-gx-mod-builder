@@ -232,6 +232,7 @@ const wallpaperModeTabs = document.querySelectorAll("[data-wallpaper-mode]");
 const wallpaperFileInput = document.querySelector("#wallpaper-file");
 const wallpaperDropzone = document.querySelector("#wallpaper-dropzone");
 const wallpaperDropStatus = document.querySelector("#wallpaper-drop-status");
+const wallpaperPresetButtons = document.querySelectorAll("[data-wallpaper-preset]");
 const wallpaperSelection = document.querySelector("#wallpaper-selection");
 const wallpaperSelectionMode = document.querySelector("#wallpaper-selection-mode");
 const wallpaperFileName = document.querySelector("#wallpaper-file-name");
@@ -250,6 +251,29 @@ const wallpaperThemeDetail = document.querySelector("#wallpaper-theme-detail");
 const wallpaperSelections = {
   dark: null,
   light: null
+};
+
+const includedWallpaperPresets = {
+  dark: {
+    image: {
+      name: "dark_logo.png",
+      url: "ModTemplate2.0/wallpaper/dark_logo.png"
+    },
+    video: {
+      name: "dark_logo_animated.webm",
+      url: "ModTemplate2.0/wallpaper/dark_logo_animated.webm"
+    }
+  },
+  light: {
+    image: {
+      name: "light_logo.png",
+      url: "ModTemplate2.0/wallpaper/light_logo.png"
+    },
+    video: {
+      name: "light_logo_animated.webm",
+      url: "ModTemplate2.0/wallpaper/light_logo_animated.webm"
+    }
+  }
 };
 
 const savedWallpaperSelections = {
@@ -321,6 +345,13 @@ function renderWallpaperEditor() {
   saveWallpaperButton.disabled = !wallpaperSelections[activeWallpaperMode];
   saveWallpaperButtonLabel.textContent = `Save ${activeWallpaperMode} wallpaper`;
 
+  wallpaperPresetButtons.forEach((button) => {
+    const selection = wallpaperSelections[activeWallpaperMode];
+    const selected = selection?.source === "included" && selection.kind === button.dataset.wallpaperPreset;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", selected.toString());
+  });
+
   wallpaperModeTabs.forEach((tab) => {
     const selected = tab.dataset.wallpaperMode === activeWallpaperMode;
     tab.classList.toggle("is-active", selected);
@@ -351,14 +382,16 @@ function selectWallpaperFile(file) {
   }
 
   const previousSelection = wallpaperSelections[activeWallpaperMode];
-  if (previousSelection) {
+  if (previousSelection?.isObjectUrl) {
     URL.revokeObjectURL(previousSelection.url);
   }
 
   wallpaperSelections[activeWallpaperMode] = {
     file,
+    isObjectUrl: true,
     kind: isVideo ? "video" : "image",
     name: file.name,
+    source: "local",
     url: URL.createObjectURL(file)
   };
   wallpaperDropStatus.textContent = isVideo
@@ -367,6 +400,34 @@ function selectWallpaperFile(file) {
   wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
 }
+
+function selectIncludedWallpaper(kind) {
+  const previousSelection = wallpaperSelections[activeWallpaperMode];
+  if (previousSelection?.isObjectUrl) {
+    URL.revokeObjectURL(previousSelection.url);
+  }
+
+  const preset = includedWallpaperPresets[activeWallpaperMode][kind];
+  wallpaperSelections[activeWallpaperMode] = {
+    file: null,
+    isObjectUrl: false,
+    kind,
+    name: preset.name,
+    source: "included",
+    url: preset.url
+  };
+  wallpaperDropStatus.textContent = kind === "video"
+    ? "Included animated wallpaper ready for preview."
+    : "Included static wallpaper ready for preview.";
+  wallpaperSaveStatus.textContent = "";
+  renderWallpaperEditor();
+}
+
+wallpaperPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    selectIncludedWallpaper(button.dataset.wallpaperPreset);
+  });
+});
 
 wallpaperFileInput.addEventListener("change", () => {
   const file = wallpaperFileInput.files?.[0];
@@ -405,7 +466,9 @@ wallpaperDropzone.addEventListener("drop", (event) => {
 clearWallpaperButton.addEventListener("click", () => {
   const selection = wallpaperSelections[activeWallpaperMode];
   if (selection) {
-    URL.revokeObjectURL(selection.url);
+    if (selection.isObjectUrl) {
+      URL.revokeObjectURL(selection.url);
+    }
     wallpaperSelections[activeWallpaperMode] = null;
   }
   wallpaperDropStatus.textContent = "";
@@ -422,7 +485,8 @@ saveWallpaperButton.addEventListener("click", () => {
   savedWallpaperSelections[activeWallpaperMode] = {
     file: selection.file,
     kind: selection.kind,
-    name: selection.name
+    name: selection.name,
+    source: selection.source
   };
   updateSavedWallpaperSummary(activeWallpaperMode);
   const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
