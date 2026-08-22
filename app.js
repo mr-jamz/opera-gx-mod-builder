@@ -3,6 +3,7 @@ const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
+const brandHomeLink = document.querySelector(".brand");
 const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
@@ -68,6 +69,19 @@ function showEditorNotice(category) {
 startButton.addEventListener("click", () => {
   switchView(landingView, creatorView);
   window.history.replaceState(null, "", "#creator");
+});
+
+brandHomeLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  const activeView = document.querySelector(".view.is-active");
+  window.history.replaceState(null, "", "#home");
+
+  if (!activeView || activeView === landingView) {
+    return;
+  }
+
+  resetPageTheme();
+  switchView(activeView, landingView);
 });
 
 backButton.addEventListener("click", () => {
