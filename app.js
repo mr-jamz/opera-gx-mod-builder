@@ -237,6 +237,9 @@ const wallpaperSelectionMode = document.querySelector("#wallpaper-selection-mode
 const wallpaperFileName = document.querySelector("#wallpaper-file-name");
 const wallpaperAnimationNotice = document.querySelector("#wallpaper-animation-notice");
 const clearWallpaperButton = document.querySelector("#clear-wallpaper");
+const saveWallpaperButton = document.querySelector("#save-wallpaper");
+const saveWallpaperButtonLabel = saveWallpaperButton.querySelector("span");
+const wallpaperSaveStatus = document.querySelector("#wallpaper-save-status");
 const wallpaperPreview = document.querySelector("#wallpaper-preview");
 const wallpaperPreviewMode = document.querySelector("#wallpaper-preview-mode");
 const wallpaperPreviewImage = document.querySelector("#speed-wallpaper-image");
@@ -249,10 +252,29 @@ const wallpaperSelections = {
   light: null
 };
 
+const savedWallpaperSelections = {
+  dark: null,
+  light: null
+};
+
+const savedWallpaperSummaries = {
+  dark: document.querySelector("#saved-dark-wallpaper-summary"),
+  light: document.querySelector("#saved-light-wallpaper-summary")
+};
+
 let activeWallpaperMode = "dark";
 
 function getWallpaperTheme(mode) {
   return savedThemeValues[mode] || themeValues[mode];
+}
+
+function updateSavedWallpaperSummary(mode) {
+  const summary = savedWallpaperSummaries[mode];
+  const selection = savedWallpaperSelections[mode];
+  summary.hidden = !selection;
+  summary.textContent = selection
+    ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name}`
+    : "";
 }
 
 function renderWallpaperMedia() {
@@ -296,6 +318,8 @@ function renderWallpaperEditor() {
   wallpaperThemeDetail.textContent = hasSavedTheme
     ? `Using your saved ${activeWallpaperMode} HSL palette.`
     : `Using the current GX ${activeWallpaperMode} palette.`;
+  saveWallpaperButton.disabled = !wallpaperSelections[activeWallpaperMode];
+  saveWallpaperButtonLabel.textContent = `Save ${activeWallpaperMode} wallpaper`;
 
   wallpaperModeTabs.forEach((tab) => {
     const selected = tab.dataset.wallpaperMode === activeWallpaperMode;
@@ -309,6 +333,7 @@ function renderWallpaperEditor() {
 wallpaperModeTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     activeWallpaperMode = tab.dataset.wallpaperMode;
+    wallpaperSaveStatus.textContent = "";
     renderWallpaperEditor();
   });
 });
@@ -331,6 +356,7 @@ function selectWallpaperFile(file) {
   }
 
   wallpaperSelections[activeWallpaperMode] = {
+    file,
     kind: isVideo ? "video" : "image",
     name: file.name,
     url: URL.createObjectURL(file)
@@ -338,6 +364,7 @@ function selectWallpaperFile(file) {
   wallpaperDropStatus.textContent = isVideo
     ? "Animated wallpaper ready for preview."
     : "Static wallpaper ready for preview.";
+  wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
 }
 
@@ -382,7 +409,24 @@ clearWallpaperButton.addEventListener("click", () => {
     wallpaperSelections[activeWallpaperMode] = null;
   }
   wallpaperDropStatus.textContent = "";
+  wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
+});
+
+saveWallpaperButton.addEventListener("click", () => {
+  const selection = wallpaperSelections[activeWallpaperMode];
+  if (!selection) {
+    return;
+  }
+
+  savedWallpaperSelections[activeWallpaperMode] = {
+    file: selection.file,
+    kind: selection.kind,
+    name: selection.name
+  };
+  updateSavedWallpaperSummary(activeWallpaperMode);
+  const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
+  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit.`;
 });
 
 renderThemeEditor();

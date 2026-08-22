@@ -85,7 +85,12 @@
             </button>
             <button class="category-card core-card" type="button" data-category="Wallpaper editor">
               <span class="card-icon icon-wallpaper" aria-hidden="true"><i></i></span>
-              <span class="card-copy"><strong>Wallpaper editor</strong><small>Static or animated backgrounds</small></span>
+              <span class="card-copy">
+                <strong>Wallpaper editor</strong>
+                <small>Static or animated backgrounds</small>
+                <span class="saved-wallpaper-summary" id="saved-dark-wallpaper-summary" hidden></span>
+                <span class="saved-wallpaper-summary" id="saved-light-wallpaper-summary" hidden></span>
+              </span>
               <span class="card-arrow" aria-hidden="true">↗</span>
             </button>
             <button class="category-card core-card" type="button" data-category="Music editor">
@@ -217,6 +222,12 @@
               <p class="wallpaper-animation-notice" id="wallpaper-animation-notice" hidden><i aria-hidden="true"></i> Animated wallpaper detected</p>
               <button id="clear-wallpaper" type="button">Remove file</button>
             </div>
+
+            <button class="save-theme-button wallpaper-save-button" id="save-wallpaper" type="button" disabled>
+              <span>Save dark wallpaper</span>
+              <b aria-hidden="true">→</b>
+            </button>
+            <p class="theme-save-status" id="wallpaper-save-status" role="status" aria-live="polite"></p>
 
             <div class="wallpaper-theme-status">
               <i aria-hidden="true"></i>
