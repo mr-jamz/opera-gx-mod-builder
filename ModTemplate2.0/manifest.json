@@ -104,6 +104,15 @@
             "images": [ "stickers/sticker1.webp", "stickers/sticker2.webp", "stickers/sticker3.webp", "stickers/sticker4.webp" ],
             "preview": "stickers/sticker1.webp"
          } ],
+         "shaders": [ {
+            "animation": {
+               "duration": 120,
+               "steps": 3600
+            },
+            "id": "shader",
+            "name": "",
+            "path": ""
+         } ],
          "cursors": [ {
             "id": "Cursors",
             "items": [ {
