@@ -144,6 +144,7 @@ const savedThemeSummaries = {
   dark: document.querySelector("#saved-dark-summary"),
   light: document.querySelector("#saved-light-summary")
 };
+const savedThemeBox = document.querySelector("#saved-theme-box");
 
 function hslString(color) {
   return `hsl(${color.h} ${color.s}% ${color.l}%)`;
@@ -168,6 +169,7 @@ function updateSavedThemeSummary(mode) {
   const values = savedThemeValues[mode];
   summary.hidden = !values;
   summary.textContent = values ? formatSavedTheme(mode, values) : "";
+  savedThemeBox.hidden = !Object.values(savedThemeValues).some(Boolean);
 }
 
 function applyPageTheme() {
@@ -315,6 +317,7 @@ const savedWallpaperSummaries = {
   dark: document.querySelector("#saved-dark-wallpaper-summary"),
   light: document.querySelector("#saved-light-wallpaper-summary")
 };
+const savedWallpaperBox = document.querySelector("#saved-wallpaper-box");
 
 let activeWallpaperMode = "dark";
 
@@ -329,6 +332,7 @@ function updateSavedWallpaperSummary(mode) {
   summary.textContent = selection
     ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name}`
     : "";
+  savedWallpaperBox.hidden = !Object.values(savedWallpaperSelections).some(Boolean);
 }
 
 function renderWallpaperMedia() {
@@ -522,10 +526,24 @@ const addMusicTrackButton = document.querySelector("#add-music-track");
 const saveMusicTracksButton = document.querySelector("#save-music-tracks");
 const musicSaveStatus = document.querySelector("#music-save-status");
 const musicMediaSelections = new WeakMap();
+const savedMusicBox = document.querySelector("#saved-music-box");
+const savedMusicSummary = document.querySelector("#saved-music-summary");
 let musicTrackUid = 1;
 let musicConversionUid = 0;
 let musicConverterPromise;
 let musicConversionQueue = Promise.resolve();
+
+function updateSavedMusicSummary() {
+  savedMusicSummary.replaceChildren();
+  modBuildState.music.tracks.forEach((track, index) => {
+    const summary = document.createElement("span");
+    const author = track.author ? ` · ${track.author}` : "";
+    const mediaName = track.media ? ` · ${track.media.file.name}` : " · No media selected";
+    summary.textContent = `Track ${String(index + 1).padStart(2, "0")} · ${track.songName}${author}${mediaName}`;
+    savedMusicSummary.append(summary);
+  });
+  savedMusicBox.hidden = modBuildState.music.tracks.length === 0;
+}
 
 function setMusicSaveAvailability() {
   const isConverting = [...musicTrackList.querySelectorAll(".music-track-card")]
@@ -838,6 +856,7 @@ saveMusicTracksButton.addEventListener("click", () => {
   });
   const trackCount = modBuildState.music.tracks.length;
   const trackLabel = trackCount === 1 ? "track" : "tracks";
+  updateSavedMusicSummary();
   musicSaveStatus.textContent = `${trackCount} ${trackLabel} saved for this visit.`;
 });
 

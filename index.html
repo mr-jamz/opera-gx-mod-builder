@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-8">
-    <script src="app.js?v=20260822-8" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-9">
+    <script src="app.js?v=20260822-9" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -73,31 +73,49 @@
           </div>
 
           <div class="card-grid core-grid">
-            <button class="category-card core-card" type="button" data-category="Theme editor">
-              <span class="card-icon icon-theme" aria-hidden="true"><i></i></span>
-              <span class="card-copy">
-                <strong>Theme editor</strong>
-                <small>Light and dark browser colors</small>
+            <div class="core-category-item">
+              <button class="category-card core-card" type="button" data-category="Theme editor">
+                <span class="card-icon icon-theme" aria-hidden="true"><i></i></span>
+                <span class="card-copy">
+                  <strong>Theme editor</strong>
+                  <small>Light and dark browser colors</small>
+                </span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </button>
+              <div class="saved-content-box" id="saved-theme-box" hidden>
+                <strong>Saved theme colors</strong>
                 <span class="saved-theme-summary" id="saved-dark-summary" hidden></span>
                 <span class="saved-theme-summary" id="saved-light-summary" hidden></span>
-              </span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </button>
-            <button class="category-card core-card" type="button" data-category="Wallpaper editor">
-              <span class="card-icon icon-wallpaper" aria-hidden="true"><i></i></span>
-              <span class="card-copy">
-                <strong>Wallpaper editor</strong>
-                <small>Static or animated backgrounds</small>
+              </div>
+            </div>
+
+            <div class="core-category-item">
+              <button class="category-card core-card" type="button" data-category="Wallpaper editor">
+                <span class="card-icon icon-wallpaper" aria-hidden="true"><i></i></span>
+                <span class="card-copy">
+                  <strong>Wallpaper editor</strong>
+                  <small>Static or animated backgrounds</small>
+                </span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </button>
+              <div class="saved-content-box" id="saved-wallpaper-box" hidden>
+                <strong>Saved wallpapers</strong>
                 <span class="saved-wallpaper-summary" id="saved-dark-wallpaper-summary" hidden></span>
                 <span class="saved-wallpaper-summary" id="saved-light-wallpaper-summary" hidden></span>
-              </span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </button>
-            <button class="category-card core-card" type="button" data-category="Music editor">
-              <span class="card-icon icon-music" aria-hidden="true"><i></i></span>
-              <span class="card-copy"><strong>Music editor</strong><small>Looping background tracks</small></span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </button>
+              </div>
+            </div>
+
+            <div class="core-category-item">
+              <button class="category-card core-card" type="button" data-category="Music editor">
+                <span class="card-icon icon-music" aria-hidden="true"><i></i></span>
+                <span class="card-copy"><strong>Music editor</strong><small>Looping background tracks</small></span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </button>
+              <div class="saved-content-box" id="saved-music-box" hidden>
+                <strong>Saved music tracks</strong>
+                <div class="saved-music-summary" id="saved-music-summary"></div>
+              </div>
+            </div>
           </div>
         </section>
 
