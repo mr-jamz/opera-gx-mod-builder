@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-1">
+    <script src="app.js?v=20260822-1" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -236,6 +236,11 @@
               <b aria-hidden="true">→</b>
             </button>
             <p class="theme-save-status" id="wallpaper-save-status" role="status" aria-live="polite"></p>
+
+            <div class="wallpaper-theme-status" hidden style="display: none;">
+              <strong id="wallpaper-theme-label">Dark theme preview</strong>
+              <span id="wallpaper-theme-detail">Using the current GX dark palette.</span>
+            </div>
 
           </section>
 
