@@ -3,13 +3,16 @@ const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
+const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
 const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
+const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
+const buildSummaryGroups = document.querySelector("#build-summary-groups");
 const editorNotice = document.querySelector("#editor-notice");
 const categoryButtons = document.querySelectorAll("[data-category]");
 
@@ -85,6 +88,15 @@ brandHomeLink.addEventListener("click", (event) => {
   switchView(activeView, landingView);
 });
 
+createModButton.addEventListener("click", () => {
+  if (!hasSavedModOptions()) {
+    return;
+  }
+  renderBuildSummary();
+  switchView(creatorView, buildReviewView);
+  window.history.replaceState(null, "", "#build-review");
+});
+
 backButton.addEventListener("click", () => {
   switchView(creatorView, landingView);
   window.history.replaceState(null, "", "#home");
@@ -129,6 +141,11 @@ backWallpaperButton.addEventListener("click", () => {
 
 backMusicButton.addEventListener("click", () => {
   switchView(musicEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backBuildReviewButton.addEventListener("click", () => {
+  switchView(buildReviewView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -558,11 +575,104 @@ function updateSavedMusicSummary() {
   updateCreateModAvailability();
 }
 
-function updateCreateModAvailability() {
+function hasSavedModOptions() {
   const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
-  createModButton.disabled = !(hasSavedTheme || hasSavedWallpaper || hasSavedMusic);
+  return hasSavedTheme || hasSavedWallpaper || hasSavedMusic;
+}
+
+function updateCreateModAvailability() {
+  createModButton.disabled = !hasSavedModOptions();
+}
+
+function appendBuildSummaryGroup(title, description, items) {
+  if (items.length === 0) {
+    return;
+  }
+
+  const group = document.createElement("section");
+  group.className = "build-summary-group";
+
+  const heading = document.createElement("div");
+  heading.className = "build-summary-heading";
+  const headingTitle = document.createElement("h3");
+  headingTitle.textContent = title;
+  const headingDescription = document.createElement("p");
+  headingDescription.textContent = description;
+  heading.append(headingTitle, headingDescription);
+
+  const list = document.createElement("div");
+  list.className = "build-summary-list";
+  items.forEach((item) => {
+    const entry = document.createElement("article");
+    const entryTitle = document.createElement("h4");
+    entryTitle.textContent = item.title;
+    const details = document.createElement("dl");
+    item.details.forEach(({ label, value }) => {
+      const row = document.createElement("div");
+      const term = document.createElement("dt");
+      const descriptionValue = document.createElement("dd");
+      term.textContent = label;
+      descriptionValue.textContent = value;
+      row.append(term, descriptionValue);
+      details.append(row);
+    });
+    entry.append(entryTitle, details);
+    list.append(entry);
+  });
+
+  group.append(heading, list);
+  buildSummaryGroups.append(group);
+}
+
+function renderBuildSummary() {
+  buildSummaryGroups.replaceChildren();
+
+  const themeItems = Object.entries(savedThemeValues)
+    .filter(([, values]) => values)
+    .map(([mode, values]) => ({
+      title: `${mode[0].toUpperCase() + mode.slice(1)} mode`,
+      details: [
+        { label: "GX accent", value: hslString(values.accent) },
+        { label: "GX secondary base", value: hslString(values.secondary) }
+      ]
+    }));
+  appendBuildSummaryGroup("Theme", "Saved Opera GX color palettes", themeItems);
+
+  const wallpaperItems = Object.entries(savedWallpaperSelections)
+    .filter(([, selection]) => selection)
+    .map(([mode, selection]) => ({
+      title: `${mode[0].toUpperCase() + mode.slice(1)} mode`,
+      details: [
+        { label: "Type", value: selection.kind === "video" ? "Animated" : "Static" },
+        { label: "File", value: selection.name },
+        { label: "Source", value: selection.source === "included" ? "Sample desktop wallpaper" : "Local upload" }
+      ]
+    }));
+  appendBuildSummaryGroup("Wallpaper", "Saved desktop wallpaper choices", wallpaperItems);
+
+  const musicItems = modBuildState.music.tracks.map((track, index) => {
+    const details = [
+      { label: "Song name", value: track.songName },
+      { label: "Author", value: track.author || "Not provided" }
+    ];
+    if (track.media) {
+      details.push(
+        { label: "Saved audio", value: track.media.file.name },
+        {
+          label: "Source",
+          value: track.media.convertedFromMp4
+            ? `Converted from ${track.media.sourceName}`
+            : "Local MP3 upload"
+        }
+      );
+    } else {
+      details.push({ label: "Saved audio", value: "No media selected" });
+    }
+    return { title: `Track ${index + 1}`, details };
+  });
+  appendBuildSummaryGroup("Music", "Saved background music tracks", musicItems);
 }
 
 function setMusicSaveAvailability() {
@@ -883,16 +993,21 @@ saveMusicTracksButton.addEventListener("click", () => {
 renderThemeEditor();
 renderWallpaperEditor();
 
-if (["#creator", "#theme-editor", "#wallpaper-editor", "#music-editor"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#wallpaper-editor", "#music-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
     "#creator": creatorView,
     "#theme-editor": themeEditorView,
     "#wallpaper-editor": wallpaperEditorView,
-    "#music-editor": musicEditorView
+    "#music-editor": musicEditorView,
+    "#build-review": buildReviewView
   };
-  const initialView = initialViews[window.location.hash];
+  let initialView = initialViews[window.location.hash];
+  if (initialView === buildReviewView && !hasSavedModOptions()) {
+    initialView = creatorView;
+    window.history.replaceState(null, "", "#creator");
+  }
   initialView.removeAttribute("aria-hidden");
   initialView.classList.add("is-active");
   if (initialView === themeEditorView) {
@@ -900,5 +1015,8 @@ if (["#creator", "#theme-editor", "#wallpaper-editor", "#music-editor"].includes
   }
   if (initialView === wallpaperEditorView) {
     renderWallpaperEditor();
+  }
+  if (initialView === buildReviewView) {
+    renderBuildSummary();
   }
 }

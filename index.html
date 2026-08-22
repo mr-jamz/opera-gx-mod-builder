@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor.">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-15">
-    <script src="app.js?v=20260822-15" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260822-16">
+    <script src="app.js?v=20260822-16" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -381,6 +381,20 @@
           <button class="save-theme-button music-save-button" id="save-music-tracks" type="button"><span>Save music tracks</span><b aria-hidden="true">→</b></button>
           <p class="theme-save-status" id="music-save-status" role="status" aria-live="polite"></p>
         </section>
+      </section>
+
+      <section class="view build-review" id="build-review" aria-labelledby="build-review-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-build-review" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">Build review</p>
+            <h2 id="build-review-title">Create Mod</h2>
+            <p class="build-review-intro">Review the saved choices that will be included in your mod.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="build-summary-groups" id="build-summary-groups" aria-live="polite"></div>
       </section>
     </main>
 

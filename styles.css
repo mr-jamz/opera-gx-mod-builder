@@ -126,6 +126,10 @@ button {
   width: min(calc(100% - 48px), 980px);
 }
 
+.build-review {
+  width: min(calc(100% - 48px), 1080px);
+}
+
 .site-header {
   height: var(--header-height);
   display: flex;
@@ -474,7 +478,8 @@ h1 em {
 
 .theme-editor.is-active,
 .wallpaper-editor.is-active,
-.music-editor.is-active {
+.music-editor.is-active,
+.build-review.is-active {
   display: block;
   padding-block: 48px 100px;
 }
@@ -1991,6 +1996,94 @@ h1 em {
   color: #77727e;
 }
 
+.build-review-intro {
+  max-width: 620px;
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.build-summary-groups {
+  display: grid;
+  gap: 18px;
+}
+
+.build-summary-group {
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface) 94%, transparent);
+}
+
+.build-summary-heading {
+  padding: 20px 24px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.build-summary-heading h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.build-summary-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.build-summary-list {
+  display: grid;
+}
+
+.build-summary-list article {
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.34fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.build-summary-list article + article {
+  border-top: 1px solid var(--line);
+}
+
+.build-summary-list h4 {
+  margin: 0;
+  color: var(--red);
+  font: 750 0.7rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.build-summary-list dl {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.build-summary-list dl > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.32fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.build-summary-list dt {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.build-summary-list dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--text);
+  font: 650 0.7rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
 .category-section {
   padding: 0 0 64px;
 }
@@ -2356,7 +2449,8 @@ h1 em {
 
   .theme-editor.is-active,
   .wallpaper-editor.is-active,
-  .music-editor.is-active {
+  .music-editor.is-active,
+  .build-review.is-active {
     padding-block: 36px 70px;
   }
 
@@ -2455,6 +2549,25 @@ h1 em {
 
   .creator-heading h2 {
     font-size: 2.65rem;
+  }
+
+  .build-summary-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .build-summary-list article,
+  .build-summary-list dl > div {
+    grid-template-columns: 1fr;
+  }
+
+  .build-summary-list article {
+    gap: 14px;
+  }
+
+  .build-summary-list dl > div {
+    gap: 4px;
   }
 
   .section-heading {
