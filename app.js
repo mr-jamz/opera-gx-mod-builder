@@ -145,6 +145,7 @@ const savedThemeSummaries = {
   light: document.querySelector("#saved-light-summary")
 };
 const savedThemeBox = document.querySelector("#saved-theme-box");
+const themeCategoryCard = document.querySelector('[data-category="Theme editor"]');
 
 function hslString(color) {
   return `hsl(${color.h} ${color.s}% ${color.l}%)`;
@@ -169,7 +170,9 @@ function updateSavedThemeSummary(mode) {
   const values = savedThemeValues[mode];
   summary.hidden = !values;
   summary.textContent = values ? formatSavedTheme(mode, values) : "";
-  savedThemeBox.hidden = !Object.values(savedThemeValues).some(Boolean);
+  const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
+  savedThemeBox.hidden = !hasSavedTheme;
+  themeCategoryCard.classList.toggle("has-saved-data", hasSavedTheme);
 }
 
 function applyPageTheme() {
@@ -318,6 +321,7 @@ const savedWallpaperSummaries = {
   light: document.querySelector("#saved-light-wallpaper-summary")
 };
 const savedWallpaperBox = document.querySelector("#saved-wallpaper-box");
+const wallpaperCategoryCard = document.querySelector('[data-category="Wallpaper editor"]');
 
 let activeWallpaperMode = "dark";
 
@@ -332,7 +336,9 @@ function updateSavedWallpaperSummary(mode) {
   summary.textContent = selection
     ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name}`
     : "";
-  savedWallpaperBox.hidden = !Object.values(savedWallpaperSelections).some(Boolean);
+  const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
+  savedWallpaperBox.hidden = !hasSavedWallpaper;
+  wallpaperCategoryCard.classList.toggle("has-saved-data", hasSavedWallpaper);
 }
 
 function renderWallpaperMedia() {
@@ -528,6 +534,7 @@ const musicSaveStatus = document.querySelector("#music-save-status");
 const musicMediaSelections = new WeakMap();
 const savedMusicBox = document.querySelector("#saved-music-box");
 const savedMusicSummary = document.querySelector("#saved-music-summary");
+const musicCategoryCard = document.querySelector('[data-category="Music editor"]');
 let musicTrackUid = 1;
 let musicConversionUid = 0;
 let musicConverterPromise;
@@ -542,7 +549,9 @@ function updateSavedMusicSummary() {
     summary.textContent = `Track ${index + 1} · ${track.songName}${author}${mediaName}`;
     savedMusicSummary.append(summary);
   });
-  savedMusicBox.hidden = modBuildState.music.tracks.length === 0;
+  const hasSavedMusic = modBuildState.music.tracks.length > 0;
+  savedMusicBox.hidden = !hasSavedMusic;
+  musicCategoryCard.classList.toggle("has-saved-data", hasSavedMusic);
 }
 
 function setMusicSaveAvailability() {
