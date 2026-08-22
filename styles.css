@@ -461,7 +461,8 @@ h1 em {
   padding-block: 64px 100px;
 }
 
-.theme-editor.is-active {
+.theme-editor.is-active,
+.wallpaper-editor.is-active {
   display: block;
   padding-block: 48px 100px;
 }
@@ -964,6 +965,501 @@ h1 em {
   line-height: 1.55;
 }
 
+.wallpaper-mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.wallpaper-mode-tab {
+  position: relative;
+  min-width: 140px;
+  padding: 16px 20px;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.wallpaper-mode-tab::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: var(--red);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.wallpaper-mode-tab:hover,
+.wallpaper-mode-tab.is-active {
+  color: var(--text);
+}
+
+.wallpaper-mode-tab.is-active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.wallpaper-mode-tab:focus-visible,
+.wallpaper-file-button:focus-within,
+.wallpaper-selection button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.wallpaper-workspace {
+  display: grid;
+  grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+}
+
+.wallpaper-controls,
+.speed-dial-panel {
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface) 94%, transparent);
+}
+
+.wallpaper-controls {
+  padding: clamp(22px, 3vw, 30px);
+}
+
+.wallpaper-controls h3,
+.speed-dial-heading h3 {
+  margin: 6px 0 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.wallpaper-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wallpaper-file-button {
+  min-height: 58px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--text);
+  border: 1px solid var(--red);
+  background: color-mix(in hsl, var(--red) 10%, var(--surface));
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.wallpaper-file-button:hover {
+  background: color-mix(in hsl, var(--red) 18%, var(--surface));
+  transform: translateY(-2px);
+}
+
+.wallpaper-file-button b {
+  color: var(--red);
+  font-size: 1.2rem;
+}
+
+.wallpaper-file-types {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font: 600 0.58rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+.wallpaper-selection {
+  margin-top: 18px;
+  padding: 14px;
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.wallpaper-selection[hidden],
+.speed-wallpaper-media[hidden] {
+  display: none !important;
+}
+
+.wallpaper-selection > span {
+  color: var(--muted);
+  font: 600 0.62rem/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.wallpaper-selection > span b {
+  color: var(--red);
+}
+
+.wallpaper-selection strong {
+  overflow: hidden;
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wallpaper-selection button {
+  width: max-content;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  color: var(--red);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.wallpaper-theme-status {
+  margin-top: 22px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-left: 2px solid var(--red);
+  background: color-mix(in hsl, var(--red) 6%, transparent);
+}
+
+.wallpaper-theme-status i {
+  width: 7px;
+  height: 7px;
+  margin-top: 3px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red);
+}
+
+.wallpaper-theme-status div {
+  display: grid;
+  gap: 4px;
+}
+
+.wallpaper-theme-status strong {
+  font-size: 0.7rem;
+}
+
+.wallpaper-theme-status span {
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1.45;
+}
+
+.speed-dial-panel {
+  padding: clamp(16px, 2vw, 22px);
+}
+
+.speed-dial-heading {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.speed-dial-heading > span {
+  padding: 7px 9px;
+  color: var(--red);
+  border: 1px solid var(--line-strong);
+  font: 700 0.58rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.speed-dial-preview {
+  --speed-accent: hsl(347 96% 55%);
+  --speed-secondary-h: 258;
+  --speed-secondary-s: 24%;
+  --speed-bg: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 4%);
+  --speed-shell: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 2% / 0.98);
+  --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / 0.88);
+  --speed-panel-strong: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 12% / 0.94);
+  --speed-text: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 94%);
+  --speed-muted: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 72%);
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  color: var(--speed-text);
+  border: 1px solid color-mix(in hsl, var(--speed-accent) 38%, transparent);
+  border-radius: 7px;
+  background:
+    radial-gradient(circle at 55% 45%, color-mix(in hsl, var(--speed-accent) 8%, transparent), transparent 40%),
+    var(--speed-bg);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.34), 0 0 24px color-mix(in hsl, var(--speed-accent) 8%, transparent);
+  isolation: isolate;
+}
+
+.speed-dial-preview[data-mode="light"] {
+  --speed-bg: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 98%);
+  --speed-shell: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 94% / 0.98);
+  --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / 0.88);
+  --speed-panel-strong: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 90% / 0.94);
+  --speed-text: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 10%);
+  --speed-muted: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 34%);
+}
+
+.speed-wallpaper-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-position: center;
+  background-size: cover;
+}
+
+.speed-dial-preview::after {
+  position: absolute;
+  inset: 69px 0 0 34px;
+  z-index: -1;
+  content: "";
+  background: color-mix(in hsl, var(--speed-bg) 48%, transparent);
+  pointer-events: none;
+}
+
+.speed-browser-topbar,
+.speed-toolbar,
+.speed-bookmarks {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  color: var(--speed-muted);
+  background: var(--speed-shell);
+  border-bottom: 1px solid color-mix(in hsl, var(--speed-text) 10%, transparent);
+}
+
+.speed-browser-topbar {
+  height: 28px;
+  padding: 0 9px;
+  gap: 6px;
+}
+
+.speed-opera-mark {
+  width: 13px;
+  height: 17px;
+  margin-right: 4px;
+  border: 1.5px solid var(--speed-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 7px color-mix(in hsl, var(--speed-accent) 45%, transparent);
+}
+
+.speed-tab {
+  min-width: 105px;
+  height: 24px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 4px 4px 0 0;
+  font-size: 0.52rem;
+}
+
+.speed-tab i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--speed-accent);
+}
+
+.speed-tab.is-muted {
+  opacity: 0.56;
+}
+
+.speed-tab.is-active {
+  color: var(--speed-text);
+  background: color-mix(in hsl, var(--speed-accent) 23%, var(--speed-panel));
+}
+
+.speed-new-tab {
+  opacity: 0.65;
+  font-size: 0.7rem;
+}
+
+.speed-window-actions {
+  margin-left: auto;
+  font-size: 0.55rem;
+  word-spacing: 7px;
+}
+
+.speed-toolbar {
+  height: 25px;
+  padding: 0 10px;
+  gap: 8px;
+  font-size: 0.62rem;
+}
+
+.speed-address {
+  height: 18px;
+  padding: 0 9px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 4px;
+  background: color-mix(in hsl, var(--speed-text) 5%, transparent);
+  font-size: 0.47rem;
+}
+
+.speed-address i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--speed-accent);
+}
+
+.speed-bookmarks {
+  height: 16px;
+  padding: 0 11px 2px 42px;
+  gap: 14px;
+  border-bottom: 0;
+  font-size: 0.42rem;
+}
+
+.speed-bookmarks span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.speed-bookmarks i {
+  width: 7px;
+  height: 5px;
+  border: 1px solid var(--speed-accent);
+}
+
+.speed-page {
+  position: absolute;
+  inset: 69px 0 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+}
+
+.speed-sidebar {
+  padding: 9px 4px 6px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--speed-muted);
+  background: color-mix(in hsl, var(--speed-shell) 85%, transparent);
+  border-right: 1px solid color-mix(in hsl, var(--speed-text) 8%, transparent);
+  font-size: 0.56rem;
+}
+
+.speed-sidebar span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+}
+
+.speed-sidebar .is-selected {
+  color: var(--speed-accent);
+  background: color-mix(in hsl, var(--speed-accent) 18%, transparent);
+  box-shadow: inset 2px 0 var(--speed-accent);
+}
+
+.speed-sidebar-bottom {
+  margin-top: auto;
+}
+
+.speed-page-content {
+  width: min(78%, 590px);
+  margin: 0 auto;
+  padding-top: clamp(18px, 4vw, 38px);
+}
+
+.speed-search {
+  height: clamp(30px, 5vw, 42px);
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--speed-muted);
+  border-bottom: 1px solid var(--speed-accent);
+  border-radius: 6px 6px 0 0;
+  background: var(--speed-panel);
+  font-size: clamp(0.52rem, 1vw, 0.7rem);
+}
+
+.speed-search i {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border: 4px solid var(--speed-accent);
+  border-radius: 50%;
+}
+
+.speed-tiles {
+  margin-top: clamp(18px, 4vw, 34px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(7px, 1.3vw, 13px);
+}
+
+.speed-tiles > div {
+  position: relative;
+  min-height: clamp(44px, 7vw, 70px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in hsl, var(--speed-text) 10%, transparent);
+  border-radius: 5px;
+  background: var(--speed-panel);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.speed-tiles > div::after {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 14px;
+  height: 14px;
+  content: "";
+  border-right: 1px solid var(--speed-accent);
+  border-bottom: 1px solid var(--speed-accent);
+}
+
+.speed-tiles div > span {
+  width: 26%;
+  aspect-ratio: 1;
+  border: 2px solid color-mix(in hsl, var(--speed-accent) 58%, var(--speed-muted));
+  border-radius: 50%;
+  opacity: 0.72;
+}
+
+.speed-tiles .speed-add-tile {
+  color: var(--speed-accent);
+  background: color-mix(in hsl, var(--speed-accent) 7%, var(--speed-panel));
+  font-size: 1.1rem;
+}
+
+.speed-dial-note {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
 .creator-heading {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -1315,6 +1811,10 @@ h1 em {
     grid-template-columns: 1fr;
   }
 
+  .wallpaper-workspace {
+    grid-template-columns: 1fr;
+  }
+
   .theme-preview-panel {
     position: static;
   }
@@ -1353,7 +1853,8 @@ h1 em {
     padding-block: 44px 72px;
   }
 
-  .theme-editor.is-active {
+  .theme-editor.is-active,
+  .wallpaper-editor.is-active {
     padding-block: 36px 70px;
   }
 
@@ -1369,6 +1870,29 @@ h1 em {
   .mode-tab {
     min-width: 0;
     flex: 1;
+  }
+
+  .wallpaper-mode-tab {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .speed-tab.is-muted,
+  .speed-bookmarks span:nth-child(n + 2) {
+    display: none;
+  }
+
+  .speed-page-content {
+    width: 86%;
+    padding-top: 14px;
+  }
+
+  .speed-tiles {
+    margin-top: 12px;
+  }
+
+  .speed-tiles > div:nth-child(n + 4) {
+    display: none;
   }
 
   .control-heading {

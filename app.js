@@ -1,9 +1,11 @@
 const landingView = document.querySelector("#home");
 const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
+const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
+const backWallpaperButton = document.querySelector("#back-wallpaper");
 const editorNotice = document.querySelector("#editor-notice");
 const categoryButtons = document.querySelectorAll("[data-category]");
 
@@ -74,6 +76,13 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Wallpaper editor") {
+      renderWallpaperEditor();
+      switchView(creatorView, wallpaperEditorView);
+      window.history.replaceState(null, "", "#wallpaper-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -81,6 +90,11 @@ categoryButtons.forEach((button) => {
 backCreatorButton.addEventListener("click", () => {
   resetPageTheme();
   switchView(themeEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backWallpaperButton.addEventListener("click", () => {
+  switchView(wallpaperEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -214,15 +228,135 @@ saveThemeButton.addEventListener("click", () => {
   themeSaveStatus.textContent = `${modeLabel} colors saved for this visit.`;
 });
 
-renderThemeEditor();
+const wallpaperModeTabs = document.querySelectorAll("[data-wallpaper-mode]");
+const wallpaperFileInput = document.querySelector("#wallpaper-file");
+const wallpaperSelection = document.querySelector("#wallpaper-selection");
+const wallpaperSelectionMode = document.querySelector("#wallpaper-selection-mode");
+const wallpaperFileName = document.querySelector("#wallpaper-file-name");
+const clearWallpaperButton = document.querySelector("#clear-wallpaper");
+const wallpaperPreview = document.querySelector("#wallpaper-preview");
+const wallpaperPreviewMode = document.querySelector("#wallpaper-preview-mode");
+const wallpaperPreviewImage = document.querySelector("#speed-wallpaper-image");
+const wallpaperPreviewVideo = document.querySelector("#speed-wallpaper-video");
+const wallpaperThemeLabel = document.querySelector("#wallpaper-theme-label");
+const wallpaperThemeDetail = document.querySelector("#wallpaper-theme-detail");
 
-if (window.location.hash === "#creator" || window.location.hash === "#theme-editor") {
+const wallpaperSelections = {
+  dark: null,
+  light: null
+};
+
+let activeWallpaperMode = "dark";
+
+function getWallpaperTheme(mode) {
+  return savedThemeValues[mode] || themeValues[mode];
+}
+
+function renderWallpaperMedia() {
+  const selection = wallpaperSelections[activeWallpaperMode];
+  wallpaperPreviewImage.style.backgroundImage = "none";
+  wallpaperPreviewVideo.pause();
+  wallpaperPreviewVideo.removeAttribute("src");
+  wallpaperPreviewVideo.load();
+  wallpaperPreviewVideo.hidden = true;
+
+  if (!selection) {
+    wallpaperSelection.hidden = true;
+    return;
+  }
+
+  wallpaperSelection.hidden = false;
+  wallpaperSelectionMode.textContent = activeWallpaperMode;
+  wallpaperFileName.textContent = selection.name;
+
+  if (selection.kind === "video") {
+    wallpaperPreviewVideo.src = selection.url;
+    wallpaperPreviewVideo.hidden = false;
+    wallpaperPreviewVideo.play().catch(() => {});
+  } else {
+    wallpaperPreviewImage.style.backgroundImage = `url("${selection.url}")`;
+  }
+}
+
+function renderWallpaperEditor() {
+  const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
+  const values = getWallpaperTheme(activeWallpaperMode);
+  const hasSavedTheme = Boolean(savedThemeValues[activeWallpaperMode]);
+
+  wallpaperPreview.dataset.mode = activeWallpaperMode;
+  wallpaperPreview.style.setProperty("--speed-accent", hslString(values.accent));
+  wallpaperPreview.style.setProperty("--speed-secondary-h", values.secondary.h);
+  wallpaperPreview.style.setProperty("--speed-secondary-s", `${values.secondary.s}%`);
+  wallpaperPreviewMode.textContent = modeLabel;
+  wallpaperThemeLabel.textContent = `${modeLabel} theme preview`;
+  wallpaperThemeDetail.textContent = hasSavedTheme
+    ? `Using your saved ${activeWallpaperMode} HSL palette.`
+    : `Using the current GX ${activeWallpaperMode} palette.`;
+
+  wallpaperModeTabs.forEach((tab) => {
+    const selected = tab.dataset.wallpaperMode === activeWallpaperMode;
+    tab.classList.toggle("is-active", selected);
+    tab.setAttribute("aria-selected", selected.toString());
+  });
+
+  renderWallpaperMedia();
+}
+
+wallpaperModeTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    activeWallpaperMode = tab.dataset.wallpaperMode;
+    renderWallpaperEditor();
+  });
+});
+
+wallpaperFileInput.addEventListener("change", () => {
+  const file = wallpaperFileInput.files?.[0];
+  if (!file) {
+    return;
+  }
+
+  const kind = file.type.startsWith("video/") ? "video" : "image";
+  const previousSelection = wallpaperSelections[activeWallpaperMode];
+  if (previousSelection) {
+    URL.revokeObjectURL(previousSelection.url);
+  }
+
+  wallpaperSelections[activeWallpaperMode] = {
+    kind,
+    name: file.name,
+    url: URL.createObjectURL(file)
+  };
+  wallpaperFileInput.value = "";
+  renderWallpaperEditor();
+});
+
+clearWallpaperButton.addEventListener("click", () => {
+  const selection = wallpaperSelections[activeWallpaperMode];
+  if (selection) {
+    URL.revokeObjectURL(selection.url);
+    wallpaperSelections[activeWallpaperMode] = null;
+  }
+  renderWallpaperEditor();
+});
+
+renderThemeEditor();
+renderWallpaperEditor();
+
+if (["#creator", "#theme-editor", "#wallpaper-editor"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
-  const initialView = window.location.hash === "#theme-editor" ? themeEditorView : creatorView;
+  const initialViews = {
+    "#creator": creatorView,
+    "#theme-editor": themeEditorView,
+    "#wallpaper-editor": wallpaperEditorView
+  };
+  const initialView = initialViews[window.location.hash];
   initialView.removeAttribute("aria-hidden");
   initialView.classList.add("is-active");
   if (initialView === themeEditorView) {
     applyPageTheme();
+  }
+  if (initialView === wallpaperEditorView) {
+    renderWallpaperEditor();
   }
 }

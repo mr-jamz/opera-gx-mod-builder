@@ -181,6 +181,113 @@
           </section>
         </div>
       </section>
+
+      <section class="view wallpaper-editor" id="wallpaper-editor" aria-labelledby="wallpaper-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-wallpaper" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow"><span>03</span> Core modding / Wallpaper</p>
+            <h2 id="wallpaper-editor-title">Wallpaper editor</h2>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="wallpaper-mode-tabs" role="tablist" aria-label="Wallpaper preview mode">
+          <button class="wallpaper-mode-tab is-active" id="wallpaper-dark-tab" type="button" role="tab" aria-selected="true" data-wallpaper-mode="dark">Dark mode</button>
+          <button class="wallpaper-mode-tab" id="wallpaper-light-tab" type="button" role="tab" aria-selected="false" data-wallpaper-mode="light">Light mode</button>
+        </div>
+
+        <div class="wallpaper-workspace">
+          <section class="wallpaper-controls" aria-labelledby="wallpaper-media-heading">
+            <p class="section-index">MEDIA 01</p>
+            <h3 id="wallpaper-media-heading">Choose wallpaper media</h3>
+            <p class="control-description">Add a static image or animated file for the selected browser mode. Files remain only in this browser visit.</p>
+
+            <input class="wallpaper-file-input" id="wallpaper-file" type="file" accept="image/png,image/jpeg,image/webp,video/webm,video/mp4">
+            <label class="wallpaper-file-button" for="wallpaper-file">
+              <span>Choose local file</span>
+              <b aria-hidden="true">＋</b>
+            </label>
+            <p class="wallpaper-file-types">PNG · JPG · WEBP · WEBM · MP4</p>
+
+            <div class="wallpaper-selection" id="wallpaper-selection" hidden>
+              <span>Selected for <b id="wallpaper-selection-mode">dark</b></span>
+              <strong id="wallpaper-file-name"></strong>
+              <button id="clear-wallpaper" type="button">Remove file</button>
+            </div>
+
+            <div class="wallpaper-theme-status">
+              <i aria-hidden="true"></i>
+              <div>
+                <strong id="wallpaper-theme-label">Dark theme preview</strong>
+                <span id="wallpaper-theme-detail">Using the current GX dark palette.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="speed-dial-panel" aria-labelledby="speed-dial-preview-heading">
+            <div class="speed-dial-heading">
+              <div>
+                <p class="section-index">LIVE PREVIEW</p>
+                <h3 id="speed-dial-preview-heading">GX Speed Dial</h3>
+              </div>
+              <span id="wallpaper-preview-mode">Dark</span>
+            </div>
+
+            <div class="speed-dial-preview" id="wallpaper-preview" data-mode="dark">
+              <div class="speed-wallpaper-media" id="speed-wallpaper-image" aria-hidden="true"></div>
+              <video class="speed-wallpaper-media" id="speed-wallpaper-video" muted loop autoplay playsinline hidden></video>
+
+              <div class="speed-browser-topbar">
+                <span class="speed-opera-mark" aria-hidden="true"></span>
+                <div class="speed-tab is-muted"><i></i><span>Workspace</span></div>
+                <div class="speed-tab is-active"><i></i><span>Speed Dial</span></div>
+                <span class="speed-new-tab" aria-hidden="true">＋</span>
+                <span class="speed-window-actions" aria-hidden="true">— □ ×</span>
+              </div>
+
+              <div class="speed-toolbar">
+                <span aria-hidden="true">‹</span>
+                <span aria-hidden="true">›</span>
+                <span aria-hidden="true">↻</span>
+                <div class="speed-address"><i aria-hidden="true"></i><span>Enter search or web address</span></div>
+                <span aria-hidden="true">⌕</span>
+                <span aria-hidden="true">☰</span>
+              </div>
+
+              <div class="speed-bookmarks" aria-hidden="true">
+                <span><i></i>Bookmarks</span>
+                <span><i></i>Downloads</span>
+                <span><i></i>Projects</span>
+              </div>
+
+              <div class="speed-page">
+                <aside class="speed-sidebar" aria-hidden="true">
+                  <span class="is-selected">◇</span>
+                  <span>□</span>
+                  <span>◌</span>
+                  <span>△</span>
+                  <span>＋</span>
+                  <span class="speed-sidebar-bottom">•••</span>
+                </aside>
+
+                <div class="speed-page-content">
+                  <div class="speed-search"><i aria-hidden="true"></i><span>Search the web</span></div>
+                  <div class="speed-tiles" aria-label="Generic Speed Dial tiles">
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div class="speed-add-tile" aria-hidden="true">＋</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors.</p>
+          </section>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
