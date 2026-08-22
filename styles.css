@@ -17,6 +17,7 @@
   --red-dark: color-mix(in srgb, var(--opera-gx-accent-color) 80%, black);
   --max-width: 1240px;
   --header-height: 88px;
+  --footer-height: 88px;
   font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 
@@ -196,7 +197,7 @@ button {
 }
 
 main {
-  min-height: calc(100vh - var(--header-height) - 70px);
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
 
 .view {
@@ -215,11 +216,11 @@ main {
 }
 
 .landing {
-  min-height: calc(100vh - var(--header-height) - 70px);
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
   grid-template-columns: minmax(0, 1.05fr) minmax(350px, 0.95fr);
   align-items: center;
   gap: clamp(3rem, 7vw, 7rem);
-  padding-block: 64px;
+  padding-block: 48px;
 }
 
 .eyebrow {
@@ -345,7 +346,7 @@ h1 em {
 
 .hero-visual {
   position: relative;
-  width: min(100%, 500px);
+  width: min(100%, 470px);
   aspect-ratio: 1;
   justify-self: center;
   display: grid;
@@ -2194,7 +2195,7 @@ h1 em {
 }
 
 .site-footer {
-  min-height: 70px;
+  min-height: var(--footer-height);
   display: flex;
   align-items: center;
   justify-content: space-between;

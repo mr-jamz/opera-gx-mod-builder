@@ -695,7 +695,7 @@ function createMusicTrack() {
         <div class="music-media-actions">
           <button type="button" data-music-action="remove-media">Remove file</button>
         </div>
-        <audio controls preload="metadata"></audio>
+        <audio controls controlslist="nodownload noplaybackrate noremoteplayback" disableremoteplayback preload="metadata"></audio>
       </div>
     </div>`;
 
