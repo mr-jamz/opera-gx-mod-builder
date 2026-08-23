@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260823-02">
-    <script src="app.js?v=20260823-02" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260823-06">
+    <script src="app.js?v=20260823-06" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -240,6 +240,15 @@
             <p class="app-icon-size-note">Recommended icon size: 512×512</p>
             <p class="wallpaper-drop-status" id="app-icon-drop-status" role="status" aria-live="polite"></p>
 
+            <div class="wallpaper-presets app-icon-presets">
+              <span>Sample app icons</span>
+              <div>
+                <button type="button" data-app-icon-preset="classic" aria-pressed="false"><img src="ModTemplate2.0/app_icon/classic_GX_logo.png" alt=""><b>Classic</b><small>PNG</small></button>
+                <button type="button" data-app-icon-preset="dark" aria-pressed="false"><img src="ModTemplate2.0/app_icon/dark_GX_logo.png" alt=""><b>Dark</b><small>PNG</small></button>
+                <button type="button" data-app-icon-preset="light" aria-pressed="false"><img src="ModTemplate2.0/app_icon/light_GX_logo.png" alt=""><b>Light</b><small>PNG</small></button>
+              </div>
+            </div>
+
             <div class="wallpaper-selection app-icon-selection" id="app-icon-selection" hidden>
               <span>Selected app icon</span>
               <strong id="app-icon-file-name"></strong>
@@ -411,9 +420,9 @@
               <span>Speed Dial position</span>
               <select id="speed-dial-position">
                 <option value="top">Top</option>
-                <option value="bottom">Bottom</option>
                 <option value="left">Left</option>
-                <option value="right">Right</option>
+                <option value="bottom">Bottom</option>
+                <option value="auto">Auto</option>
               </select>
             </label>
 
@@ -438,31 +447,70 @@
             <p class="theme-save-status" id="speed-dial-effects-save-status" role="status" aria-live="polite"></p>
           </section>
 
-          <section class="speed-dial-effects-preview-panel" aria-labelledby="speed-dial-effects-preview-heading">
-            <div class="speed-dial-effects-preview-heading">
+          <section class="speed-dial-panel speed-dial-effects-preview-panel" aria-labelledby="speed-dial-effects-preview-heading">
+            <div class="speed-dial-heading">
               <div>
                 <p class="section-index">LIVE PREVIEW</p>
                 <h3 id="speed-dial-effects-preview-heading">GX Speed Dial</h3>
               </div>
+              <div class="speed-dial-effects-preview-tabs" role="tablist" aria-label="Wallpaper preview mode">
+                <button class="is-active" type="button" role="tab" aria-selected="true" data-speed-dial-preview-mode="dark">Dark</button>
+                <button type="button" role="tab" aria-selected="false" data-speed-dial-preview-mode="light">Light</button>
+              </div>
             </div>
 
-            <div class="speed-dial-effects-preview" id="speed-dial-effects-preview" data-mode="dark" data-position="top">
-              <div class="speed-dial-effects-wallpaper" aria-hidden="true"></div>
-              <div class="speed-dial-effects-background" aria-hidden="true"></div>
+            <div class="speed-dial-preview speed-dial-effects-browser" id="speed-dial-effects-preview" data-mode="dark" data-position="top">
+              <div class="speed-wallpaper-media" id="speed-dial-effects-wallpaper-image" aria-hidden="true"></div>
+              <video class="speed-wallpaper-media" id="speed-dial-effects-wallpaper-video" muted loop autoplay playsinline hidden></video>
               <div class="speed-dial-effects-vignette" aria-hidden="true"></div>
-              <div class="speed-dial-effects-content">
-                <div class="speed-dial-effects-search"><i aria-hidden="true"></i><span>Search the web</span></div>
-                <div class="speed-dial-effects-tiles" aria-label="Generic Speed Dial tiles">
-                  <div><span></span></div>
-                  <div><span></span></div>
-                  <div><span></span></div>
-                  <div><span></span></div>
-                  <div><span></span></div>
-                  <div class="speed-dial-effects-add" aria-hidden="true">＋</div>
+
+              <div class="speed-browser-topbar">
+                <span class="speed-opera-mark" aria-hidden="true"></span>
+                <div class="speed-tab is-muted"><i></i><span>Workspace</span></div>
+                <div class="speed-tab is-active"><i></i><span>Speed Dial</span></div>
+                <span class="speed-new-tab" aria-hidden="true">＋</span>
+                <span class="speed-window-actions" aria-hidden="true">— □ ×</span>
+              </div>
+
+              <div class="speed-toolbar">
+                <span aria-hidden="true">‹</span>
+                <span aria-hidden="true">›</span>
+                <span aria-hidden="true">↻</span>
+                <div class="speed-address"><i aria-hidden="true"></i><span>Enter search or web address</span></div>
+                <span aria-hidden="true">⌕</span>
+                <span aria-hidden="true">☰</span>
+              </div>
+
+              <div class="speed-bookmarks" aria-hidden="true">
+                <span><i></i>Bookmarks</span>
+                <span><i></i>Downloads</span>
+                <span><i></i>Projects</span>
+              </div>
+
+              <div class="speed-page">
+                <aside class="speed-sidebar" aria-hidden="true">
+                  <span class="is-selected">◇</span>
+                  <span>□</span>
+                  <span>◌</span>
+                  <span>△</span>
+                  <span>＋</span>
+                  <span class="speed-sidebar-bottom">•••</span>
+                </aside>
+
+                <div class="speed-page-content">
+                  <div class="speed-search"><i aria-hidden="true"></i><span>Search the web</span></div>
+                  <div class="speed-tiles" aria-label="Generic Speed Dial tiles">
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div><span></span></div>
+                    <div class="speed-add-tile" aria-hidden="true">＋</div>
+                  </div>
                 </div>
               </div>
             </div>
-            <p class="speed-dial-effects-note">This preview approximates how Opera GX applies the saved start-page settings</p>
+            <p class="speed-dial-note" id="speed-dial-effects-wallpaper-status">No saved dark wallpaper</p>
           </section>
         </div>
       </section>

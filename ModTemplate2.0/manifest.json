@@ -12,7 +12,7 @@
          "app_icon": [ {
             "id": "AppIcon",
             "name": "InsertModNameOrSomethingHere",
-            "path": "app_icon/app_icon1.png"
+            "path": "app_icon/classic_GX_logo.png"
          } ],
          "background_music": [ {
             "author": "InsertAuthorHere",

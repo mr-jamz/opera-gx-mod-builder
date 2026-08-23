@@ -357,12 +357,28 @@ const appIconSaveStatus = document.querySelector("#app-icon-save-status");
 const appIconPreviewImage = document.querySelector("#app-icon-preview-image");
 const appIconPreviewPlaceholder = document.querySelector("#app-icon-preview-placeholder");
 const appIconPreviewName = document.querySelector("#app-icon-preview-name");
+const appIconPresetButtons = document.querySelectorAll("[data-app-icon-preset]");
 const savedAppIconBox = document.querySelector("#saved-app-icon-box");
 const savedAppIconSummary = document.querySelector("#saved-app-icon-summary");
 const appIconCategoryCard = document.querySelector('[data-category="App icon"]');
 
 let appIconSelectionValue = null;
 let savedAppIconValue = null;
+
+const includedAppIconPresets = {
+  classic: {
+    name: "classic_GX_logo.png",
+    url: "ModTemplate2.0/app_icon/classic_GX_logo.png"
+  },
+  dark: {
+    name: "dark_GX_logo.png",
+    url: "ModTemplate2.0/app_icon/dark_GX_logo.png"
+  },
+  light: {
+    name: "light_GX_logo.png",
+    url: "ModTemplate2.0/app_icon/light_GX_logo.png"
+  }
+};
 
 function renderAppIconEditor() {
   const selection = appIconSelectionValue;
@@ -373,6 +389,12 @@ function renderAppIconEditor() {
   appIconPreviewImage.hidden = !selection;
   appIconPreviewPlaceholder.hidden = Boolean(selection);
   appIconPreviewName.textContent = selection?.name || "No icon selected";
+
+  appIconPresetButtons.forEach((button) => {
+    const selected = selection?.source === "included" && selection.preset === button.dataset.appIconPreset;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", selected.toString());
+  });
 
   if (selection) {
     appIconPreviewImage.src = selection.previewUrl;
@@ -400,14 +422,17 @@ function selectAppIcon(file) {
   const previewUrl = URL.createObjectURL(file);
   const image = new Image();
   image.addEventListener("load", () => {
-    if (appIconSelectionValue?.previewUrl && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
+    if (appIconSelectionValue?.isObjectUrl && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
       URL.revokeObjectURL(appIconSelectionValue.previewUrl);
     }
     appIconSelectionValue = {
       file,
       height: image.naturalHeight,
+      isObjectUrl: true,
       name: file.name,
+      preset: null,
       previewUrl,
+      source: "local",
       width: image.naturalWidth
     };
     appIconDropStatus.textContent = image.naturalWidth === 512 && image.naturalHeight === 512
@@ -422,6 +447,43 @@ function selectAppIcon(file) {
   }, { once: true });
   image.src = previewUrl;
 }
+
+function selectIncludedAppIcon(presetKey) {
+  const preset = includedAppIconPresets[presetKey];
+  if (!preset) {
+    return;
+  }
+
+  const image = new Image();
+  image.addEventListener("load", () => {
+    if (appIconSelectionValue?.isObjectUrl && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
+      URL.revokeObjectURL(appIconSelectionValue.previewUrl);
+    }
+    appIconSelectionValue = {
+      file: null,
+      height: image.naturalHeight,
+      isObjectUrl: false,
+      name: preset.name,
+      preset: presetKey,
+      previewUrl: preset.url,
+      source: "included",
+      width: image.naturalWidth
+    };
+    appIconDropStatus.textContent = "Sample app icon ready for preview";
+    appIconSaveStatus.textContent = "";
+    renderAppIconEditor();
+  }, { once: true });
+  image.addEventListener("error", () => {
+    appIconDropStatus.textContent = "This sample icon could not be opened";
+  }, { once: true });
+  image.src = preset.url;
+}
+
+appIconPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    selectIncludedAppIcon(button.dataset.appIconPreset);
+  });
+});
 
 appIconFileInput.addEventListener("change", () => {
   selectAppIcon(appIconFileInput.files[0]);
@@ -447,7 +509,7 @@ appIconDropzone.addEventListener("drop", (event) => {
 });
 
 clearAppIconButton.addEventListener("click", () => {
-  if (appIconSelectionValue && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
+  if (appIconSelectionValue?.isObjectUrl && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
     URL.revokeObjectURL(appIconSelectionValue.previewUrl);
   }
   appIconSelectionValue = null;
@@ -459,6 +521,9 @@ clearAppIconButton.addEventListener("click", () => {
 saveAppIconButton.addEventListener("click", () => {
   if (!appIconSelectionValue) {
     return;
+  }
+  if (savedAppIconValue?.isObjectUrl && savedAppIconValue.previewUrl !== appIconSelectionValue.previewUrl) {
+    URL.revokeObjectURL(savedAppIconValue.previewUrl);
   }
   savedAppIconValue = { ...appIconSelectionValue };
   updateSavedAppIconSummary();
@@ -716,13 +781,21 @@ saveWallpaperButton.addEventListener("click", () => {
     return;
   }
 
+  const previousSavedSelection = savedWallpaperSelections[activeWallpaperMode];
+  if (previousSavedSelection?.isObjectUrl) {
+    URL.revokeObjectURL(previousSavedSelection.previewUrl);
+  }
+
   savedWallpaperSelections[activeWallpaperMode] = {
     file: selection.file,
+    isObjectUrl: selection.source === "local",
     kind: selection.kind,
     name: selection.name,
+    previewUrl: selection.source === "local" ? URL.createObjectURL(selection.file) : selection.url,
     source: selection.source
   };
   updateSavedWallpaperSummary(activeWallpaperMode);
+  renderSpeedDialEffectsEditor();
   const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
   wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit`;
 });
@@ -734,11 +807,16 @@ const speedDialTextColorValue = document.querySelector("#speed-dial-text-color-v
 const speedDialTextShadowValue = document.querySelector("#speed-dial-text-shadow-value");
 const speedDialFocusMode = document.querySelector("#speed-dial-focus-mode");
 const speedDialEffectsPreview = document.querySelector("#speed-dial-effects-preview");
+const speedDialEffectsPreviewModeTabs = document.querySelectorAll("[data-speed-dial-preview-mode]");
+const speedDialEffectsWallpaperImage = document.querySelector("#speed-dial-effects-wallpaper-image");
+const speedDialEffectsWallpaperVideo = document.querySelector("#speed-dial-effects-wallpaper-video");
+const speedDialEffectsWallpaperStatus = document.querySelector("#speed-dial-effects-wallpaper-status");
 const saveSpeedDialEffectsButton = document.querySelector("#save-speed-dial-effects");
 const speedDialEffectsSaveStatus = document.querySelector("#speed-dial-effects-save-status");
 const savedSpeedDialBox = document.querySelector("#saved-speed-dial-box");
 const savedSpeedDialSummary = document.querySelector("#saved-speed-dial-summary");
 const speedDialCategoryCard = document.querySelector('[data-category="Speed Dial effects"]');
+let activeSpeedDialPreviewMode = "dark";
 const speedDialRangeControls = [
   {
     input: document.querySelector("#speed-dial-background-blur"),
@@ -782,7 +860,8 @@ function updateSavedSpeedDialSummary() {
 
 function renderSpeedDialEffectsEditor() {
   const values = speedDialEffectValues;
-  const theme = getWallpaperTheme("dark");
+  const theme = getWallpaperTheme(activeSpeedDialPreviewMode);
+  const wallpaper = savedWallpaperSelections[activeSpeedDialPreviewMode];
 
   speedDialPosition.value = values.position;
   speedDialTextColor.value = values.textColor;
@@ -796,18 +875,50 @@ function renderSpeedDialEffectsEditor() {
     output.textContent = values[key];
   });
 
+  speedDialEffectsPreviewModeTabs.forEach((tab) => {
+    const selected = tab.dataset.speedDialPreviewMode === activeSpeedDialPreviewMode;
+    tab.classList.toggle("is-active", selected);
+    tab.setAttribute("aria-selected", selected.toString());
+  });
+
+  speedDialEffectsWallpaperImage.style.backgroundImage = "none";
+  speedDialEffectsWallpaperVideo.pause();
+  speedDialEffectsWallpaperVideo.removeAttribute("src");
+  speedDialEffectsWallpaperVideo.load();
+  speedDialEffectsWallpaperVideo.hidden = true;
+
+  if (wallpaper?.kind === "video") {
+    speedDialEffectsWallpaperVideo.src = wallpaper.previewUrl;
+    speedDialEffectsWallpaperVideo.hidden = false;
+    speedDialEffectsWallpaperVideo.play().catch(() => {});
+  } else if (wallpaper) {
+    speedDialEffectsWallpaperImage.style.backgroundImage = `url("${wallpaper.previewUrl}")`;
+  }
+
+  const previewModeLabel = activeSpeedDialPreviewMode[0].toUpperCase() + activeSpeedDialPreviewMode.slice(1);
+  speedDialEffectsWallpaperStatus.textContent = wallpaper
+    ? `${previewModeLabel} wallpaper · ${wallpaper.kind === "video" ? "Animated" : "Static"} · ${wallpaper.name}`
+    : `No saved ${activeSpeedDialPreviewMode} wallpaper`;
+  speedDialEffectsPreview.dataset.mode = activeSpeedDialPreviewMode;
   speedDialEffectsPreview.dataset.position = values.position;
   speedDialEffectsPreview.classList.toggle("is-focus-mode", values.focusMode);
-  speedDialEffectsPreview.style.setProperty("--speed-effects-accent", hslString(theme.accent));
-  speedDialEffectsPreview.style.setProperty("--speed-effects-secondary-h", theme.secondary.h);
-  speedDialEffectsPreview.style.setProperty("--speed-effects-secondary-s", `${theme.secondary.s}%`);
-  speedDialEffectsPreview.style.setProperty("--speed-effects-text", values.textColor);
-  speedDialEffectsPreview.style.setProperty("--speed-effects-shadow", values.textShadow);
+  speedDialEffectsPreview.style.setProperty("--speed-accent", hslString(theme.accent));
+  speedDialEffectsPreview.style.setProperty("--speed-secondary-h", theme.secondary.h);
+  speedDialEffectsPreview.style.setProperty("--speed-secondary-s", `${theme.secondary.s}%`);
+  speedDialEffectsPreview.style.setProperty("--speed-custom-text", values.textColor);
+  speedDialEffectsPreview.style.setProperty("--speed-custom-shadow", values.textShadow);
   speedDialEffectsPreview.style.setProperty("--speed-effects-blur", `${values.backgroundBlur * 0.12}px`);
   speedDialEffectsPreview.style.setProperty("--speed-effects-background-opacity", values.backgroundOpacity / 100);
   speedDialEffectsPreview.style.setProperty("--speed-effects-islands-opacity", 0.16 + values.islandsOpacity * 0.008);
   speedDialEffectsPreview.style.setProperty("--speed-effects-vignette", values.vignetteStrength / 100);
 }
+
+speedDialEffectsPreviewModeTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    activeSpeedDialPreviewMode = tab.dataset.speedDialPreviewMode;
+    renderSpeedDialEffectsEditor();
+  });
+});
 
 speedDialPosition.addEventListener("change", () => {
   speedDialEffectValues.position = speedDialPosition.value;
@@ -936,7 +1047,8 @@ function renderBuildSummary() {
       title: "App icon",
       details: [
         { label: "File", value: savedAppIconValue.name },
-        { label: "Dimensions", value: `${savedAppIconValue.width}×${savedAppIconValue.height}` }
+        { label: "Dimensions", value: `${savedAppIconValue.width}×${savedAppIconValue.height}` },
+        { label: "Source", value: savedAppIconValue.source === "included" ? "Sample app icon" : "Local upload" }
       ]
     }]
     : [];
