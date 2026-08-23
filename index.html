@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260822-21">
-    <script src="app.js?v=20260822-21" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260823-01">
+    <script src="app.js?v=20260823-01" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -135,7 +135,13 @@
             <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Keyboard sounds"><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Shaders"><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page details</small></span><span class="card-arrow">↗</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page details</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-speed-dial-box" hidden>
+                <strong>Saved Speed Dial effects</strong>
+                <span class="saved-speed-dial-summary" id="saved-speed-dial-summary"></span>
+              </div>
+            </div>
             <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Web modding"><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
@@ -320,6 +326,85 @@
               </div>
             </div>
             <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="view speed-dial-effects-editor" id="speed-dial-effects-editor" aria-labelledby="speed-dial-effects-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-speed-dial-effects" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Speed Dial effects</p>
+            <h2 id="speed-dial-effects-title">Speed Dial effects</h2>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="speed-dial-effects-workspace">
+          <section class="speed-dial-effects-controls" id="speed-dial-effects-controls">
+            <div class="speed-dial-effects-heading">
+              <div>
+                <p class="section-index">START PAGE</p>
+                <h3>Speed Dial settings</h3>
+              </div>
+            </div>
+
+            <label class="speed-dial-position-control" for="speed-dial-position">
+              <span>Speed Dial position</span>
+              <select id="speed-dial-position">
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+              </select>
+            </label>
+
+            <div class="speed-dial-color-controls">
+              <label for="speed-dial-text-color"><span>Text color</span><input id="speed-dial-text-color" type="color" value="#ffffff"><output id="speed-dial-text-color-value">#ffffff</output></label>
+              <label for="speed-dial-text-shadow"><span>Text shadow</span><input id="speed-dial-text-shadow" type="color" value="#757575"><output id="speed-dial-text-shadow-value">#757575</output></label>
+            </div>
+
+            <div class="speed-dial-range-controls">
+              <label for="speed-dial-background-blur"><span>Background blur <output id="speed-dial-background-blur-value">0</output></span><input id="speed-dial-background-blur" type="range" min="0" max="100" value="0"></label>
+              <label for="speed-dial-background-opacity"><span>Background opacity <output id="speed-dial-background-opacity-value">0</output></span><input id="speed-dial-background-opacity" type="range" min="0" max="100" value="0"></label>
+              <label for="speed-dial-islands-opacity"><span>Islands opacity <output id="speed-dial-islands-opacity-value">0</output></span><input id="speed-dial-islands-opacity" type="range" min="0" max="100" value="0"></label>
+              <label for="speed-dial-vignette-strength"><span>Vignette strength <output id="speed-dial-vignette-strength-value">35</output></span><input id="speed-dial-vignette-strength" type="range" min="0" max="100" value="35"></label>
+            </div>
+
+            <label class="speed-dial-focus-control" for="speed-dial-focus-mode">
+              <span><strong>Focus mode</strong><small>Reduce start-page distractions</small></span>
+              <input id="speed-dial-focus-mode" type="checkbox">
+            </label>
+
+            <button class="save-theme-button" id="save-speed-dial-effects" type="button"><span>Save Speed Dial effects</span><b aria-hidden="true">→</b></button>
+            <p class="theme-save-status" id="speed-dial-effects-save-status" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="speed-dial-effects-preview-panel" aria-labelledby="speed-dial-effects-preview-heading">
+            <div class="speed-dial-effects-preview-heading">
+              <div>
+                <p class="section-index">LIVE PREVIEW</p>
+                <h3 id="speed-dial-effects-preview-heading">GX Speed Dial</h3>
+              </div>
+            </div>
+
+            <div class="speed-dial-effects-preview" id="speed-dial-effects-preview" data-mode="dark" data-position="top">
+              <div class="speed-dial-effects-wallpaper" aria-hidden="true"></div>
+              <div class="speed-dial-effects-background" aria-hidden="true"></div>
+              <div class="speed-dial-effects-vignette" aria-hidden="true"></div>
+              <div class="speed-dial-effects-content">
+                <div class="speed-dial-effects-search"><i aria-hidden="true"></i><span>Search the web</span></div>
+                <div class="speed-dial-effects-tiles" aria-label="Generic Speed Dial tiles">
+                  <div><span></span></div>
+                  <div><span></span></div>
+                  <div><span></span></div>
+                  <div><span></span></div>
+                  <div><span></span></div>
+                  <div class="speed-dial-effects-add" aria-hidden="true">＋</div>
+                </div>
+              </div>
+            </div>
+            <p class="speed-dial-effects-note">This preview approximates how Opera GX applies the saved start-page settings</p>
           </section>
         </div>
       </section>

@@ -487,6 +487,7 @@ h1 em {
 
 .theme-editor.is-active,
 .wallpaper-editor.is-active,
+.speed-dial-effects-editor.is-active,
 .music-editor.is-active,
 .build-review.is-active {
   display: block;
@@ -1044,6 +1045,264 @@ h1 em {
   grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
   align-items: start;
   gap: 18px;
+}
+
+.speed-dial-effects-workspace {
+  display: grid;
+  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+}
+
+.speed-dial-effects-controls,
+.speed-dial-effects-preview-panel {
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface) 94%, transparent);
+}
+
+.speed-dial-effects-controls {
+  padding: clamp(22px, 3vw, 30px);
+}
+
+.speed-dial-effects-heading h3,
+.speed-dial-effects-preview-heading h3 {
+  margin: 6px 0 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.speed-dial-position-control,
+.speed-dial-range-controls label {
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.speed-dial-position-control {
+  margin-top: 28px;
+}
+
+.speed-dial-position-control select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  color: var(--text);
+  border: 1px solid var(--line);
+  background: var(--surface-deep);
+  font: inherit;
+}
+
+.speed-dial-color-controls {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.speed-dial-color-controls label {
+  min-width: 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface-deep);
+}
+
+.speed-dial-color-controls label > span {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.speed-dial-color-controls input[type="color"] {
+  width: 38px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.speed-dial-color-controls output,
+.speed-dial-range-controls output {
+  color: var(--red);
+  font: 700 0.65rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.speed-dial-range-controls {
+  margin-top: 22px;
+  display: grid;
+  gap: 18px;
+}
+
+.speed-dial-range-controls label > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.speed-dial-range-controls input[type="range"] {
+  width: 100%;
+  accent-color: var(--red);
+  cursor: pointer;
+}
+
+.speed-dial-focus-control {
+  margin: 24px 0;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--line);
+  background: var(--surface-deep);
+  cursor: pointer;
+}
+
+.speed-dial-focus-control > span {
+  display: grid;
+  gap: 4px;
+}
+
+.speed-dial-focus-control small {
+  color: var(--muted);
+}
+
+.speed-dial-focus-control input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--red);
+}
+
+.speed-dial-effects-preview-panel {
+  padding: clamp(18px, 2.5vw, 26px);
+}
+
+.speed-dial-effects-preview {
+  --speed-effects-accent: var(--red);
+  --speed-effects-secondary-h: 258;
+  --speed-effects-secondary-s: 24%;
+  --speed-effects-text: #ffffff;
+  --speed-effects-shadow: #757575;
+  --speed-effects-blur: 0px;
+  --speed-effects-background-opacity: 0;
+  --speed-effects-islands-opacity: 0.16;
+  --speed-effects-vignette: 0.35;
+  position: relative;
+  min-height: 520px;
+  margin-top: 18px;
+  overflow: hidden;
+  color: var(--speed-effects-text);
+  border: 1px solid color-mix(in hsl, var(--speed-effects-accent) 62%, var(--line));
+  background: hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 8%);
+}
+
+.speed-dial-effects-wallpaper,
+.speed-dial-effects-background,
+.speed-dial-effects-vignette {
+  position: absolute;
+  inset: -18px;
+}
+
+.speed-dial-effects-wallpaper {
+  background:
+    radial-gradient(circle at 70% 24%, color-mix(in hsl, var(--speed-effects-accent) 24%, transparent), transparent 38%),
+    linear-gradient(145deg, hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 10%), hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 4%));
+  filter: blur(var(--speed-effects-blur));
+}
+
+.speed-dial-effects-background {
+  background: hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 5%);
+  opacity: var(--speed-effects-background-opacity);
+}
+
+.speed-dial-effects-vignette {
+  background: radial-gradient(circle, transparent 35%, #000 100%);
+  opacity: var(--speed-effects-vignette);
+}
+
+.speed-dial-effects-content {
+  position: relative;
+  z-index: 1;
+  min-height: 520px;
+  padding: clamp(34px, 6vw, 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-shadow: 0 2px 10px var(--speed-effects-shadow);
+}
+
+.speed-dial-effects-preview[data-position="bottom"] .speed-dial-effects-content {
+  justify-content: flex-end;
+}
+
+.speed-dial-effects-preview[data-position="left"] .speed-dial-effects-content {
+  width: 68%;
+  justify-content: center;
+}
+
+.speed-dial-effects-preview[data-position="right"] .speed-dial-effects-content {
+  width: 68%;
+  margin-left: auto;
+  justify-content: center;
+}
+
+.speed-dial-effects-search {
+  min-height: 58px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 2px solid var(--speed-effects-accent);
+  background: hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 16% / var(--speed-effects-islands-opacity));
+  backdrop-filter: blur(10px);
+  font-size: 0.88rem;
+}
+
+.speed-dial-effects-search i,
+.speed-dial-effects-tiles span {
+  width: 19px;
+  height: 19px;
+  border: 3px solid var(--speed-effects-accent);
+  border-radius: 50%;
+}
+
+.speed-dial-effects-tiles {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.speed-dial-effects-tiles > div {
+  min-height: 96px;
+  display: grid;
+  place-items: center;
+  border: 1px solid hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 78% / 0.15);
+  background: hsl(var(--speed-effects-secondary-h) var(--speed-effects-secondary-s) 24% / var(--speed-effects-islands-opacity));
+  backdrop-filter: blur(8px);
+}
+
+.speed-dial-effects-add {
+  color: var(--speed-effects-accent);
+  font-size: 1.4rem;
+}
+
+.speed-dial-effects-preview.is-focus-mode .speed-dial-effects-tiles {
+  opacity: 0.15;
+  transform: scale(0.96);
+}
+
+.speed-dial-effects-note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
 }
 
 .wallpaper-controls,
@@ -2264,6 +2523,17 @@ h1 em {
   width: 100%;
 }
 
+.additional-category-item {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.additional-category-item .category-card {
+  width: 100%;
+}
+
 .additional-grid {
   grid-template-columns: repeat(3, 1fr);
 }
@@ -2448,6 +2718,7 @@ h1 em {
 
 .saved-theme-summary,
 .saved-wallpaper-summary,
+.saved-speed-dial-summary,
 .saved-music-summary span {
   color: var(--red);
   font: 650 0.62rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
@@ -2562,6 +2833,10 @@ h1 em {
     grid-template-columns: 1fr;
   }
 
+  .speed-dial-effects-workspace {
+    grid-template-columns: 1fr;
+  }
+
   .theme-preview-panel {
     position: static;
   }
@@ -2599,6 +2874,7 @@ h1 em {
 
   .theme-editor.is-active,
   .wallpaper-editor.is-active,
+  .speed-dial-effects-editor.is-active,
   .music-editor.is-active,
   .build-review.is-active {
     padding-block: 36px 70px;

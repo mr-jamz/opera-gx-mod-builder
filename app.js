@@ -2,6 +2,7 @@ const landingView = document.querySelector("#home");
 const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
+const speedDialEffectsEditorView = document.querySelector("#speed-dial-effects-editor");
 const musicEditorView = document.querySelector("#music-editor");
 const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
@@ -9,6 +10,7 @@ const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
+const backSpeedDialEffectsButton = document.querySelector("#back-speed-dial-effects");
 const backMusicButton = document.querySelector("#back-music");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
@@ -38,6 +40,19 @@ const savedThemeValues = {
   dark: null,
   light: null
 };
+
+const speedDialEffectValues = {
+  backgroundBlur: 0,
+  backgroundOpacity: 0,
+  focusMode: false,
+  islandsOpacity: 0,
+  position: "top",
+  textColor: "#ffffff",
+  textShadow: "#757575",
+  vignetteStrength: 35
+};
+
+let savedSpeedDialEffectValues = null;
 
 const modBuildState = {
   music: {
@@ -128,6 +143,13 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Speed Dial effects") {
+      renderSpeedDialEffectsEditor();
+      switchView(creatorView, speedDialEffectsEditorView);
+      window.history.replaceState(null, "", "#speed-dial-effects-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -140,6 +162,11 @@ backCreatorButton.addEventListener("click", () => {
 
 backWallpaperButton.addEventListener("click", () => {
   switchView(wallpaperEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backSpeedDialEffectsButton.addEventListener("click", () => {
+  switchView(speedDialEffectsEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -566,6 +593,126 @@ saveWallpaperButton.addEventListener("click", () => {
   wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit`;
 });
 
+const speedDialPosition = document.querySelector("#speed-dial-position");
+const speedDialTextColor = document.querySelector("#speed-dial-text-color");
+const speedDialTextShadow = document.querySelector("#speed-dial-text-shadow");
+const speedDialTextColorValue = document.querySelector("#speed-dial-text-color-value");
+const speedDialTextShadowValue = document.querySelector("#speed-dial-text-shadow-value");
+const speedDialFocusMode = document.querySelector("#speed-dial-focus-mode");
+const speedDialEffectsPreview = document.querySelector("#speed-dial-effects-preview");
+const saveSpeedDialEffectsButton = document.querySelector("#save-speed-dial-effects");
+const speedDialEffectsSaveStatus = document.querySelector("#speed-dial-effects-save-status");
+const savedSpeedDialBox = document.querySelector("#saved-speed-dial-box");
+const savedSpeedDialSummary = document.querySelector("#saved-speed-dial-summary");
+const speedDialCategoryCard = document.querySelector('[data-category="Speed Dial effects"]');
+const speedDialRangeControls = [
+  {
+    input: document.querySelector("#speed-dial-background-blur"),
+    key: "backgroundBlur",
+    output: document.querySelector("#speed-dial-background-blur-value")
+  },
+  {
+    input: document.querySelector("#speed-dial-background-opacity"),
+    key: "backgroundOpacity",
+    output: document.querySelector("#speed-dial-background-opacity-value")
+  },
+  {
+    input: document.querySelector("#speed-dial-islands-opacity"),
+    key: "islandsOpacity",
+    output: document.querySelector("#speed-dial-islands-opacity-value")
+  },
+  {
+    input: document.querySelector("#speed-dial-vignette-strength"),
+    key: "vignetteStrength",
+    output: document.querySelector("#speed-dial-vignette-strength-value")
+  }
+];
+
+function copySpeedDialEffectValues(values) {
+  return { ...values };
+}
+
+function updateSavedSpeedDialSummary() {
+  const values = savedSpeedDialEffectValues;
+  const positionLabel = values
+    ? values.position[0].toUpperCase() + values.position.slice(1)
+    : "";
+  savedSpeedDialSummary.textContent = values
+    ? `${positionLabel} · Blur ${values.backgroundBlur} · Background ${values.backgroundOpacity} · Islands ${values.islandsOpacity} · Vignette ${values.vignetteStrength} · Focus ${values.focusMode ? "on" : "off"}`
+    : "";
+  const hasSavedSpeedDialEffects = Boolean(values);
+  savedSpeedDialBox.hidden = !hasSavedSpeedDialEffects;
+  speedDialCategoryCard.classList.toggle("has-saved-data", hasSavedSpeedDialEffects);
+  updateCreateModAvailability();
+}
+
+function renderSpeedDialEffectsEditor() {
+  const values = speedDialEffectValues;
+  const theme = getWallpaperTheme("dark");
+
+  speedDialPosition.value = values.position;
+  speedDialTextColor.value = values.textColor;
+  speedDialTextShadow.value = values.textShadow;
+  speedDialTextColorValue.textContent = values.textColor.toUpperCase();
+  speedDialTextShadowValue.textContent = values.textShadow.toUpperCase();
+  speedDialFocusMode.checked = values.focusMode;
+
+  speedDialRangeControls.forEach(({ input, key, output }) => {
+    input.value = values[key];
+    output.textContent = values[key];
+  });
+
+  speedDialEffectsPreview.dataset.position = values.position;
+  speedDialEffectsPreview.classList.toggle("is-focus-mode", values.focusMode);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-accent", hslString(theme.accent));
+  speedDialEffectsPreview.style.setProperty("--speed-effects-secondary-h", theme.secondary.h);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-secondary-s", `${theme.secondary.s}%`);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-text", values.textColor);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-shadow", values.textShadow);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-blur", `${values.backgroundBlur * 0.12}px`);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-background-opacity", values.backgroundOpacity / 100);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-islands-opacity", 0.16 + values.islandsOpacity * 0.008);
+  speedDialEffectsPreview.style.setProperty("--speed-effects-vignette", values.vignetteStrength / 100);
+}
+
+speedDialPosition.addEventListener("change", () => {
+  speedDialEffectValues.position = speedDialPosition.value;
+  speedDialEffectsSaveStatus.textContent = "";
+  renderSpeedDialEffectsEditor();
+});
+
+speedDialTextColor.addEventListener("input", () => {
+  speedDialEffectValues.textColor = speedDialTextColor.value;
+  speedDialEffectsSaveStatus.textContent = "";
+  renderSpeedDialEffectsEditor();
+});
+
+speedDialTextShadow.addEventListener("input", () => {
+  speedDialEffectValues.textShadow = speedDialTextShadow.value;
+  speedDialEffectsSaveStatus.textContent = "";
+  renderSpeedDialEffectsEditor();
+});
+
+speedDialRangeControls.forEach(({ input, key }) => {
+  input.addEventListener("input", () => {
+    speedDialEffectValues[key] = Number(input.value);
+    speedDialEffectsSaveStatus.textContent = "";
+    renderSpeedDialEffectsEditor();
+  });
+});
+
+speedDialFocusMode.addEventListener("change", () => {
+  speedDialEffectValues.focusMode = speedDialFocusMode.checked;
+  speedDialEffectsSaveStatus.textContent = "";
+  renderSpeedDialEffectsEditor();
+});
+
+saveSpeedDialEffectsButton.addEventListener("click", () => {
+  savedSpeedDialEffectValues = copySpeedDialEffectValues(speedDialEffectValues);
+  updateSavedSpeedDialSummary();
+  speedDialEffectsSaveStatus.textContent = "Speed Dial effects saved for this visit";
+});
+
 const musicTrackList = document.querySelector("#music-track-list");
 const addMusicTrackButton = document.querySelector("#add-music-track");
 const saveMusicTracksButton = document.querySelector("#save-music-tracks");
@@ -598,7 +745,8 @@ function hasSavedModOptions() {
   const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
-  return hasSavedTheme || hasSavedWallpaper || hasSavedMusic;
+  const hasSavedSpeedDialEffects = Boolean(savedSpeedDialEffectValues);
+  return hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedSpeedDialEffects;
 }
 
 function updateCreateModAvailability() {
@@ -692,6 +840,23 @@ function renderBuildSummary() {
     return { title: `Track ${index + 1}`, details };
   });
   appendBuildSummaryGroup("Music", "Saved background music tracks", musicItems);
+
+  const speedDialItems = savedSpeedDialEffectValues
+    ? [{
+      title: "General settings",
+      details: [
+        { label: "Speed Dial position", value: savedSpeedDialEffectValues.position },
+        { label: "Text color", value: savedSpeedDialEffectValues.textColor.toUpperCase() },
+        { label: "Text shadow", value: savedSpeedDialEffectValues.textShadow.toUpperCase() },
+        { label: "Background blur", value: String(savedSpeedDialEffectValues.backgroundBlur) },
+        { label: "Background opacity", value: String(savedSpeedDialEffectValues.backgroundOpacity) },
+        { label: "Focus mode", value: savedSpeedDialEffectValues.focusMode ? "Enabled" : "Disabled" },
+        { label: "Islands opacity", value: String(savedSpeedDialEffectValues.islandsOpacity) },
+        { label: "Vignette strength", value: String(savedSpeedDialEffectValues.vignetteStrength) }
+      ]
+    }]
+    : [];
+  appendBuildSummaryGroup("Speed Dial effects", "Saved Opera GX start-page settings", speedDialItems);
 }
 
 function setMusicSaveAvailability() {
@@ -1011,14 +1176,16 @@ saveMusicTracksButton.addEventListener("click", () => {
 
 renderThemeEditor();
 renderWallpaperEditor();
+renderSpeedDialEffectsEditor();
 
-if (["#creator", "#theme-editor", "#wallpaper-editor", "#music-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#wallpaper-editor", "#speed-dial-effects-editor", "#music-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
     "#creator": creatorView,
     "#theme-editor": themeEditorView,
     "#wallpaper-editor": wallpaperEditorView,
+    "#speed-dial-effects-editor": speedDialEffectsEditorView,
     "#music-editor": musicEditorView,
     "#build-review": buildReviewView
   };
@@ -1034,6 +1201,9 @@ if (["#creator", "#theme-editor", "#wallpaper-editor", "#music-editor", "#build-
   }
   if (initialView === wallpaperEditorView) {
     renderWallpaperEditor();
+  }
+  if (initialView === speedDialEffectsEditorView) {
+    renderSpeedDialEffectsEditor();
   }
   if (initialView === buildReviewView) {
     renderBuildSummary();
