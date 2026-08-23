@@ -1,6 +1,7 @@
 const landingView = document.querySelector("#home");
 const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
+const appIconEditorView = document.querySelector("#app-icon-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const speedDialEffectsEditorView = document.querySelector("#speed-dial-effects-editor");
 const musicEditorView = document.querySelector("#music-editor");
@@ -9,6 +10,7 @@ const brandHomeLink = document.querySelector(".brand");
 const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
+const backAppIconButton = document.querySelector("#back-app-icon");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backSpeedDialEffectsButton = document.querySelector("#back-speed-dial-effects");
 const backMusicButton = document.querySelector("#back-music");
@@ -137,6 +139,13 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "App icon") {
+      renderAppIconEditor();
+      switchView(creatorView, appIconEditorView);
+      window.history.replaceState(null, "", "#app-icon-editor");
+      return;
+    }
+
     if (button.dataset.category === "Music editor") {
       switchView(creatorView, musicEditorView);
       window.history.replaceState(null, "", "#music-editor");
@@ -162,6 +171,11 @@ backCreatorButton.addEventListener("click", () => {
 
 backWallpaperButton.addEventListener("click", () => {
   switchView(wallpaperEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backAppIconButton.addEventListener("click", () => {
+  switchView(appIconEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -329,6 +343,126 @@ saveThemeButton.addEventListener("click", () => {
   updateSavedThemeSummary(activeThemeMode);
   const modeLabel = activeThemeMode[0].toUpperCase() + activeThemeMode.slice(1);
   themeSaveStatus.textContent = `${modeLabel} colors saved for this visit`;
+});
+
+const appIconFileInput = document.querySelector("#app-icon-file");
+const appIconDropzone = document.querySelector("#app-icon-dropzone");
+const appIconDropStatus = document.querySelector("#app-icon-drop-status");
+const appIconSelection = document.querySelector("#app-icon-selection");
+const appIconFileName = document.querySelector("#app-icon-file-name");
+const appIconDimensions = document.querySelector("#app-icon-dimensions");
+const clearAppIconButton = document.querySelector("#clear-app-icon");
+const saveAppIconButton = document.querySelector("#save-app-icon");
+const appIconSaveStatus = document.querySelector("#app-icon-save-status");
+const appIconPreviewImage = document.querySelector("#app-icon-preview-image");
+const appIconPreviewPlaceholder = document.querySelector("#app-icon-preview-placeholder");
+const appIconPreviewName = document.querySelector("#app-icon-preview-name");
+const savedAppIconBox = document.querySelector("#saved-app-icon-box");
+const savedAppIconSummary = document.querySelector("#saved-app-icon-summary");
+const appIconCategoryCard = document.querySelector('[data-category="App icon"]');
+
+let appIconSelectionValue = null;
+let savedAppIconValue = null;
+
+function renderAppIconEditor() {
+  const selection = appIconSelectionValue;
+  appIconSelection.hidden = !selection;
+  saveAppIconButton.disabled = !selection;
+  appIconFileName.textContent = selection?.name || "";
+  appIconDimensions.textContent = selection ? `${selection.width}×${selection.height}` : "";
+  appIconPreviewImage.hidden = !selection;
+  appIconPreviewPlaceholder.hidden = Boolean(selection);
+  appIconPreviewName.textContent = selection?.name || "No icon selected";
+
+  if (selection) {
+    appIconPreviewImage.src = selection.previewUrl;
+  } else {
+    appIconPreviewImage.removeAttribute("src");
+  }
+}
+
+function updateSavedAppIconSummary() {
+  savedAppIconBox.hidden = !savedAppIconValue;
+  savedAppIconSummary.textContent = savedAppIconValue
+    ? `${savedAppIconValue.name} · ${savedAppIconValue.width}×${savedAppIconValue.height}`
+    : "";
+  appIconCategoryCard.classList.toggle("has-saved-data", Boolean(savedAppIconValue));
+  updateCreateModAvailability();
+}
+
+function selectAppIcon(file) {
+  const validTypes = ["image/png", "image/jpeg"];
+  if (!file || !validTypes.includes(file.type)) {
+    appIconDropStatus.textContent = "Choose a PNG or JPG image";
+    return;
+  }
+
+  const previewUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.addEventListener("load", () => {
+    if (appIconSelectionValue?.previewUrl && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
+      URL.revokeObjectURL(appIconSelectionValue.previewUrl);
+    }
+    appIconSelectionValue = {
+      file,
+      height: image.naturalHeight,
+      name: file.name,
+      previewUrl,
+      width: image.naturalWidth
+    };
+    appIconDropStatus.textContent = image.naturalWidth === 512 && image.naturalHeight === 512
+      ? "Icon ready for preview"
+      : `Icon loaded at ${image.naturalWidth}×${image.naturalHeight} · 512×512 is recommended`;
+    appIconSaveStatus.textContent = "";
+    renderAppIconEditor();
+  }, { once: true });
+  image.addEventListener("error", () => {
+    URL.revokeObjectURL(previewUrl);
+    appIconDropStatus.textContent = "This image could not be opened";
+  }, { once: true });
+  image.src = previewUrl;
+}
+
+appIconFileInput.addEventListener("change", () => {
+  selectAppIcon(appIconFileInput.files[0]);
+  appIconFileInput.value = "";
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  appIconDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    appIconDropzone.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  appIconDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    appIconDropzone.classList.remove("is-dragging");
+  });
+});
+
+appIconDropzone.addEventListener("drop", (event) => {
+  selectAppIcon(event.dataTransfer.files[0]);
+});
+
+clearAppIconButton.addEventListener("click", () => {
+  if (appIconSelectionValue && appIconSelectionValue.previewUrl !== savedAppIconValue?.previewUrl) {
+    URL.revokeObjectURL(appIconSelectionValue.previewUrl);
+  }
+  appIconSelectionValue = null;
+  appIconDropStatus.textContent = "";
+  appIconSaveStatus.textContent = "";
+  renderAppIconEditor();
+});
+
+saveAppIconButton.addEventListener("click", () => {
+  if (!appIconSelectionValue) {
+    return;
+  }
+  savedAppIconValue = { ...appIconSelectionValue };
+  updateSavedAppIconSummary();
+  appIconSaveStatus.textContent = "App icon saved for this visit";
 });
 
 const wallpaperModeTabs = document.querySelectorAll("[data-wallpaper-mode]");
@@ -742,11 +876,12 @@ function updateSavedMusicSummary() {
 }
 
 function hasSavedModOptions() {
+  const hasSavedAppIcon = Boolean(savedAppIconValue);
   const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
   const hasSavedSpeedDialEffects = Boolean(savedSpeedDialEffectValues);
-  return hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedSpeedDialEffects;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedSpeedDialEffects;
 }
 
 function updateCreateModAvailability() {
@@ -795,6 +930,17 @@ function appendBuildSummaryGroup(title, description, items) {
 
 function renderBuildSummary() {
   buildSummaryGroups.replaceChildren();
+
+  const appIconItems = savedAppIconValue
+    ? [{
+      title: "App icon",
+      details: [
+        { label: "File", value: savedAppIconValue.name },
+        { label: "Dimensions", value: `${savedAppIconValue.width}×${savedAppIconValue.height}` }
+      ]
+    }]
+    : [];
+  appendBuildSummaryGroup("App icon", "Saved mod identity image", appIconItems);
 
   const themeItems = Object.entries(savedThemeValues)
     .filter(([, values]) => values)
@@ -1175,15 +1321,17 @@ saveMusicTracksButton.addEventListener("click", () => {
 });
 
 renderThemeEditor();
+renderAppIconEditor();
 renderWallpaperEditor();
 renderSpeedDialEffectsEditor();
 
-if (["#creator", "#theme-editor", "#wallpaper-editor", "#speed-dial-effects-editor", "#music-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#wallpaper-editor", "#speed-dial-effects-editor", "#music-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
     "#creator": creatorView,
     "#theme-editor": themeEditorView,
+    "#app-icon-editor": appIconEditorView,
     "#wallpaper-editor": wallpaperEditorView,
     "#speed-dial-effects-editor": speedDialEffectsEditorView,
     "#music-editor": musicEditorView,
@@ -1201,6 +1349,9 @@ if (["#creator", "#theme-editor", "#wallpaper-editor", "#speed-dial-effects-edit
   }
   if (initialView === wallpaperEditorView) {
     renderWallpaperEditor();
+  }
+  if (initialView === appIconEditorView) {
+    renderAppIconEditor();
   }
   if (initialView === speedDialEffectsEditorView) {
     renderSpeedDialEffectsEditor();

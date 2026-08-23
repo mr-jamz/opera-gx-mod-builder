@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260823-01">
-    <script src="app.js?v=20260823-01" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260823-02">
+    <script src="app.js?v=20260823-02" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -127,7 +127,13 @@
           </div>
 
           <div class="card-grid additional-grid">
-            <button class="category-card" type="button" data-category="App icon"><span class="card-copy"><strong>App icon</strong><small>Desktop identity</small></span><span class="card-arrow">↗</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="App icon"><span class="card-copy"><strong>App icon</strong><small>Desktop identity</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-app-icon-box" hidden>
+                <strong>Saved app icon</strong>
+                <span class="saved-app-icon-summary" id="saved-app-icon-summary"></span>
+              </div>
+            </div>
             <button class="category-card" type="button" data-category="Browser sounds"><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Cursors"><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
@@ -205,6 +211,58 @@
             <p class="locked-value-note" id="secondary-lock-note"><span aria-hidden="true">◆</span> Opera GX locks GX secondary base lightness to <strong id="secondary-lock-value">16%</strong> in dark mode</p>
             <button class="save-theme-button" id="save-theme-colors" type="button"><span>Save dark colors</span><b aria-hidden="true">→</b></button>
             <p class="theme-save-status" id="theme-save-status" role="status" aria-live="polite"></p>
+          </section>
+        </div>
+      </section>
+
+      <section class="view app-icon-editor" id="app-icon-editor" aria-labelledby="app-icon-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-app-icon" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / App icon</p>
+            <h2 id="app-icon-editor-title">App icon editor</h2>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="app-icon-workspace">
+          <section class="app-icon-controls" aria-labelledby="app-icon-media-heading">
+            <p class="section-index">ICON MEDIA</p>
+            <h3 id="app-icon-media-heading">Choose an app icon</h3>
+            <p class="control-description">Add the image Opera GX will display for your mod</p>
+
+            <input class="wallpaper-file-input" id="app-icon-file" type="file" accept="image/png,image/jpeg">
+            <label class="wallpaper-file-button app-icon-dropzone" id="app-icon-dropzone" for="app-icon-file">
+              <span><strong>Drop icon here</strong><small>or choose a local file</small></span>
+              <b aria-hidden="true">＋</b>
+            </label>
+            <p class="wallpaper-file-types">PNG · JPG</p>
+            <p class="app-icon-size-note">Recommended icon size: 512×512</p>
+            <p class="wallpaper-drop-status" id="app-icon-drop-status" role="status" aria-live="polite"></p>
+
+            <div class="wallpaper-selection app-icon-selection" id="app-icon-selection" hidden>
+              <span>Selected app icon</span>
+              <strong id="app-icon-file-name"></strong>
+              <small id="app-icon-dimensions"></small>
+              <button id="clear-app-icon" type="button">Remove file</button>
+            </div>
+
+            <button class="save-theme-button" id="save-app-icon" type="button" disabled><span>Save app icon</span><b aria-hidden="true">→</b></button>
+            <p class="theme-save-status" id="app-icon-save-status" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="app-icon-preview-panel" aria-labelledby="app-icon-preview-heading">
+            <div>
+              <p class="section-index">LIVE PREVIEW</p>
+              <h3 id="app-icon-preview-heading">App icon</h3>
+            </div>
+            <div class="app-icon-preview-stage">
+              <div class="app-icon-preview-frame">
+                <span class="app-icon-preview-placeholder" id="app-icon-preview-placeholder" aria-hidden="true"><i></i></span>
+                <img id="app-icon-preview-image" alt="Selected app icon preview" hidden>
+              </div>
+              <p id="app-icon-preview-name">No icon selected</p>
+            </div>
           </section>
         </div>
       </section>
