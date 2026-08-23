@@ -1261,6 +1261,64 @@ h1 em {
   white-space: nowrap;
 }
 
+.corner-curve-reference {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.corner-curve-reference h4 {
+  margin: 6px 0 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.corner-curve-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.corner-curve-grid figure {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-deep);
+}
+
+.corner-curve-grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  display: block;
+  object-fit: contain;
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%),
+    #101014;
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.corner-curve-grid figcaption {
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+
+.corner-curve-grid figcaption strong {
+  color: var(--red);
+  font: 800 0.72rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.corner-curve-grid figcaption span {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
 .speed-dial-effects-workspace {
   display: grid;
   grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
