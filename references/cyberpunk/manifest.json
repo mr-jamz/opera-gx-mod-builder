@@ -1,0 +1,932 @@
+{
+  "description": "Cyberpunk 2077",
+  "developer": {
+    "name": "Opera Software"
+  },
+  "icons": {
+    "512": "icon_512.png"
+  },
+  "manifest_version": 3,
+  "mod": {
+    "payload": {
+      "theme": [
+        {
+          "dark": {
+            "gx_accent": {
+              "h": 57,
+              "l": 51,
+              "s": 98
+            },
+            "gx_secondary_base": {
+              "h": 0,
+              "l": 2,
+              "s": 0
+            }
+          },
+          "id": "0",
+          "light": {
+            "gx_accent": {
+              "h": 353,
+              "l": 52,
+              "s": 98
+            },
+            "gx_secondary_base": {
+              "h": 234,
+              "l": 45,
+              "s": 46
+            }
+          },
+          "name": "Official Cyberpunk 2077"
+        }
+      ],
+      "wallpaper": [
+        {
+          "dark": {
+            "groups": [
+              {
+                "layers": [
+                  {
+                    "options": {
+                      "blend_mode": "normal",
+                      "grayscale": false
+                    },
+                    "resource": "dark_wallpaper/1.jpg",
+                    "type": "image"
+                  }
+                ],
+                "shader": {
+                  "path": "shaders/vignette.sksl"
+                }
+              }
+            ],
+            "image_mobile": "mobile_wallpaper/dark.jpg",
+            "preview": {
+              "176x124": "dark_wallpaper/preview.png"
+            },
+            "speeddial_position": "left",
+            "text_color": "#ffffff",
+            "text_shadow": "#757575",
+            "ui_settings": {
+              "background_blur": 0,
+              "background_opacity": 0,
+              "focus_mode": false,
+              "islands_opacity": 0,
+              "vignette_strength": 35
+            }
+          },
+          "id": "wallpaper_2",
+          "light": {
+            "groups": [
+              {
+                "layers": [
+                  {
+                    "options": {
+                      "blend_mode": "normal",
+                      "grayscale": false
+                    },
+                    "resource": "light_wallpaper/1.jpg",
+                    "type": "image"
+                  }
+                ],
+                "shader": {
+                  "path": "shaders/vignette.sksl"
+                }
+              }
+            ],
+            "image_mobile": "mobile_wallpaper/light.jpg",
+            "preview": {
+              "176x124": "light_wallpaper/preview.png"
+            },
+            "speeddial_position": "left",
+            "text_color": "#ffffff",
+            "text_shadow": "#757575",
+            "ui_settings": {
+              "background_blur": 0,
+              "background_opacity": 0,
+              "focus_mode": false,
+              "islands_opacity": 40,
+              "vignette_strength": 24
+            }
+          },
+          "name": "Cyberpunk 2077",
+          "title": "Cyberpunk 2077"
+        }
+      ],
+      "background_music": [
+        {
+          "author": "Marcin Przybyłowicz",
+          "id": "music_0",
+          "name": "Been Good To Know Ya",
+          "tracks": [
+            "music/004_Opera_GX_Been_Good_To_Know_Ya_MUS_WIP-8.ogg"
+          ]
+        },
+        {
+          "author": "P.T. Adamczyk",
+          "id": "music_1",
+          "name": "The Rebel Path",
+          "tracks": [
+            "music/001_Opera_GX_The_Rebel_Path_MUS_WIP-8.ogg"
+          ]
+        },
+        {
+          "author": "P.T. Adamczyk",
+          "id": "music_2",
+          "name": "Scavenger Hunt",
+          "tracks": [
+            "music/002_Opera_GX_Scavengers_MUS_WIP-8.ogg"
+          ]
+        },
+        {
+          "author": "Marcin Przybyłowicz",
+          "id": "music_3",
+          "name": "Patri(di)ots",
+          "tracks": [
+            "music/003_Opera_GX_Patridiots_MUS_WIP-8.ogg"
+          ]
+        }
+      ],
+      "app_icon": [
+        {
+          "id": "app_icon_01",
+          "name": "Cyberpunk 2077",
+          "path": "app_icon/app_icon1.png"
+        }
+      ],
+      "browser_sounds": [
+        {
+          "id": "0",
+          "name": "Official Cyberpunk 2077",
+          "sounds": {
+            "CLICK": [
+              "sounds/IMPORTANT_CLICK.m4a"
+            ],
+            "FEATURE_SWITCH_OFF": [
+              "sounds/FEATURE_SWITCH_OFF.m4a"
+            ],
+            "FEATURE_SWITCH_ON": [
+              "sounds/FEATURE_SWITCH_ON.m4a"
+            ],
+            "HOVER": [
+              "sounds/HOVER.m4a"
+            ],
+            "HOVER_UP": [
+              "sounds/HOVER.m4a"
+            ],
+            "IMPORTANT_CLICK": [
+              "sounds/IMPORTANT_CLICK.m4a"
+            ],
+            "LIMITER_OFF": [
+              "sounds/FEATURE_SWITCH_OFF.m4a"
+            ],
+            "LIMITER_ON": [
+              "sounds/FEATURE_SWITCH_ON.m4a"
+            ],
+            "SWITCH_TOGGLE": [
+              "sounds/FEATURE_SWITCH_ON.m4a"
+            ],
+            "TAB_CLOSE": [
+              "sounds/TAB_CLOSE.m4a"
+            ],
+            "TAB_INSERT": [
+              "sounds/TAB_INSERT.m4a"
+            ],
+            "TAB_SLASH": [
+              "sounds/TAB_SLASH.m4a"
+            ]
+          }
+        }
+      ],
+      "cursors": [
+        {
+          "id": "cursors_0",
+          "items": [
+            {
+              "path": "cursors/Cyan/north_resize.cur",
+              "type": "NORTH_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/north_east_resize.cur",
+              "type": "NORTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/north_south_resize.cur",
+              "type": "NORTH_SOUTH_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/no_drop.cur",
+              "type": "NO_DROP"
+            },
+            {
+              "path": "cursors/Cyan/north_east_south_west_resize.cur",
+              "type": "NORTH_EAST_SOUTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/grab.cur",
+              "type": "GRAB"
+            },
+            {
+              "path": "cursors/Cyan/alias.cur",
+              "type": "ALIAS"
+            },
+            {
+              "path": "cursors/Cyan/west_resize.cur",
+              "type": "WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/south_west_panning.cur",
+              "type": "SOUTH_WEST_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/north_west_south_east_resize.cur",
+              "type": "NORTH_WEST_SOUTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/south_east_resize.cur",
+              "type": "SOUTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/wait.cur",
+              "type": "WAIT"
+            },
+            {
+              "path": "cursors/Cyan/north_south_no_resize.cur",
+              "type": "NORTH_SOUTH_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/not_allowed.cur",
+              "type": "NOT_ALLOWED"
+            },
+            {
+              "path": "cursors/Cyan/middle_panning.cur",
+              "type": "MIDDLE_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/copy.cur",
+              "type": "COPY"
+            },
+            {
+              "path": "cursors/Cyan/middle_panning_horizontal.cur",
+              "type": "MIDDLE_PANNING_HORIZONTAL"
+            },
+            {
+              "path": "cursors/Cyan/row_resize.cur",
+              "type": "ROW_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/cell.cur",
+              "type": "CELL"
+            },
+            {
+              "path": "cursors/Cyan/zoom_out.cur",
+              "type": "ZOOM_OUT"
+            },
+            {
+              "path": "cursors/Cyan/north_west_south_east_no_resize.cur",
+              "type": "NORTH_WEST_SOUTH_EAST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/vertical_text.cur",
+              "type": "VERTICAL_TEXT"
+            },
+            {
+              "path": "cursors/Cyan/help.cur",
+              "type": "HELP"
+            },
+            {
+              "path": "cursors/Cyan/column_resize.cur",
+              "type": "COLUMN_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/cross.cur",
+              "type": "CROSS"
+            },
+            {
+              "path": "cursors/Cyan/east_panning.cur",
+              "type": "EAST_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/grabbing.cur",
+              "type": "GRABBING"
+            },
+            {
+              "path": "cursors/Cyan/east_west_no_resize.cur",
+              "type": "EAST_WEST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/north_west_panning.cur",
+              "type": "NORTH_WEST_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/move.cur",
+              "type": "MOVE"
+            },
+            {
+              "path": "cursors/Cyan/east_west_resize.cur",
+              "type": "EAST_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/context_menu.cur",
+              "type": "CONTEXT_MENU"
+            },
+            {
+              "path": "cursors/Cyan/zoom_in.cur",
+              "type": "ZOOM_IN"
+            },
+            {
+              "path": "cursors/Cyan/south_panning.cur",
+              "type": "SOUTH_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/north_east_panning.cur",
+              "type": "NORTH_EAST_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/pointer.cur",
+              "type": "POINTER"
+            },
+            {
+              "path": "cursors/Cyan/west_panning.cur",
+              "type": "WEST_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/hand.cur",
+              "type": "HAND"
+            },
+            {
+              "path": "cursors/Cyan/i_beam.cur",
+              "type": "I_BEAM"
+            },
+            {
+              "path": "cursors/Cyan/north_panning.cur",
+              "type": "NORTH_PANNING"
+            },
+            {
+              "path": "cursors/Cyan/south_west_resize.cur",
+              "type": "SOUTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/south_resize.cur",
+              "type": "SOUTH_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/middle_panning_vertical.cur",
+              "type": "MIDDLE_PANNING_VERTICAL"
+            },
+            {
+              "path": "cursors/Cyan/progress.cur",
+              "type": "PROGRESS"
+            },
+            {
+              "path": "cursors/Cyan/north_east_south_west_no_resize.cur",
+              "type": "NORTH_EAST_SOUTH_WEST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/north_west_resize.cur",
+              "type": "NORTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/east_resize.cur",
+              "type": "EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Cyan/south_east_panning.cur",
+              "type": "SOUTH_EAST_PANNING"
+            }
+          ],
+          "name": "Cyan",
+          "preview": "cursors/Cyan/preview.png"
+        },
+        {
+          "id": "cursors_1",
+          "items": [
+            {
+              "path": "cursors/Yellow/north_resize.cur",
+              "type": "NORTH_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/north_east_resize.cur",
+              "type": "NORTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/north_south_resize.cur",
+              "type": "NORTH_SOUTH_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/no_drop.cur",
+              "type": "NO_DROP"
+            },
+            {
+              "path": "cursors/Yellow/north_east_south_west_resize.cur",
+              "type": "NORTH_EAST_SOUTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/grab.cur",
+              "type": "GRAB"
+            },
+            {
+              "path": "cursors/Yellow/alias.cur",
+              "type": "ALIAS"
+            },
+            {
+              "path": "cursors/Yellow/west_resize.cur",
+              "type": "WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/south_west_panning.cur",
+              "type": "SOUTH_WEST_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/north_west_south_east_resize.cur",
+              "type": "NORTH_WEST_SOUTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/south_east_resize.cur",
+              "type": "SOUTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/wait.cur",
+              "type": "WAIT"
+            },
+            {
+              "path": "cursors/Yellow/north_south_no_resize.cur",
+              "type": "NORTH_SOUTH_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/not_allowed.cur",
+              "type": "NOT_ALLOWED"
+            },
+            {
+              "path": "cursors/Yellow/middle_panning.cur",
+              "type": "MIDDLE_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/copy.cur",
+              "type": "COPY"
+            },
+            {
+              "path": "cursors/Yellow/middle_panning_horizontal.cur",
+              "type": "MIDDLE_PANNING_HORIZONTAL"
+            },
+            {
+              "path": "cursors/Yellow/row_resize.cur",
+              "type": "ROW_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/cell.cur",
+              "type": "CELL"
+            },
+            {
+              "path": "cursors/Yellow/zoom_out.cur",
+              "type": "ZOOM_OUT"
+            },
+            {
+              "path": "cursors/Yellow/north_west_south_east_no_resize.cur",
+              "type": "NORTH_WEST_SOUTH_EAST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/vertical_text.cur",
+              "type": "VERTICAL_TEXT"
+            },
+            {
+              "path": "cursors/Yellow/help.cur",
+              "type": "HELP"
+            },
+            {
+              "path": "cursors/Yellow/column_resize.cur",
+              "type": "COLUMN_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/cross.cur",
+              "type": "CROSS"
+            },
+            {
+              "path": "cursors/Yellow/east_panning.cur",
+              "type": "EAST_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/grabbing.cur",
+              "type": "GRABBING"
+            },
+            {
+              "path": "cursors/Yellow/east_west_no_resize.cur",
+              "type": "EAST_WEST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/north_west_panning.cur",
+              "type": "NORTH_WEST_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/move.cur",
+              "type": "MOVE"
+            },
+            {
+              "path": "cursors/Yellow/east_west_resize.cur",
+              "type": "EAST_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/context_menu.cur",
+              "type": "CONTEXT_MENU"
+            },
+            {
+              "path": "cursors/Yellow/zoom_in.cur",
+              "type": "ZOOM_IN"
+            },
+            {
+              "path": "cursors/Yellow/south_panning.cur",
+              "type": "SOUTH_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/north_east_panning.cur",
+              "type": "NORTH_EAST_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/pointer.cur",
+              "type": "POINTER"
+            },
+            {
+              "path": "cursors/Yellow/west_panning.cur",
+              "type": "WEST_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/hand.cur",
+              "type": "HAND"
+            },
+            {
+              "path": "cursors/Yellow/i_beam.cur",
+              "type": "I_BEAM"
+            },
+            {
+              "path": "cursors/Yellow/north_panning.cur",
+              "type": "NORTH_PANNING"
+            },
+            {
+              "path": "cursors/Yellow/south_west_resize.cur",
+              "type": "SOUTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/south_resize.cur",
+              "type": "SOUTH_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/middle_panning_vertical.cur",
+              "type": "MIDDLE_PANNING_VERTICAL"
+            },
+            {
+              "path": "cursors/Yellow/progress.cur",
+              "type": "PROGRESS"
+            },
+            {
+              "path": "cursors/Yellow/north_east_south_west_no_resize.cur",
+              "type": "NORTH_EAST_SOUTH_WEST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/north_west_resize.cur",
+              "type": "NORTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/east_resize.cur",
+              "type": "EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Yellow/south_east_panning.cur",
+              "type": "SOUTH_EAST_PANNING"
+            }
+          ],
+          "name": "Yellow",
+          "preview": "cursors/Yellow/preview.png"
+        },
+        {
+          "id": "cursors_2",
+          "items": [
+            {
+              "path": "cursors/Red/north_resize.cur",
+              "type": "NORTH_RESIZE"
+            },
+            {
+              "path": "cursors/Red/north_east_resize.cur",
+              "type": "NORTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/north_south_resize.cur",
+              "type": "NORTH_SOUTH_RESIZE"
+            },
+            {
+              "path": "cursors/Red/no_drop.cur",
+              "type": "NO_DROP"
+            },
+            {
+              "path": "cursors/Red/north_east_south_west_resize.cur",
+              "type": "NORTH_EAST_SOUTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/grab.cur",
+              "type": "GRAB"
+            },
+            {
+              "path": "cursors/Red/alias.cur",
+              "type": "ALIAS"
+            },
+            {
+              "path": "cursors/Red/west_resize.cur",
+              "type": "WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/south_west_panning.cur",
+              "type": "SOUTH_WEST_PANNING"
+            },
+            {
+              "path": "cursors/Red/north_west_south_east_resize.cur",
+              "type": "NORTH_WEST_SOUTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/south_east_resize.cur",
+              "type": "SOUTH_EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/wait.cur",
+              "type": "WAIT"
+            },
+            {
+              "path": "cursors/Red/north_south_no_resize.cur",
+              "type": "NORTH_SOUTH_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Red/not_allowed.cur",
+              "type": "NOT_ALLOWED"
+            },
+            {
+              "path": "cursors/Red/middle_panning.cur",
+              "type": "MIDDLE_PANNING"
+            },
+            {
+              "path": "cursors/Red/copy.cur",
+              "type": "COPY"
+            },
+            {
+              "path": "cursors/Red/middle_panning_horizontal.cur",
+              "type": "MIDDLE_PANNING_HORIZONTAL"
+            },
+            {
+              "path": "cursors/Red/row_resize.cur",
+              "type": "ROW_RESIZE"
+            },
+            {
+              "path": "cursors/Red/cell.cur",
+              "type": "CELL"
+            },
+            {
+              "path": "cursors/Red/zoom_out.cur",
+              "type": "ZOOM_OUT"
+            },
+            {
+              "path": "cursors/Red/north_west_south_east_no_resize.cur",
+              "type": "NORTH_WEST_SOUTH_EAST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Red/vertical_text.cur",
+              "type": "VERTICAL_TEXT"
+            },
+            {
+              "path": "cursors/Red/help.cur",
+              "type": "HELP"
+            },
+            {
+              "path": "cursors/Red/column_resize.cur",
+              "type": "COLUMN_RESIZE"
+            },
+            {
+              "path": "cursors/Red/cross.cur",
+              "type": "CROSS"
+            },
+            {
+              "path": "cursors/Red/east_panning.cur",
+              "type": "EAST_PANNING"
+            },
+            {
+              "path": "cursors/Red/grabbing.cur",
+              "type": "GRABBING"
+            },
+            {
+              "path": "cursors/Red/east_west_no_resize.cur",
+              "type": "EAST_WEST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Red/north_west_panning.cur",
+              "type": "NORTH_WEST_PANNING"
+            },
+            {
+              "path": "cursors/Red/move.cur",
+              "type": "MOVE"
+            },
+            {
+              "path": "cursors/Red/east_west_resize.cur",
+              "type": "EAST_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/context_menu.cur",
+              "type": "CONTEXT_MENU"
+            },
+            {
+              "path": "cursors/Red/zoom_in.cur",
+              "type": "ZOOM_IN"
+            },
+            {
+              "path": "cursors/Red/south_panning.cur",
+              "type": "SOUTH_PANNING"
+            },
+            {
+              "path": "cursors/Red/north_east_panning.cur",
+              "type": "NORTH_EAST_PANNING"
+            },
+            {
+              "path": "cursors/Red/pointer.cur",
+              "type": "POINTER"
+            },
+            {
+              "path": "cursors/Red/west_panning.cur",
+              "type": "WEST_PANNING"
+            },
+            {
+              "path": "cursors/Red/hand.cur",
+              "type": "HAND"
+            },
+            {
+              "path": "cursors/Red/i_beam.cur",
+              "type": "I_BEAM"
+            },
+            {
+              "path": "cursors/Red/north_panning.cur",
+              "type": "NORTH_PANNING"
+            },
+            {
+              "path": "cursors/Red/south_west_resize.cur",
+              "type": "SOUTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/south_resize.cur",
+              "type": "SOUTH_RESIZE"
+            },
+            {
+              "path": "cursors/Red/middle_panning_vertical.cur",
+              "type": "MIDDLE_PANNING_VERTICAL"
+            },
+            {
+              "path": "cursors/Red/progress.cur",
+              "type": "PROGRESS"
+            },
+            {
+              "path": "cursors/Red/north_east_south_west_no_resize.cur",
+              "type": "NORTH_EAST_SOUTH_WEST_NO_RESIZE"
+            },
+            {
+              "path": "cursors/Red/north_west_resize.cur",
+              "type": "NORTH_WEST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/east_resize.cur",
+              "type": "EAST_RESIZE"
+            },
+            {
+              "path": "cursors/Red/south_east_panning.cur",
+              "type": "SOUTH_EAST_PANNING"
+            }
+          ],
+          "name": "Red",
+          "preview": "cursors/Red/preview.png"
+        }
+      ],
+      "fonts": [
+        {
+          "body": {
+            "name": "Blender Book",
+            "variants": [
+              {
+                "path": "font/blender-book.ttf"
+              }
+            ]
+          },
+          "header": {
+            "name": "Blender Bold",
+            "variants": [
+              {
+                "path": "font/blender-bold.ttf"
+              }
+            ]
+          },
+          "id": "fonts_01",
+          "name": "Cyberpunk 2077"
+        }
+      ],
+      "image_overrides": [
+        {
+          "id": "image_overrides_01",
+          "images": {
+            "sidebar_bookmarks_button": "icons/gx_sidebar_bookmarks.json",
+            "sidebar_crypto_wallet_button": "icons/gx_sidebar_crypto_wallet.json",
+            "sidebar_downloads_button": "icons/gx_sidebar_downloads.json",
+            "sidebar_easy_share_button": "icons/gx_sidebar_myflow.json",
+            "sidebar_extensions_button": "icons/gx_sidebar_extensions.json",
+            "sidebar_gx_booster_button": "icons/gx_sidebar_cleaner.json",
+            "sidebar_history_button": "icons/gx_sidebar_history.json",
+            "sidebar_limiters_button": "icons/gx_sidebar_limiters.json",
+            "sidebar_mods_button": "icons/gx_sidebar_mods.json",
+            "sidebar_news_button": "icons/gx_sidebar_news.json",
+            "sidebar_pinboards_button": "icons/gx_sidebar_pinboards.json",
+            "sidebar_player_service_button": "icons/gx_sidebar_player.json",
+            "sidebar_settings_button": "icons/gx_sidebar_settings.json",
+            "sidebar_shaders_button": "icons/gx_sidebar_shaders.json",
+            "sidebar_speeddial_button": "icons/gx_sidebar_speeddial.json",
+            "top_bar_account_button": "icons/top_bar_account_button.json",
+            "top_bar_back_button": "icons/top_bar_back_button.json",
+            "top_bar_downloads_button": "icons/top_bar_downloads_button.json",
+            "top_bar_easy_setup_button": "icons/top_bar_easy_setup_button.json",
+            "top_bar_extensions_button": "icons/top_bar_extensions_button.json",
+            "top_bar_forward_button": "icons/top_bar_forward_button.json",
+            "top_bar_reload_button": "icons/top_bar_reload_button.json"
+          },
+          "name": "Cyberpunk 2077"
+        }
+      ],
+      "keyboard_sounds": [
+        {
+          "id": "0",
+          "name": "Official Cyberpunk 2077",
+          "sounds": {
+            "TYPING_BACKSPACE": [
+              "sounds/TYPING_BACKSPACE_01.m4a"
+            ],
+            "TYPING_ENTER": [
+              "sounds/TYPING_ENTER_02.m4a"
+            ],
+            "TYPING_LETTER": [
+              "sounds/TYPING_LETTER_008.m4a",
+              "sounds/TYPING_LETTER_012.m4a",
+              "sounds/TYPING_LETTER_019.m4a",
+              "sounds/TYPING_LETTER_014.m4a",
+              "sounds/TYPING_LETTER_009.m4a",
+              "sounds/TYPING_LETTER_017.m4a",
+              "sounds/TYPING_LETTER_001.m4a",
+              "sounds/TYPING_LETTER_006.m4a",
+              "sounds/TYPING_LETTER_010.m4a",
+              "sounds/TYPING_LETTER_015.m4a",
+              "sounds/TYPING_LETTER_005.m4a",
+              "sounds/TYPING_LETTER_003.m4a",
+              "sounds/TYPING_LETTER_013.m4a",
+              "sounds/TYPING_LETTER_011.m4a",
+              "sounds/TYPING_LETTER_004.m4a",
+              "sounds/TYPING_LETTER_016.m4a",
+              "sounds/TYPING_LETTER_007.m4a",
+              "sounds/TYPING_LETTER_002.m4a",
+              "sounds/TYPING_LETTER_018.m4a"
+            ],
+            "TYPING_SPACE": [
+              "sounds/TYPING_SPACE_01.m4a"
+            ]
+          }
+        }
+      ],
+      "mobile_image_overrides": [
+        {
+          "id": "0",
+          "images": {
+            "start_page_logo": "mobile_logo/mobile_logo1.gif"
+          },
+          "name": "Cyberpunk 2077 #1"
+        },
+        {
+          "id": "1",
+          "images": {
+            "start_page_logo": "mobile_logo/mobile_logo2.gif"
+          },
+          "name": "Cyberpunk 2077 #2"
+        }
+      ],
+      "shaders": [
+        {
+          "animation": {
+            "duration": 120,
+            "steps": 3600
+          },
+          "id": "Cyberpunk 2077",
+          "name": "Cyberpunk 2077",
+          "path": "shaders/cp77v2.sksl"
+        }
+      ],
+      "splash_screen": [
+        {
+          "id": "splash_screen_01",
+          "name": "Cyberpunk 2077",
+          "path": "splash/splash1.mp4"
+        }
+      ]
+    },
+    "schema_version": 2,
+    "tags": [
+      "cp_2077"
+    ]
+  },
+  "name": "Official Cyberpunk 2077",
+  "update_url": "https://api.gx.me/store/mods/update",
+  "version": "1.38"
+}
