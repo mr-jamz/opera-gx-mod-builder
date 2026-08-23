@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260823-06">
-    <script src="app.js?v=20260823-06" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260823-07">
+    <script src="app.js?v=20260823-07" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -256,6 +256,29 @@
               <button id="clear-app-icon" type="button">Remove file</button>
             </div>
 
+            <section class="app-icon-adjustments" id="app-icon-adjustments" aria-labelledby="app-icon-adjustments-heading" hidden>
+              <div>
+                <span class="section-index">ADJUST ICON</span>
+                <h4 id="app-icon-adjustments-heading">Resize and position</h4>
+              </div>
+
+              <label class="app-icon-sizing-control" for="app-icon-sizing">
+                <span>Sizing</span>
+                <select id="app-icon-sizing">
+                  <option value="crop">Crop to fill</option>
+                  <option value="fit">Fit inside</option>
+                </select>
+              </label>
+
+              <div class="app-icon-range-controls">
+                <label for="app-icon-zoom"><span>Zoom <output id="app-icon-zoom-value">100%</output></span><input id="app-icon-zoom" type="range" min="50" max="250" value="100"></label>
+                <label for="app-icon-position-x"><span>Horizontal position <output id="app-icon-position-x-value">0</output></span><input id="app-icon-position-x" type="range" min="-100" max="100" value="0"></label>
+                <label for="app-icon-position-y"><span>Vertical position <output id="app-icon-position-y-value">0</output></span><input id="app-icon-position-y" type="range" min="-100" max="100" value="0"></label>
+                <label for="app-icon-corner-radius"><span>Corner curve <output id="app-icon-corner-radius-value">0%</output></span><input id="app-icon-corner-radius" type="range" min="0" max="50" value="0"></label>
+              </div>
+              <p>Curved corners are exported as transparent pixels</p>
+            </section>
+
             <button class="save-theme-button" id="save-app-icon" type="button" disabled><span>Save app icon</span><b aria-hidden="true">→</b></button>
             <p class="theme-save-status" id="app-icon-save-status" role="status" aria-live="polite"></p>
           </section>
@@ -268,7 +291,7 @@
             <div class="app-icon-preview-stage">
               <div class="app-icon-preview-frame">
                 <span class="app-icon-preview-placeholder" id="app-icon-preview-placeholder" aria-hidden="true"><i></i></span>
-                <img id="app-icon-preview-image" alt="Selected app icon preview" hidden>
+                <canvas id="app-icon-preview-canvas" width="512" height="512" aria-label="Adjusted app icon preview" hidden></canvas>
               </div>
               <p id="app-icon-preview-name">No icon selected</p>
             </div>

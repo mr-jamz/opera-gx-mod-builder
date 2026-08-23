@@ -354,13 +354,41 @@ const appIconDimensions = document.querySelector("#app-icon-dimensions");
 const clearAppIconButton = document.querySelector("#clear-app-icon");
 const saveAppIconButton = document.querySelector("#save-app-icon");
 const appIconSaveStatus = document.querySelector("#app-icon-save-status");
-const appIconPreviewImage = document.querySelector("#app-icon-preview-image");
+const appIconAdjustments = document.querySelector("#app-icon-adjustments");
+const appIconSizing = document.querySelector("#app-icon-sizing");
+const appIconPreviewCanvas = document.querySelector("#app-icon-preview-canvas");
 const appIconPreviewPlaceholder = document.querySelector("#app-icon-preview-placeholder");
 const appIconPreviewName = document.querySelector("#app-icon-preview-name");
 const appIconPresetButtons = document.querySelectorAll("[data-app-icon-preset]");
 const savedAppIconBox = document.querySelector("#saved-app-icon-box");
 const savedAppIconSummary = document.querySelector("#saved-app-icon-summary");
 const appIconCategoryCard = document.querySelector('[data-category="App icon"]');
+const appIconAdjustmentControls = [
+  {
+    input: document.querySelector("#app-icon-zoom"),
+    key: "zoom",
+    output: document.querySelector("#app-icon-zoom-value"),
+    suffix: "%"
+  },
+  {
+    input: document.querySelector("#app-icon-position-x"),
+    key: "positionX",
+    output: document.querySelector("#app-icon-position-x-value"),
+    suffix: ""
+  },
+  {
+    input: document.querySelector("#app-icon-position-y"),
+    key: "positionY",
+    output: document.querySelector("#app-icon-position-y-value"),
+    suffix: ""
+  },
+  {
+    input: document.querySelector("#app-icon-corner-radius"),
+    key: "cornerRadius",
+    output: document.querySelector("#app-icon-corner-radius-value"),
+    suffix: "%"
+  }
+];
 
 let appIconSelectionValue = null;
 let savedAppIconValue = null;
@@ -380,13 +408,66 @@ const includedAppIconPresets = {
   }
 };
 
+function createDefaultAppIconAdjustments() {
+  return {
+    cornerRadius: 0,
+    positionX: 0,
+    positionY: 0,
+    sizing: "crop",
+    zoom: 100
+  };
+}
+
+function addRoundedRectanglePath(context, x, y, width, height, radius) {
+  const safeRadius = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + safeRadius, y);
+  context.lineTo(x + width - safeRadius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+  context.lineTo(x + width, y + height - safeRadius);
+  context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+  context.lineTo(x + safeRadius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+  context.lineTo(x, y + safeRadius);
+  context.quadraticCurveTo(x, y, x + safeRadius, y);
+  context.closePath();
+}
+
+function renderAdjustedAppIcon() {
+  const selection = appIconSelectionValue;
+  const context = appIconPreviewCanvas.getContext("2d");
+  context.clearRect(0, 0, 512, 512);
+
+  if (!selection) {
+    return;
+  }
+
+  const adjustments = selection.adjustments;
+  const baseScale = adjustments.sizing === "fit"
+    ? Math.min(512 / selection.width, 512 / selection.height)
+    : Math.max(512 / selection.width, 512 / selection.height);
+  const scale = baseScale * (adjustments.zoom / 100);
+  const drawWidth = selection.width * scale;
+  const drawHeight = selection.height * scale;
+  const drawX = (512 - drawWidth) / 2 + adjustments.positionX * 2.56;
+  const drawY = (512 - drawHeight) / 2 + adjustments.positionY * 2.56;
+  const radius = 512 * (adjustments.cornerRadius / 100);
+
+  context.save();
+  addRoundedRectanglePath(context, 0, 0, 512, 512, radius);
+  context.clip();
+  context.drawImage(selection.sourceImage, drawX, drawY, drawWidth, drawHeight);
+  context.restore();
+}
+
 function renderAppIconEditor() {
   const selection = appIconSelectionValue;
   appIconSelection.hidden = !selection;
+  appIconAdjustments.hidden = !selection;
   saveAppIconButton.disabled = !selection;
   appIconFileName.textContent = selection?.name || "";
-  appIconDimensions.textContent = selection ? `${selection.width}×${selection.height}` : "";
-  appIconPreviewImage.hidden = !selection;
+  appIconDimensions.textContent = selection ? `Original ${selection.width}×${selection.height} · Output 512×512 PNG` : "";
+  appIconPreviewCanvas.hidden = !selection;
   appIconPreviewPlaceholder.hidden = Boolean(selection);
   appIconPreviewName.textContent = selection?.name || "No icon selected";
 
@@ -397,10 +478,14 @@ function renderAppIconEditor() {
   });
 
   if (selection) {
-    appIconPreviewImage.src = selection.previewUrl;
-  } else {
-    appIconPreviewImage.removeAttribute("src");
+    appIconSizing.value = selection.adjustments.sizing;
+    appIconAdjustmentControls.forEach(({ input, key, output, suffix }) => {
+      input.value = selection.adjustments[key];
+      output.textContent = `${selection.adjustments[key]}${suffix}`;
+    });
   }
+
+  renderAdjustedAppIcon();
 }
 
 function updateSavedAppIconSummary() {
@@ -426,6 +511,7 @@ function selectAppIcon(file) {
       URL.revokeObjectURL(appIconSelectionValue.previewUrl);
     }
     appIconSelectionValue = {
+      adjustments: createDefaultAppIconAdjustments(),
       file,
       height: image.naturalHeight,
       isObjectUrl: true,
@@ -433,6 +519,7 @@ function selectAppIcon(file) {
       preset: null,
       previewUrl,
       source: "local",
+      sourceImage: image,
       width: image.naturalWidth
     };
     appIconDropStatus.textContent = image.naturalWidth === 512 && image.naturalHeight === 512
@@ -460,6 +547,7 @@ function selectIncludedAppIcon(presetKey) {
       URL.revokeObjectURL(appIconSelectionValue.previewUrl);
     }
     appIconSelectionValue = {
+      adjustments: createDefaultAppIconAdjustments(),
       file: null,
       height: image.naturalHeight,
       isObjectUrl: false,
@@ -467,6 +555,7 @@ function selectIncludedAppIcon(presetKey) {
       preset: presetKey,
       previewUrl: preset.url,
       source: "included",
+      sourceImage: image,
       width: image.naturalWidth
     };
     appIconDropStatus.textContent = "Sample app icon ready for preview";
@@ -482,6 +571,26 @@ function selectIncludedAppIcon(presetKey) {
 appIconPresetButtons.forEach((button) => {
   button.addEventListener("click", () => {
     selectIncludedAppIcon(button.dataset.appIconPreset);
+  });
+});
+
+appIconSizing.addEventListener("change", () => {
+  if (!appIconSelectionValue) {
+    return;
+  }
+  appIconSelectionValue.adjustments.sizing = appIconSizing.value;
+  appIconSaveStatus.textContent = "";
+  renderAppIconEditor();
+});
+
+appIconAdjustmentControls.forEach(({ input, key }) => {
+  input.addEventListener("input", () => {
+    if (!appIconSelectionValue) {
+      return;
+    }
+    appIconSelectionValue.adjustments[key] = Number(input.value);
+    appIconSaveStatus.textContent = "";
+    renderAppIconEditor();
   });
 });
 
@@ -518,16 +627,54 @@ clearAppIconButton.addEventListener("click", () => {
   renderAppIconEditor();
 });
 
-saveAppIconButton.addEventListener("click", () => {
+function exportAdjustedAppIcon() {
+  return new Promise((resolve, reject) => {
+    appIconPreviewCanvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("The adjusted icon could not be exported"));
+        return;
+      }
+      resolve(blob);
+    }, "image/png");
+  });
+}
+
+saveAppIconButton.addEventListener("click", async () => {
   if (!appIconSelectionValue) {
     return;
   }
-  if (savedAppIconValue?.isObjectUrl && savedAppIconValue.previewUrl !== appIconSelectionValue.previewUrl) {
-    URL.revokeObjectURL(savedAppIconValue.previewUrl);
+
+  saveAppIconButton.disabled = true;
+  appIconSaveStatus.textContent = "Preparing 512×512 PNG";
+
+  try {
+    const blob = await exportAdjustedAppIcon();
+    const baseName = appIconSelectionValue.name.replace(/\.[^.]+$/, "");
+    const outputName = `${baseName}_512.png`;
+    const outputFile = new File([blob], outputName, { type: "image/png" });
+    const outputUrl = URL.createObjectURL(outputFile);
+
+    if (savedAppIconValue?.isObjectUrl) {
+      URL.revokeObjectURL(savedAppIconValue.previewUrl);
+    }
+    savedAppIconValue = {
+      adjustments: { ...appIconSelectionValue.adjustments },
+      file: outputFile,
+      height: 512,
+      isObjectUrl: true,
+      name: outputName,
+      originalName: appIconSelectionValue.name,
+      previewUrl: outputUrl,
+      source: appIconSelectionValue.source,
+      width: 512
+    };
+    updateSavedAppIconSummary();
+    appIconSaveStatus.textContent = "512×512 PNG saved for this visit";
+  } catch (error) {
+    appIconSaveStatus.textContent = error.message;
+  } finally {
+    saveAppIconButton.disabled = !appIconSelectionValue;
   }
-  savedAppIconValue = { ...appIconSelectionValue };
-  updateSavedAppIconSummary();
-  appIconSaveStatus.textContent = "App icon saved for this visit";
 });
 
 const wallpaperModeTabs = document.querySelectorAll("[data-wallpaper-mode]");
@@ -1048,6 +1195,7 @@ function renderBuildSummary() {
       details: [
         { label: "File", value: savedAppIconValue.name },
         { label: "Dimensions", value: `${savedAppIconValue.width}×${savedAppIconValue.height}` },
+        { label: "Corner curve", value: `${savedAppIconValue.adjustments.cornerRadius}%` },
         { label: "Source", value: savedAppIconValue.source === "included" ? "Sample app icon" : "Local upload" }
       ]
     }]
