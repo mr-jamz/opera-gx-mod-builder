@@ -1353,23 +1353,79 @@ h1 em {
 }
 
 .speed-dial-position-control {
+  position: relative;
   margin-top: 28px;
 }
 
-.speed-dial-position-control select {
+.speed-dial-position-trigger {
   width: 100%;
   min-height: 44px;
   padding: 0 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   color: var(--text);
-  color-scheme: dark;
   border: 1px solid var(--line);
   background: var(--surface-deep);
   font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.speed-dial-position-control select option {
+.speed-dial-position-trigger i {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 160ms ease;
+}
+
+.speed-dial-position-trigger[aria-expanded="true"] i {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.speed-dial-position-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  z-index: 8;
+  padding: 5px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--red);
+  background: #111019;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.62);
+}
+
+.speed-dial-position-options[hidden] {
+  display: none;
+}
+
+.speed-dial-position-options button {
+  min-height: 39px;
+  padding: 0 12px;
   color: var(--text);
-  background: var(--surface-deep);
+  border: 0;
+  background: #111019;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.speed-dial-position-options button:hover,
+.speed-dial-position-options button:focus-visible,
+.speed-dial-position-options button[aria-selected="true"] {
+  color: #ffffff;
+  outline: 0;
+  background: color-mix(in hsl, var(--red) 30%, #17131f);
+}
+
+.speed-dial-position-trigger:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
 }
 
 .speed-dial-color-controls {

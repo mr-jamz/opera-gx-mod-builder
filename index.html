@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260823-08">
-    <script src="app.js?v=20260823-08" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260824-01">
+    <script src="app.js?v=20260824-01" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -454,15 +454,18 @@
               </div>
             </div>
 
-            <label class="speed-dial-position-control" for="speed-dial-position">
-              <span>Speed Dial position</span>
-              <select id="speed-dial-position">
-                <option value="top">Top</option>
-                <option value="left">Left</option>
-                <option value="bottom">Bottom</option>
-                <option value="auto">Auto</option>
-              </select>
-            </label>
+            <div class="speed-dial-position-control" id="speed-dial-position-control">
+              <span id="speed-dial-position-label">Speed Dial position</span>
+              <button class="speed-dial-position-trigger" id="speed-dial-position" type="button" aria-labelledby="speed-dial-position-label speed-dial-position-value" aria-haspopup="listbox" aria-expanded="false">
+                <strong id="speed-dial-position-value">Top</strong><i aria-hidden="true"></i>
+              </button>
+              <div class="speed-dial-position-options" id="speed-dial-position-options" role="listbox" aria-labelledby="speed-dial-position-label" hidden>
+                <button type="button" role="option" aria-selected="true" data-speed-dial-position="top">Top</button>
+                <button type="button" role="option" aria-selected="false" data-speed-dial-position="left">Left</button>
+                <button type="button" role="option" aria-selected="false" data-speed-dial-position="bottom">Bottom</button>
+                <button type="button" role="option" aria-selected="false" data-speed-dial-position="auto">Auto</button>
+              </div>
+            </div>
 
             <div class="speed-dial-color-controls">
               <label for="speed-dial-text-color"><span>Text color</span><input id="speed-dial-text-color" type="color" value="#ffffff"><output id="speed-dial-text-color-value">#ffffff</output></label>

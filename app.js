@@ -948,6 +948,10 @@ saveWallpaperButton.addEventListener("click", () => {
 });
 
 const speedDialPosition = document.querySelector("#speed-dial-position");
+const speedDialPositionControl = document.querySelector("#speed-dial-position-control");
+const speedDialPositionValue = document.querySelector("#speed-dial-position-value");
+const speedDialPositionOptions = document.querySelector("#speed-dial-position-options");
+const speedDialPositionChoices = document.querySelectorAll("[data-speed-dial-position]");
 const speedDialTextColor = document.querySelector("#speed-dial-text-color");
 const speedDialTextShadow = document.querySelector("#speed-dial-text-shadow");
 const speedDialTextColorValue = document.querySelector("#speed-dial-text-color-value");
@@ -1010,7 +1014,10 @@ function renderSpeedDialEffectsEditor() {
   const theme = getWallpaperTheme(activeSpeedDialPreviewMode);
   const wallpaper = savedWallpaperSelections[activeSpeedDialPreviewMode];
 
-  speedDialPosition.value = values.position;
+  speedDialPositionValue.textContent = values.position[0].toUpperCase() + values.position.slice(1);
+  speedDialPositionChoices.forEach((choice) => {
+    choice.setAttribute("aria-selected", (choice.dataset.speedDialPosition === values.position).toString());
+  });
   speedDialTextColor.value = values.textColor;
   speedDialTextShadow.value = values.textShadow;
   speedDialTextColorValue.textContent = values.textColor.toUpperCase();
@@ -1067,10 +1074,38 @@ speedDialEffectsPreviewModeTabs.forEach((tab) => {
   });
 });
 
-speedDialPosition.addEventListener("change", () => {
-  speedDialEffectValues.position = speedDialPosition.value;
-  speedDialEffectsSaveStatus.textContent = "";
-  renderSpeedDialEffectsEditor();
+function closeSpeedDialPositionMenu() {
+  speedDialPosition.setAttribute("aria-expanded", "false");
+  speedDialPositionOptions.hidden = true;
+}
+
+speedDialPosition.addEventListener("click", () => {
+  const isOpen = speedDialPosition.getAttribute("aria-expanded") === "true";
+  speedDialPosition.setAttribute("aria-expanded", (!isOpen).toString());
+  speedDialPositionOptions.hidden = isOpen;
+});
+
+speedDialPositionChoices.forEach((choice) => {
+  choice.addEventListener("click", () => {
+    speedDialEffectValues.position = choice.dataset.speedDialPosition;
+    speedDialEffectsSaveStatus.textContent = "";
+    closeSpeedDialPositionMenu();
+    renderSpeedDialEffectsEditor();
+    speedDialPosition.focus();
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!speedDialPositionControl.contains(event.target)) {
+    closeSpeedDialPositionMenu();
+  }
+});
+
+speedDialPositionControl.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeSpeedDialPositionMenu();
+    speedDialPosition.focus();
+  }
 });
 
 speedDialTextColor.addEventListener("input", () => {
