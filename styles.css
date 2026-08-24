@@ -2534,12 +2534,14 @@ h1 em {
 }
 
 .speed-page-content {
-  width: min(78%, 590px);
+  width: 52%;
   margin: 0 auto;
-  padding-top: clamp(18px, 4vw, 38px);
+  padding-top: clamp(24px, 5.25vw, 54px);
 }
 
 .speed-search {
+  width: 66%;
+  margin-inline: auto;
   height: clamp(30px, 5vw, 42px);
   padding: 0 12px;
   display: flex;
@@ -2563,13 +2565,14 @@ h1 em {
 .speed-tiles {
   margin-top: clamp(18px, 4vw, 34px);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(7px, 1.3vw, 13px);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(5px, 0.9vw, 11px);
 }
 
 .speed-tiles > div {
   position: relative;
-  min-height: clamp(44px, 7vw, 70px);
+  min-width: 0;
+  aspect-ratio: 1.65;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -3372,7 +3375,12 @@ h1 em {
     padding-top: 14px;
   }
 
+  .speed-search {
+    width: 78%;
+  }
+
   .speed-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     margin-top: 12px;
   }
 
