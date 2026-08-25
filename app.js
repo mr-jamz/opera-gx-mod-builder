@@ -54,7 +54,7 @@ const speedDialEffectDefaults = {
   },
   light: {
     backgroundBlur: 0,
-    backgroundOpacity: 100,
+    backgroundOpacity: 0,
     focusMode: false,
     islandsOpacity: 0,
     position: "top",
