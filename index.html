@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260824-03">
-    <script src="app.js?v=20260824-03" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260825-02">
+    <script src="app.js?v=20260825-02" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -93,12 +93,12 @@
                 <span class="card-icon icon-wallpaper" aria-hidden="true"><i></i></span>
                 <span class="card-copy">
                   <strong>Wallpaper editor</strong>
-                  <small>Static or animated backgrounds</small>
+                  <small>Wallpapers and Speed Dial settings</small>
                 </span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </button>
               <div class="saved-content-box" id="saved-wallpaper-box" hidden>
-                <strong>Saved wallpapers</strong>
+                <strong>Saved wallpaper settings</strong>
                 <span class="saved-wallpaper-summary" id="saved-dark-wallpaper-summary" hidden></span>
                 <span class="saved-wallpaper-summary" id="saved-light-wallpaper-summary" hidden></span>
               </div>
@@ -141,13 +141,6 @@
             <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Keyboard sounds"><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Shaders"><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
-            <div class="additional-category-item">
-              <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page details</small></span><span class="card-arrow">↗</span></button>
-              <div class="saved-content-box" id="saved-speed-dial-box" hidden>
-                <strong>Saved Speed Dial effects</strong>
-                <span class="saved-speed-dial-summary" id="saved-speed-dial-summary"></span>
-              </div>
-            </div>
             <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Web modding"><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
@@ -358,96 +351,8 @@
               <button id="clear-wallpaper" type="button">Remove file</button>
             </div>
 
-            <button class="save-theme-button wallpaper-save-button" id="save-wallpaper" type="button" disabled>
-              <span>Save dark wallpaper</span>
-              <b aria-hidden="true">→</b>
-            </button>
-            <p class="theme-save-status" id="wallpaper-save-status" role="status" aria-live="polite"></p>
+            <div class="control-divider"></div>
 
-            <div class="wallpaper-theme-status" hidden style="display: none;">
-              <strong id="wallpaper-theme-label">Dark theme preview</strong>
-              <span id="wallpaper-theme-detail">Using the current GX dark palette</span>
-            </div>
-
-          </section>
-
-          <section class="speed-dial-panel" aria-labelledby="speed-dial-preview-heading">
-            <div class="speed-dial-heading">
-              <div>
-                <p class="section-index">LIVE PREVIEW</p>
-                <h3 id="speed-dial-preview-heading">GX Speed Dial</h3>
-              </div>
-              <span id="wallpaper-preview-mode">Dark</span>
-            </div>
-
-            <div class="speed-dial-preview" id="wallpaper-preview" data-mode="dark">
-              <div class="speed-wallpaper-media" id="speed-wallpaper-image" aria-hidden="true"></div>
-              <video class="speed-wallpaper-media" id="speed-wallpaper-video" muted loop autoplay playsinline hidden></video>
-
-              <div class="speed-browser-topbar">
-                <span class="speed-opera-mark" aria-hidden="true"></span>
-                <div class="speed-tab is-muted"><i></i><span>Workspace</span></div>
-                <div class="speed-tab is-active"><i></i><span>Speed Dial</span></div>
-                <span class="speed-new-tab" aria-hidden="true">＋</span>
-                <span class="speed-window-actions" aria-hidden="true">— □ ×</span>
-              </div>
-
-              <div class="speed-toolbar">
-                <span aria-hidden="true">‹</span>
-                <span aria-hidden="true">›</span>
-                <span aria-hidden="true">↻</span>
-                <div class="speed-address"><i aria-hidden="true"></i><span>Enter search or web address</span></div>
-                <span aria-hidden="true">⌕</span>
-                <span aria-hidden="true">☰</span>
-              </div>
-
-              <div class="speed-bookmarks" aria-hidden="true">
-                <span><i></i>Bookmarks</span>
-                <span><i></i>Downloads</span>
-                <span><i></i>Projects</span>
-              </div>
-
-              <div class="speed-page">
-                <aside class="speed-sidebar" aria-hidden="true">
-                  <span class="is-selected">◇</span>
-                  <span>□</span>
-                  <span>◌</span>
-                  <span>△</span>
-                  <span>＋</span>
-                  <span class="speed-sidebar-bottom">•••</span>
-                </aside>
-
-                <div class="speed-page-content">
-                  <div class="speed-search"><i aria-hidden="true"></i><span>Search the web</span></div>
-                  <div class="speed-tiles" aria-label="Generic Speed Dial tiles">
-                    <div><span></span></div>
-                    <div><span></span></div>
-                    <div><span></span></div>
-                    <div><span></span></div>
-                    <div><span></span></div>
-                    <div><span></span></div>
-                    <div class="speed-add-tile" aria-hidden="true">＋</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors</p>
-          </section>
-        </div>
-      </section>
-
-      <section class="view speed-dial-effects-editor" id="speed-dial-effects-editor" aria-labelledby="speed-dial-effects-title" aria-hidden="true">
-        <div class="editor-topbar">
-          <button class="back-button" id="back-speed-dial-effects" type="button" aria-label="Return to mod categories">←</button>
-          <div>
-            <p class="eyebrow">More modding / Speed Dial effects</p>
-            <h2 id="speed-dial-effects-title">Speed Dial effects</h2>
-          </div>
-          <p class="schema-chip">Schema v2</p>
-        </div>
-
-        <div class="speed-dial-effects-workspace">
-          <section class="speed-dial-effects-controls" id="speed-dial-effects-controls">
             <div class="speed-dial-effects-heading">
               <div>
                 <p class="section-index">START PAGE</p>
@@ -485,25 +390,31 @@
               <input id="speed-dial-focus-mode" type="checkbox">
             </label>
 
-            <button class="save-theme-button" id="save-speed-dial-effects" type="button"><span>Save Speed Dial effects</span><b aria-hidden="true">→</b></button>
-            <p class="theme-save-status" id="speed-dial-effects-save-status" role="status" aria-live="polite"></p>
+            <button class="save-theme-button wallpaper-save-button" id="save-wallpaper" type="button" disabled>
+              <span>Save dark wallpaper settings</span>
+              <b aria-hidden="true">→</b>
+            </button>
+            <p class="theme-save-status" id="wallpaper-save-status" role="status" aria-live="polite"></p>
+
+            <div class="wallpaper-theme-status" hidden style="display: none;">
+              <strong id="wallpaper-theme-label">Dark theme preview</strong>
+              <span id="wallpaper-theme-detail">Using the current GX dark palette</span>
+            </div>
+
           </section>
 
-          <section class="speed-dial-panel speed-dial-effects-preview-panel" aria-labelledby="speed-dial-effects-preview-heading">
+          <section class="speed-dial-panel" aria-labelledby="speed-dial-preview-heading">
             <div class="speed-dial-heading">
               <div>
                 <p class="section-index">LIVE PREVIEW</p>
-                <h3 id="speed-dial-effects-preview-heading">GX Speed Dial</h3>
+                <h3 id="speed-dial-preview-heading">GX Speed Dial</h3>
               </div>
-              <div class="speed-dial-effects-preview-tabs" role="tablist" aria-label="Wallpaper preview mode">
-                <button class="is-active" type="button" role="tab" aria-selected="true" data-speed-dial-preview-mode="dark">Dark</button>
-                <button type="button" role="tab" aria-selected="false" data-speed-dial-preview-mode="light">Light</button>
-              </div>
+              <span id="wallpaper-preview-mode">Dark</span>
             </div>
 
-            <div class="speed-dial-preview speed-dial-effects-browser" id="speed-dial-effects-preview" data-mode="dark" data-position="top">
-              <div class="speed-wallpaper-media" id="speed-dial-effects-wallpaper-image" aria-hidden="true"></div>
-              <video class="speed-wallpaper-media" id="speed-dial-effects-wallpaper-video" muted loop autoplay playsinline hidden></video>
+            <div class="speed-dial-preview speed-dial-effects-browser" id="wallpaper-preview" data-mode="dark" data-position="top">
+              <div class="speed-wallpaper-media" id="speed-wallpaper-image" aria-hidden="true"></div>
+              <video class="speed-wallpaper-media" id="speed-wallpaper-video" muted loop autoplay playsinline hidden></video>
               <div class="speed-dial-effects-vignette" aria-hidden="true"></div>
 
               <div class="speed-browser-topbar">
@@ -553,7 +464,7 @@
                 </div>
               </div>
             </div>
-            <p class="speed-dial-note" id="speed-dial-effects-wallpaper-status">No saved dark wallpaper</p>
+            <p class="speed-dial-note">This simulated start page uses the selected theme’s accent and GX secondary base colors</p>
           </section>
         </div>
       </section>

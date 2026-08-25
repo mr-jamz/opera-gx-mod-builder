@@ -1723,21 +1723,17 @@ h1 em {
 }
 
 .speed-dial-effects-browser[data-position="bottom"] .speed-page-content {
-  width: 72%;
+  width: 52%;
   align-self: end;
   padding-top: 0;
   padding-bottom: clamp(24px, 6vw, 68px);
 }
 
 .speed-dial-effects-browser[data-position="left"] .speed-page-content {
-  width: 86%;
+  width: 52%;
   margin-right: auto;
   margin-left: 7%;
   padding-top: clamp(38px, 8vw, 90px);
-}
-
-.speed-dial-effects-browser[data-position="left"] .speed-search {
-  width: 62%;
 }
 
 .speed-dial-effects-browser.is-focus-mode .speed-tiles {

@@ -116,148 +116,148 @@
          "cursors": [ {
             "id": "Cursors",
             "items": [ {
-               "path": "cursors/Cyan/north_resize.cur",
+               "path": "cursors/MyCursor/north_resize.cur",
                "type": "NORTH_RESIZE"
             }, {
-               "path": "cursors/Cyan/north_east_resize.cur",
+               "path": "cursors/MyCursor/north_east_resize.cur",
                "type": "NORTH_EAST_RESIZE"
             }, {
-               "path": "cursors/Cyan/north_south_resize.cur",
+               "path": "cursors/MyCursor/north_south_resize.cur",
                "type": "NORTH_SOUTH_RESIZE"
             }, {
-               "path": "cursors/Cyan/no_drop.cur",
+               "path": "cursors/MyCursor/no_drop.cur",
                "type": "NO_DROP"
             }, {
-               "path": "cursors/Cyan/north_east_south_west_resize.cur",
+               "path": "cursors/MyCursor/north_east_south_west_resize.cur",
                "type": "NORTH_EAST_SOUTH_WEST_RESIZE"
             }, {
-               "path": "cursors/Cyan/grab.cur",
+               "path": "cursors/MyCursor/grab.cur",
                "type": "GRAB"
             }, {
-               "path": "cursors/Cyan/alias.cur",
+               "path": "cursors/MyCursor/alias.cur",
                "type": "ALIAS"
             }, {
-               "path": "cursors/Cyan/west_resize.cur",
+               "path": "cursors/MyCursor/west_resize.cur",
                "type": "WEST_RESIZE"
             }, {
-               "path": "cursors/Cyan/south_west_panning.cur",
+               "path": "cursors/MyCursor/south_west_panning.cur",
                "type": "SOUTH_WEST_PANNING"
             }, {
-               "path": "cursors/Cyan/north_west_south_east_resize.cur",
+               "path": "cursors/MyCursor/north_west_south_east_resize.cur",
                "type": "NORTH_WEST_SOUTH_EAST_RESIZE"
             }, {
-               "path": "cursors/Cyan/south_east_resize.cur",
+               "path": "cursors/MyCursor/south_east_resize.cur",
                "type": "SOUTH_EAST_RESIZE"
             }, {
-               "path": "cursors/Cyan/wait.cur",
+               "path": "cursors/MyCursor/wait.cur",
                "type": "WAIT"
             }, {
-               "path": "cursors/Cyan/north_south_no_resize.cur",
+               "path": "cursors/MyCursor/north_south_no_resize.cur",
                "type": "NORTH_SOUTH_NO_RESIZE"
             }, {
-               "path": "cursors/Cyan/not_allowed.cur",
+               "path": "cursors/MyCursor/not_allowed.cur",
                "type": "NOT_ALLOWED"
             }, {
-               "path": "cursors/Cyan/middle_panning.cur",
+               "path": "cursors/MyCursor/middle_panning.cur",
                "type": "MIDDLE_PANNING"
             }, {
-               "path": "cursors/Cyan/copy.cur",
+               "path": "cursors/MyCursor/copy.cur",
                "type": "COPY"
             }, {
-               "path": "cursors/Cyan/middle_panning_horizontal.cur",
+               "path": "cursors/MyCursor/middle_panning_horizontal.cur",
                "type": "MIDDLE_PANNING_HORIZONTAL"
             }, {
-               "path": "cursors/Cyan/row_resize.cur",
+               "path": "cursors/MyCursor/row_resize.cur",
                "type": "ROW_RESIZE"
             }, {
-               "path": "cursors/Cyan/cell.cur",
+               "path": "cursors/MyCursor/cell.cur",
                "type": "CELL"
             }, {
-               "path": "cursors/Cyan/zoom_out.cur",
+               "path": "cursors/MyCursor/zoom_out.cur",
                "type": "ZOOM_OUT"
             }, {
-               "path": "cursors/Cyan/north_west_south_east_no_resize.cur",
+               "path": "cursors/MyCursor/north_west_south_east_no_resize.cur",
                "type": "NORTH_WEST_SOUTH_EAST_NO_RESIZE"
             }, {
-               "path": "cursors/Cyan/vertical_text.cur",
+               "path": "cursors/MyCursor/vertical_text.cur",
                "type": "VERTICAL_TEXT"
             }, {
-               "path": "cursors/Cyan/help.cur",
+               "path": "cursors/MyCursor/help.cur",
                "type": "HELP"
             }, {
-               "path": "cursors/Cyan/column_resize.cur",
+               "path": "cursors/MyCursor/column_resize.cur",
                "type": "COLUMN_RESIZE"
             }, {
-               "path": "cursors/Cyan/cross.cur",
+               "path": "cursors/MyCursor/cross.cur",
                "type": "CROSS"
             }, {
-               "path": "cursors/Cyan/east_panning.cur",
+               "path": "cursors/MyCursor/east_panning.cur",
                "type": "EAST_PANNING"
             }, {
-               "path": "cursors/Cyan/grabbing.cur",
+               "path": "cursors/MyCursor/grabbing.cur",
                "type": "GRABBING"
             }, {
-               "path": "cursors/Cyan/east_west_no_resize.cur",
+               "path": "cursors/MyCursor/east_west_no_resize.cur",
                "type": "EAST_WEST_NO_RESIZE"
             }, {
-               "path": "cursors/Cyan/north_west_panning.cur",
+               "path": "cursors/MyCursor/north_west_panning.cur",
                "type": "NORTH_WEST_PANNING"
             }, {
-               "path": "cursors/Cyan/move.cur",
+               "path": "cursors/MyCursor/move.cur",
                "type": "MOVE"
             }, {
-               "path": "cursors/Cyan/east_west_resize.cur",
+               "path": "cursors/MyCursor/east_west_resize.cur",
                "type": "EAST_WEST_RESIZE"
             }, {
-               "path": "cursors/Cyan/context_menu.cur",
+               "path": "cursors/MyCursor/context_menu.cur",
                "type": "CONTEXT_MENU"
             }, {
-               "path": "cursors/Cyan/zoom_in.cur",
+               "path": "cursors/MyCursor/zoom_in.cur",
                "type": "ZOOM_IN"
             }, {
-               "path": "cursors/Cyan/south_panning.cur",
+               "path": "cursors/MyCursor/south_panning.cur",
                "type": "SOUTH_PANNING"
             }, {
-               "path": "cursors/Cyan/north_east_panning.cur",
+               "path": "cursors/MyCursor/north_east_panning.cur",
                "type": "NORTH_EAST_PANNING"
             }, {
-               "path": "cursors/Cyan/pointer.cur",
+               "path": "cursors/MyCursor/pointer.cur",
                "type": "POINTER"
             }, {
-               "path": "cursors/Cyan/west_panning.cur",
+               "path": "cursors/MyCursor/west_panning.cur",
                "type": "WEST_PANNING"
             }, {
-               "path": "cursors/Cyan/hand.cur",
+               "path": "cursors/MyCursor/hand.cur",
                "type": "HAND"
             }, {
-               "path": "cursors/Cyan/i_beam.cur",
+               "path": "cursors/MyCursor/i_beam.cur",
                "type": "I_BEAM"
             }, {
-               "path": "cursors/Cyan/north_panning.cur",
+               "path": "cursors/MyCursor/north_panning.cur",
                "type": "NORTH_PANNING"
             }, {
-               "path": "cursors/Cyan/south_west_resize.cur",
+               "path": "cursors/MyCursor/south_west_resize.cur",
                "type": "SOUTH_WEST_RESIZE"
             }, {
-               "path": "cursors/Cyan/south_resize.cur",
+               "path": "cursors/MyCursor/south_resize.cur",
                "type": "SOUTH_RESIZE"
             }, {
-               "path": "cursors/Cyan/middle_panning_vertical.cur",
+               "path": "cursors/MyCursor/middle_panning_vertical.cur",
                "type": "MIDDLE_PANNING_VERTICAL"
             }, {
-               "path": "cursors/Cyan/progress.cur",
+               "path": "cursors/MyCursor/progress.cur",
                "type": "PROGRESS"
             }, {
-               "path": "cursors/Cyan/north_east_south_west_no_resize.cur",
+               "path": "cursors/MyCursor/north_east_south_west_no_resize.cur",
                "type": "NORTH_EAST_SOUTH_WEST_NO_RESIZE"
             }, {
-               "path": "cursors/Cyan/north_west_resize.cur",
+               "path": "cursors/MyCursor/north_west_resize.cur",
                "type": "NORTH_WEST_RESIZE"
             }, {
-               "path": "cursors/Cyan/east_resize.cur",
+               "path": "cursors/MyCursor/east_resize.cur",
                "type": "EAST_RESIZE"
             }, {
-               "path": "cursors/Cyan/south_east_panning.cur",
+               "path": "cursors/MyCursor/south_east_panning.cur",
                "type": "SOUTH_EAST_PANNING"
             } ],
             "name": "InsertModNameOrSomethingHere",
@@ -299,8 +299,8 @@
                "image": "wallpaper/dark_logo_animated.mp4",
                "image_mobile": "wallpaper/mobile_dark.mp4",
                "speeddial_position": "top",
-               "text_color": "#f0f0f0",
-               "text_shadow": "#757575",
+               "text_color": "#0DE338",
+               "text_shadow": "#FF0000",
                "ui_settings": {
                   "background_blur": 0,
                   "background_opacity": 0,
