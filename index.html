@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260825-02">
-    <script src="app.js?v=20260825-02" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260825-04">
+    <script src="app.js?v=20260825-04" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -359,10 +359,11 @@
                 <h3>Speed Dial settings</h3>
               </div>
             </div>
+            <p class="control-description speed-dial-enable-note">Check a setting to enable it and include it in this mode’s mod data</p>
 
-            <div class="speed-dial-position-control" id="speed-dial-position-control">
-              <span id="speed-dial-position-label">Speed Dial position</span>
-              <button class="speed-dial-position-trigger" id="speed-dial-position" type="button" aria-labelledby="speed-dial-position-label speed-dial-position-value" aria-haspopup="listbox" aria-expanded="false">
+            <div class="speed-dial-position-control speed-dial-optional-setting" id="speed-dial-position-control" data-speed-dial-setting-row="position">
+              <label class="speed-dial-setting-enable" for="enable-speed-dial-position"><input id="enable-speed-dial-position" type="checkbox" data-speed-dial-setting="position"><span id="speed-dial-position-label">Speed Dial position</span></label>
+              <button class="speed-dial-position-trigger" id="speed-dial-position" type="button" aria-labelledby="speed-dial-position-label speed-dial-position-value" aria-haspopup="listbox" aria-expanded="false" disabled>
                 <strong id="speed-dial-position-value">Top</strong><i aria-hidden="true"></i>
               </button>
               <div class="speed-dial-position-options" id="speed-dial-position-options" role="listbox" aria-labelledby="speed-dial-position-label" hidden>
@@ -374,21 +375,30 @@
             </div>
 
             <div class="speed-dial-color-controls">
-              <label for="speed-dial-text-color"><span>Text color</span><input id="speed-dial-text-color" type="color" value="#ffffff"><output id="speed-dial-text-color-value">#ffffff</output></label>
-              <label for="speed-dial-text-shadow"><span>Text shadow</span><input id="speed-dial-text-shadow" type="color" value="#757575"><output id="speed-dial-text-shadow-value">#757575</output></label>
+              <div class="speed-dial-color-setting speed-dial-optional-setting" data-speed-dial-setting-row="textColor">
+                <label class="speed-dial-setting-enable" for="enable-speed-dial-text-color"><input id="enable-speed-dial-text-color" type="checkbox" data-speed-dial-setting="textColor"><span>Text color</span></label>
+                <div><input id="speed-dial-text-color" type="color" value="#ffffff" aria-label="Text color" disabled><output id="speed-dial-text-color-value">#ffffff</output></div>
+              </div>
+              <div class="speed-dial-color-setting speed-dial-optional-setting" data-speed-dial-setting-row="textShadow">
+                <label class="speed-dial-setting-enable" for="enable-speed-dial-text-shadow"><input id="enable-speed-dial-text-shadow" type="checkbox" data-speed-dial-setting="textShadow"><span>Text shadow</span></label>
+                <div><input id="speed-dial-text-shadow" type="color" value="#757575" aria-label="Text shadow" disabled><output id="speed-dial-text-shadow-value">#757575</output></div>
+              </div>
             </div>
 
             <div class="speed-dial-range-controls">
-              <label for="speed-dial-background-blur"><span>Background blur <output id="speed-dial-background-blur-value">0</output></span><input id="speed-dial-background-blur" type="range" min="0" max="100" value="0"></label>
-              <label for="speed-dial-background-opacity"><span>Background opacity <output id="speed-dial-background-opacity-value">0</output></span><input id="speed-dial-background-opacity" type="range" min="0" max="100" value="0"></label>
-              <label for="speed-dial-islands-opacity"><span>Islands opacity <output id="speed-dial-islands-opacity-value">0</output></span><input id="speed-dial-islands-opacity" type="range" min="0" max="100" value="0"></label>
-              <label for="speed-dial-vignette-strength"><span>Vignette strength <output id="speed-dial-vignette-strength-value">35</output></span><input id="speed-dial-vignette-strength" type="range" min="0" max="100" value="35"></label>
+              <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="backgroundBlur"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-background-blur"><input id="enable-speed-dial-background-blur" type="checkbox" data-speed-dial-setting="backgroundBlur"><span>Background blur</span></label><output id="speed-dial-background-blur-value">0</output></div><input id="speed-dial-background-blur" type="range" min="0" max="100" value="0" aria-label="Background blur" disabled></div>
+              <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="backgroundOpacity"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-background-opacity"><input id="enable-speed-dial-background-opacity" type="checkbox" data-speed-dial-setting="backgroundOpacity"><span>Background opacity</span></label><output id="speed-dial-background-opacity-value">0</output></div><input id="speed-dial-background-opacity" type="range" min="0" max="100" value="0" aria-label="Background opacity" disabled></div>
+              <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="islandsOpacity"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-islands-opacity"><input id="enable-speed-dial-islands-opacity" type="checkbox" data-speed-dial-setting="islandsOpacity"><span>Islands opacity</span></label><output id="speed-dial-islands-opacity-value">0</output></div><input id="speed-dial-islands-opacity" type="range" min="0" max="100" value="0" aria-label="Islands opacity" disabled></div>
+              <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="vignetteStrength"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-vignette-strength"><input id="enable-speed-dial-vignette-strength" type="checkbox" data-speed-dial-setting="vignetteStrength"><span>Vignette strength</span></label><output id="speed-dial-vignette-strength-value">35</output></div><input id="speed-dial-vignette-strength" type="range" min="0" max="100" value="35" aria-label="Vignette strength" disabled></div>
             </div>
 
-            <label class="speed-dial-focus-control" for="speed-dial-focus-mode">
-              <span><strong>Focus mode</strong><small>Reduce start-page distractions</small></span>
-              <input id="speed-dial-focus-mode" type="checkbox">
-            </label>
+            <div class="speed-dial-focus-setting speed-dial-optional-setting" data-speed-dial-setting-row="focusMode">
+              <label class="speed-dial-setting-enable" for="enable-speed-dial-focus-mode"><input id="enable-speed-dial-focus-mode" type="checkbox" data-speed-dial-setting="focusMode"><span>Focus mode</span></label>
+              <label class="speed-dial-focus-control" for="speed-dial-focus-mode">
+                <span><strong>Enable Focus mode</strong><small>Reduce start-page distractions</small></span>
+                <input id="speed-dial-focus-mode" type="checkbox" disabled>
+              </label>
+            </div>
 
             <button class="save-theme-button wallpaper-save-button" id="save-wallpaper" type="button" disabled>
               <span>Save dark wallpaper settings</span>

@@ -41,7 +41,7 @@ const savedThemeValues = {
   light: null
 };
 
-const speedDialEffectValues = {
+const speedDialEffectDefaults = {
   dark: {
     backgroundBlur: 0,
     backgroundOpacity: 0,
@@ -62,6 +62,29 @@ const speedDialEffectValues = {
     textShadow: "#0b000e",
     vignetteStrength: 0
   }
+};
+
+const speedDialSettingKeys = [
+  "position",
+  "textColor",
+  "textShadow",
+  "backgroundBlur",
+  "backgroundOpacity",
+  "islandsOpacity",
+  "vignetteStrength",
+  "focusMode"
+];
+
+function createSpeedDialEffectValues(mode) {
+  return {
+    ...speedDialEffectDefaults[mode],
+    enabled: Object.fromEntries(speedDialSettingKeys.map((key) => [key, false]))
+  };
+}
+
+const speedDialEffectValues = {
+  dark: createSpeedDialEffectValues("dark"),
+  light: createSpeedDialEffectValues("light")
 };
 
 const savedSpeedDialEffectValues = {
@@ -745,12 +768,15 @@ function updateSavedWallpaperSummary(mode) {
   const summary = savedWallpaperSummaries[mode];
   const selection = savedWallpaperSelections[mode];
   const speedDial = savedSpeedDialEffectValues[mode];
-  const positionLabel = speedDial
-    ? speedDial.position[0].toUpperCase() + speedDial.position.slice(1)
-    : "";
+  const enabledSpeedDialCount = speedDial
+    ? Object.values(speedDial.enabled).filter(Boolean).length
+    : 0;
+  const speedDialLabel = enabledSpeedDialCount === 1
+    ? "1 Speed Dial option"
+    : `${enabledSpeedDialCount} Speed Dial options`;
   summary.hidden = !selection;
   summary.textContent = selection
-    ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name} · Speed Dial ${positionLabel}`
+    ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name} · ${speedDialLabel}`
     : "";
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   savedWallpaperBox.hidden = !hasSavedWallpaper;
@@ -965,6 +991,8 @@ const speedDialTextShadow = document.querySelector("#speed-dial-text-shadow");
 const speedDialTextColorValue = document.querySelector("#speed-dial-text-color-value");
 const speedDialTextShadowValue = document.querySelector("#speed-dial-text-shadow-value");
 const speedDialFocusMode = document.querySelector("#speed-dial-focus-mode");
+const speedDialSettingToggles = document.querySelectorAll("[data-speed-dial-setting]");
+const speedDialSettingRows = document.querySelectorAll("[data-speed-dial-setting-row]");
 const speedDialRangeControls = [
   {
     input: document.querySelector("#speed-dial-background-blur"),
@@ -989,40 +1017,66 @@ const speedDialRangeControls = [
 ];
 
 function copySpeedDialEffectValues(values) {
-  return { ...values };
+  return {
+    ...values,
+    enabled: { ...values.enabled }
+  };
 }
 
 function renderWallpaperSpeedDialSettings() {
   const values = speedDialEffectValues[activeWallpaperMode];
+  const defaults = speedDialEffectDefaults[activeWallpaperMode];
   const theme = getWallpaperTheme(activeWallpaperMode);
 
+  speedDialSettingToggles.forEach((toggle) => {
+    toggle.checked = values.enabled[toggle.dataset.speedDialSetting];
+  });
+  speedDialSettingRows.forEach((row) => {
+    row.classList.toggle("is-enabled", values.enabled[row.dataset.speedDialSettingRow]);
+  });
+
   speedDialPositionValue.textContent = values.position[0].toUpperCase() + values.position.slice(1);
+  speedDialPosition.disabled = !values.enabled.position;
   speedDialPositionChoices.forEach((choice) => {
     choice.setAttribute("aria-selected", (choice.dataset.speedDialPosition === values.position).toString());
   });
   speedDialTextColor.value = values.textColor;
   speedDialTextShadow.value = values.textShadow;
+  speedDialTextColor.disabled = !values.enabled.textColor;
+  speedDialTextShadow.disabled = !values.enabled.textShadow;
   speedDialTextColorValue.textContent = values.textColor.toUpperCase();
   speedDialTextShadowValue.textContent = values.textShadow.toUpperCase();
   speedDialFocusMode.checked = values.focusMode;
+  speedDialFocusMode.disabled = !values.enabled.focusMode;
 
   speedDialRangeControls.forEach(({ input, key, output }) => {
     input.value = values[key];
+    input.disabled = !values.enabled[key];
     output.textContent = values[key];
   });
 
-  wallpaperPreview.dataset.position = values.position;
-  wallpaperPreview.classList.toggle("is-focus-mode", values.focusMode);
+  const previewValue = (key) => values.enabled[key] ? values[key] : defaults[key];
+  wallpaperPreview.dataset.position = previewValue("position");
+  wallpaperPreview.classList.toggle("is-focus-mode", previewValue("focusMode"));
   wallpaperPreview.style.setProperty("--speed-accent", hslString(theme.accent));
   wallpaperPreview.style.setProperty("--speed-secondary-h", theme.secondary.h);
   wallpaperPreview.style.setProperty("--speed-secondary-s", `${theme.secondary.s}%`);
-  wallpaperPreview.style.setProperty("--speed-custom-text", values.textColor);
-  wallpaperPreview.style.setProperty("--speed-custom-shadow", values.textShadow);
-  wallpaperPreview.style.setProperty("--speed-effects-blur", `${values.backgroundBlur * 0.12}px`);
-  wallpaperPreview.style.setProperty("--speed-effects-background-opacity", values.backgroundOpacity / 100);
-  wallpaperPreview.style.setProperty("--speed-effects-islands-opacity", 0.16 + values.islandsOpacity * 0.008);
-  wallpaperPreview.style.setProperty("--speed-effects-vignette", values.vignetteStrength / 100);
+  wallpaperPreview.style.setProperty("--speed-custom-text", previewValue("textColor"));
+  wallpaperPreview.style.setProperty("--speed-custom-shadow", previewValue("textShadow"));
+  wallpaperPreview.style.setProperty("--speed-effects-blur", `${previewValue("backgroundBlur") * 0.12}px`);
+  wallpaperPreview.style.setProperty("--speed-effects-background-opacity", previewValue("backgroundOpacity") / 100);
+  wallpaperPreview.style.setProperty("--speed-effects-islands-opacity", 0.16 + previewValue("islandsOpacity") * 0.008);
+  wallpaperPreview.style.setProperty("--speed-effects-vignette", previewValue("vignetteStrength") / 100);
 }
+
+speedDialSettingToggles.forEach((toggle) => {
+  toggle.addEventListener("change", () => {
+    speedDialEffectValues[activeWallpaperMode].enabled[toggle.dataset.speedDialSetting] = toggle.checked;
+    wallpaperSaveStatus.textContent = "";
+    closeSpeedDialPositionMenu();
+    renderWallpaperSpeedDialSettings();
+  });
+});
 
 function closeSpeedDialPositionMenu() {
   speedDialPosition.setAttribute("aria-expanded", "false");
@@ -1201,16 +1255,32 @@ function renderBuildSummary() {
         { label: "Source", value: selection.source === "included" ? "Sample desktop wallpaper" : "Local upload" }
       ];
       if (speedDial) {
-        details.push(
-          { label: "Speed Dial position", value: speedDial.position },
-          { label: "Text color", value: speedDial.textColor.toUpperCase() },
-          { label: "Text shadow", value: speedDial.textShadow.toUpperCase() },
-          { label: "Background blur", value: String(speedDial.backgroundBlur) },
-          { label: "Background opacity", value: String(speedDial.backgroundOpacity) },
-          { label: "Focus mode", value: speedDial.focusMode ? "Enabled" : "Disabled" },
-          { label: "Islands opacity", value: String(speedDial.islandsOpacity) },
-          { label: "Vignette strength", value: String(speedDial.vignetteStrength) }
-        );
+        const enabledCount = Object.values(speedDial.enabled).filter(Boolean).length;
+        details.push({ label: "Speed Dial overrides", value: `${enabledCount} enabled` });
+        if (speedDial.enabled.position) {
+          details.push({ label: "Speed Dial position", value: speedDial.position });
+        }
+        if (speedDial.enabled.textColor) {
+          details.push({ label: "Text color", value: speedDial.textColor.toUpperCase() });
+        }
+        if (speedDial.enabled.textShadow) {
+          details.push({ label: "Text shadow", value: speedDial.textShadow.toUpperCase() });
+        }
+        if (speedDial.enabled.backgroundBlur) {
+          details.push({ label: "Background blur", value: String(speedDial.backgroundBlur) });
+        }
+        if (speedDial.enabled.backgroundOpacity) {
+          details.push({ label: "Background opacity", value: String(speedDial.backgroundOpacity) });
+        }
+        if (speedDial.enabled.focusMode) {
+          details.push({ label: "Focus mode", value: speedDial.focusMode ? "Enabled" : "Disabled" });
+        }
+        if (speedDial.enabled.islandsOpacity) {
+          details.push({ label: "Islands opacity", value: String(speedDial.islandsOpacity) });
+        }
+        if (speedDial.enabled.vignetteStrength) {
+          details.push({ label: "Vignette strength", value: String(speedDial.vignetteStrength) });
+        }
       }
       return {
         title: `${mode[0].toUpperCase() + mode.slice(1)} mode`,

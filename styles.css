@@ -1358,12 +1358,34 @@ h1 em {
 }
 
 .speed-dial-position-control,
-.speed-dial-range-controls label {
+.speed-dial-range-setting {
   display: grid;
   gap: 10px;
   color: var(--muted);
   font-size: 0.76rem;
   font-weight: 750;
+}
+
+.speed-dial-setting-enable {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.speed-dial-setting-enable input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+  accent-color: var(--red);
+}
+
+.speed-dial-optional-setting.is-enabled .speed-dial-setting-enable {
+  color: var(--text);
 }
 
 .speed-dial-position-control {
@@ -1442,6 +1464,11 @@ h1 em {
   outline-offset: 3px;
 }
 
+.speed-dial-position-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
 .speed-dial-color-controls {
   margin-top: 20px;
   display: grid;
@@ -1449,22 +1476,21 @@ h1 em {
   gap: 12px;
 }
 
-.speed-dial-color-controls label {
+.speed-dial-color-setting {
   min-width: 0;
   padding: 12px;
   display: grid;
-  grid-template-columns: 38px 1fr;
-  align-items: center;
-  gap: 8px;
+  gap: 12px;
   border: 1px solid var(--line);
   background: var(--surface-deep);
 }
 
-.speed-dial-color-controls label > span {
-  grid-column: 1 / -1;
-  color: var(--muted);
-  font-size: 0.7rem;
-  font-weight: 750;
+.speed-dial-color-setting > div {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  transition: opacity 160ms ease;
 }
 
 .speed-dial-color-controls input[type="color"] {
@@ -1488,8 +1514,9 @@ h1 em {
   gap: 18px;
 }
 
-.speed-dial-range-controls label > span {
+.speed-dial-range-setting > div {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
@@ -1498,10 +1525,27 @@ h1 em {
   width: 100%;
   accent-color: var(--red);
   cursor: pointer;
+  transition: opacity 160ms ease;
+}
+
+.speed-dial-color-setting:not(.is-enabled) > div,
+.speed-dial-range-setting:not(.is-enabled) > input,
+.speed-dial-focus-setting:not(.is-enabled) .speed-dial-focus-control {
+  opacity: 0.35;
+}
+
+.speed-dial-color-controls input:disabled,
+.speed-dial-range-controls input:disabled,
+.speed-dial-focus-control input:disabled {
+  cursor: not-allowed;
+}
+
+.speed-dial-focus-setting {
+  margin: 24px 0;
 }
 
 .speed-dial-focus-control {
-  margin: 24px 0;
+  margin: 10px 0 0;
   padding: 14px;
   display: flex;
   align-items: center;
@@ -1749,6 +1793,24 @@ h1 em {
 
 .wallpaper-controls {
   padding: clamp(22px, 3vw, 30px);
+  max-height: min(760px, calc(100vh - 120px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--red) var(--surface-deep);
+  scrollbar-width: thin;
+}
+
+.wallpaper-controls::-webkit-scrollbar {
+  width: 8px;
+}
+
+.wallpaper-controls::-webkit-scrollbar-track {
+  background: var(--surface-deep);
+}
+
+.wallpaper-controls::-webkit-scrollbar-thumb {
+  border: 2px solid var(--surface-deep);
+  background: var(--red);
 }
 
 .wallpaper-controls h3,
@@ -2307,6 +2369,8 @@ h1 em {
 
 .speed-dial-panel {
   padding: clamp(16px, 2vw, 22px);
+  position: sticky;
+  top: 18px;
 }
 
 .speed-dial-heading {
@@ -3271,6 +3335,15 @@ h1 em {
 
   .wallpaper-workspace {
     grid-template-columns: 1fr;
+  }
+
+  .wallpaper-controls {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .speed-dial-panel {
+    position: static;
   }
 
   .app-icon-workspace {
