@@ -1722,21 +1722,26 @@ h1 em {
   --speed-effects-background-opacity: 0;
   --speed-effects-islands-opacity: 0.16;
   --speed-effects-vignette: 0.35;
+  --speed-chrome-surface: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 2% / var(--speed-effects-background-opacity));
   --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / var(--speed-effects-islands-opacity));
   --speed-search-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / var(--speed-effects-islands-opacity));
 }
 
 .speed-dial-preview.speed-dial-effects-browser[data-mode="light"] {
+  --speed-chrome-surface: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 94% / var(--speed-effects-background-opacity));
   --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / var(--speed-effects-islands-opacity));
   --speed-search-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / var(--speed-effects-islands-opacity));
 }
 
 .speed-dial-preview.speed-dial-effects-browser::after {
-  background: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 4% / var(--speed-effects-background-opacity));
+  background: transparent;
 }
 
-.speed-dial-preview.speed-dial-effects-browser[data-mode="light"]::after {
-  background: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 98% / var(--speed-effects-background-opacity));
+.speed-dial-effects-browser .speed-browser-topbar,
+.speed-dial-effects-browser .speed-toolbar,
+.speed-dial-effects-browser .speed-bookmarks,
+.speed-dial-effects-browser .speed-sidebar {
+  background: var(--speed-chrome-surface);
 }
 
 .speed-dial-effects-browser .speed-wallpaper-media {
