@@ -299,14 +299,14 @@
                "image": "wallpaper/dark_logo_animated.mp4",
                "image_mobile": "wallpaper/mobile_dark.mp4",
                "speeddial_position": "top",
-               "text_color": "#0DE338",
-               "text_shadow": "#FF0000",
+               "text_color": "#FFFFFF",
+               "text_shadow": "#757575",
                "ui_settings": {
+				  "background_opacity": 0,
                   "background_blur": 0,
-                  "background_opacity": 0,
-                  "focus_mode": false,
                   "islands_opacity": 0,
-                  "vignette_strength": 35
+                  "vignette_strength": 35,
+				  "focus_mode": false
                }
             },
             "light": {
@@ -314,14 +314,14 @@
                "image": "wallpaper/light_logo_animated.webm",
                "image_mobile": "wallpaper/mobile_light.mp4",
                "speeddial_position": "top",
-               "text_color": "#f0f0f0",
-               "text_shadow": "#0B000E",
+               "text_color": "#2C2735",
+               "text_shadow": "#FFFFFF",
                "ui_settings": {
+				  "background_opacity": 0,
                   "background_blur": 0,
-                  "background_opacity": 100,
-                  "focus_mode": false,
                   "islands_opacity": 0,
-                  "vignette_strength": 0
+                  "vignette_strength": 35,
+				  "focus_mode": false
                }
             }
             }],

@@ -1724,15 +1724,11 @@ h1 em {
   --speed-effects-vignette: 0.35;
   --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / var(--speed-effects-islands-opacity));
   --speed-search-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 8% / var(--speed-effects-islands-opacity));
-  --speed-text: var(--speed-custom-text);
-  --speed-muted: color-mix(in hsl, var(--speed-custom-text) 72%, transparent);
 }
 
 .speed-dial-preview.speed-dial-effects-browser[data-mode="light"] {
   --speed-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / var(--speed-effects-islands-opacity));
   --speed-search-panel: hsl(var(--speed-secondary-h) var(--speed-secondary-s) 100% / var(--speed-effects-islands-opacity));
-  --speed-text: var(--speed-custom-text);
-  --speed-muted: color-mix(in hsl, var(--speed-custom-text) 72%, transparent);
 }
 
 .speed-dial-preview.speed-dial-effects-browser::after {
@@ -1748,6 +1744,14 @@ h1 em {
   transform: scale(1.025);
 }
 
+.speed-dial-effects-browser .speed-tiles {
+  row-gap: clamp(18px, 2vw, 24px);
+}
+
+.speed-dial-effects-browser .speed-tiles > div:not(.speed-add-tile) {
+  overflow: visible;
+}
+
 .speed-dial-effects-browser .speed-dial-effects-vignette {
   position: absolute;
   inset: 69px 0 0 34px;
@@ -1757,8 +1761,17 @@ h1 em {
   pointer-events: none;
 }
 
-.speed-dial-effects-browser .speed-page-content {
-  text-shadow: 0 2px 10px var(--speed-custom-shadow);
+.speed-dial-effects-browser .speed-tiles > div:not(.speed-add-tile) small {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  color: var(--speed-custom-text);
+  font-size: clamp(0.38rem, 0.62vw, 0.56rem);
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: 0 1px 4px var(--speed-custom-shadow);
+  white-space: nowrap;
+  transform: translateX(-50%);
 }
 
 .speed-dial-effects-browser[data-position="bottom"] .speed-page-content {
