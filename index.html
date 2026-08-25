@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260825-04">
-    <script src="app.js?v=20260825-04" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260825-05">
+    <script src="app.js?v=20260825-05" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -392,13 +392,10 @@
               <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="vignetteStrength"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-vignette-strength"><input id="enable-speed-dial-vignette-strength" type="checkbox" data-speed-dial-setting="vignetteStrength"><span>Vignette strength</span></label><output id="speed-dial-vignette-strength-value">35</output></div><input id="speed-dial-vignette-strength" type="range" min="0" max="100" value="35" aria-label="Vignette strength" disabled></div>
             </div>
 
-            <div class="speed-dial-focus-setting speed-dial-optional-setting" data-speed-dial-setting-row="focusMode">
-              <label class="speed-dial-setting-enable" for="enable-speed-dial-focus-mode"><input id="enable-speed-dial-focus-mode" type="checkbox" data-speed-dial-setting="focusMode"><span>Focus mode</span></label>
-              <label class="speed-dial-focus-control" for="speed-dial-focus-mode">
-                <span><strong>Enable Focus mode</strong><small>Reduce start-page distractions</small></span>
-                <input id="speed-dial-focus-mode" type="checkbox" disabled>
-              </label>
-            </div>
+            <label class="speed-dial-focus-control" for="speed-dial-focus-mode">
+              <span><strong>Focus mode</strong><small>Reduce start-page distractions</small></span>
+              <input id="speed-dial-focus-mode" type="checkbox">
+            </label>
 
             <button class="save-theme-button wallpaper-save-button" id="save-wallpaper" type="button" disabled>
               <span>Save dark wallpaper settings</span>

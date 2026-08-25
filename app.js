@@ -58,8 +58,8 @@ const speedDialEffectDefaults = {
     focusMode: false,
     islandsOpacity: 0,
     position: "top",
-    textColor: "#f0f0f0",
-    textShadow: "#0b000e",
+    textColor: "#2c2735",
+    textShadow: "#ffffff",
     vignetteStrength: 0
   }
 };
@@ -1047,7 +1047,6 @@ function renderWallpaperSpeedDialSettings() {
   speedDialTextColorValue.textContent = values.textColor.toUpperCase();
   speedDialTextShadowValue.textContent = values.textShadow.toUpperCase();
   speedDialFocusMode.checked = values.focusMode;
-  speedDialFocusMode.disabled = !values.enabled.focusMode;
 
   speedDialRangeControls.forEach(({ input, key, output }) => {
     input.value = values[key];
@@ -1134,6 +1133,7 @@ speedDialRangeControls.forEach(({ input, key }) => {
 
 speedDialFocusMode.addEventListener("change", () => {
   speedDialEffectValues[activeWallpaperMode].focusMode = speedDialFocusMode.checked;
+  speedDialEffectValues[activeWallpaperMode].enabled.focusMode = speedDialFocusMode.checked;
   wallpaperSaveStatus.textContent = "";
   renderWallpaperSpeedDialSettings();
 });

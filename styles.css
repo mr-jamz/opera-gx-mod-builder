@@ -1529,8 +1529,7 @@ h1 em {
 }
 
 .speed-dial-color-setting:not(.is-enabled) > div,
-.speed-dial-range-setting:not(.is-enabled) > input,
-.speed-dial-focus-setting:not(.is-enabled) .speed-dial-focus-control {
+.speed-dial-range-setting:not(.is-enabled) > input {
   opacity: 0.35;
 }
 
@@ -1540,12 +1539,8 @@ h1 em {
   cursor: not-allowed;
 }
 
-.speed-dial-focus-setting {
-  margin: 24px 0;
-}
-
 .speed-dial-focus-control {
-  margin: 10px 0 0;
+  margin: 24px 0;
   padding: 14px;
   display: flex;
   align-items: center;
