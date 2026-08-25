@@ -1060,8 +1060,8 @@ function renderWallpaperSpeedDialSettings() {
   wallpaperPreview.style.setProperty("--speed-accent", hslString(theme.accent));
   wallpaperPreview.style.setProperty("--speed-secondary-h", theme.secondary.h);
   wallpaperPreview.style.setProperty("--speed-secondary-s", `${theme.secondary.s}%`);
-  wallpaperPreview.style.setProperty("--speed-custom-text", previewValue("textColor"));
-  wallpaperPreview.style.setProperty("--speed-custom-shadow", previewValue("textShadow"));
+  wallpaperPreview.style.setProperty("--speed-label-color", previewValue("textColor"));
+  wallpaperPreview.style.setProperty("--speed-label-shadow", previewValue("textShadow"));
   wallpaperPreview.style.setProperty("--speed-effects-blur", `${previewValue("backgroundBlur") * 0.12}px`);
   wallpaperPreview.style.setProperty("--speed-effects-background-opacity", previewValue("backgroundOpacity") / 100);
   wallpaperPreview.style.setProperty("--speed-effects-islands-opacity", 0.16 + previewValue("islandsOpacity") * 0.008);

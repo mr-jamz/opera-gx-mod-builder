@@ -1716,8 +1716,8 @@ h1 em {
 }
 
 .speed-dial-preview.speed-dial-effects-browser {
-  --speed-custom-text: #ffffff;
-  --speed-custom-shadow: #757575;
+  --speed-label-color: #ffffff;
+  --speed-label-shadow: #757575;
   --speed-effects-blur: 0px;
   --speed-effects-background-opacity: 0;
   --speed-effects-islands-opacity: 0.16;
@@ -1765,11 +1765,11 @@ h1 em {
   position: absolute;
   top: calc(100% + 5px);
   left: 50%;
-  color: var(--speed-custom-text);
+  color: var(--speed-label-color);
   font-size: clamp(0.38rem, 0.62vw, 0.56rem);
   font-weight: 600;
   line-height: 1;
-  text-shadow: 0 1px 4px var(--speed-custom-shadow);
+  text-shadow: 0 1px 4px var(--speed-label-shadow);
   white-space: nowrap;
   transform: translateX(-50%);
 }
