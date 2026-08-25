@@ -325,6 +325,23 @@
                }
             }
             }],
+			"sd_effects": [ {
+            "id": "sd_effects_01",
+            "name": "ShiftFX",
+            "shader": {
+               "animations": [ {
+                  "duration": 500,
+                  "infinite": false,
+                  "name": "hover",
+                  "preserve_last_frame": true,
+                  "reversible": true,
+                  "steps": 30,
+                  "type": "hover"
+               } ],
+               "args": [ "__hover-shader-frame" ],
+               "path": "sd_effects/sd-shiftfx.txt"
+            }
+         } ],
             "page_styles": [ {
             "css": [ "webmodding/opera.css"],
             "id": "Webmodding1",

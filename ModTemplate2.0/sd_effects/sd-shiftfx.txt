@@ -1,0 +1,57 @@
+uniform shader iChunk;
+uniform float iArgs[9];
+
+half3 rgbToHsl(float r, float g, float b) {
+    float cMax = max(r, max(g, b));
+    float cMin = min(r, min(g, b));
+    float delta = cMax - cMin;
+    float h = 0.0;
+    if (delta == 0.0) {
+        h = 0.0;
+    } else if (cMax == r) {
+        h = 60.0 * mod((g - b) / delta, 6.0);
+    } else if (cMax == g) {
+        h = 60.0 * ((b - r) / delta + 2.0);
+    } else if (cMax == b) {
+        h = 60.0 * ((r - g) / delta + 4.0);
+    }
+    float l = (cMax + cMin) / 2.0;
+    float s = 0.0;
+    if (delta == 0.0) {
+        s = 0.0;
+    } else {
+        s = delta / (1.0 - abs(2.0 * l - 1.0));
+    }
+    return half3(h, s, l);
+}
+
+half3 hslToRgb(float h, float s, float l) {
+    float c = (1.0 - abs(2.0 * l - 1.0)) * s;
+    float x = c * (1.0 - abs(mod(h / 60.0, 2.0) - 1.0));
+    float m = l - c / 2.0;
+    if (h < 60.0) {
+        return half3(c + m, x + m, m);
+    } else if (h < 120.0) {
+        return half3(x + m, c + m, m);
+    } else if (h < 180.0) {
+        return half3(m, c + m, x + m);
+    } else if (h < 240.0) {
+        return half3(m, x + m, c + m);
+    } else if (h < 300.0) {
+        return half3(x + m, m, c + m);
+    } else {
+        return half3(c + m, m, x + m);
+    }
+}
+
+half4 main(float2 xy) {
+    float luminance;
+    half4 color = iChunk.eval(xy);
+    half4 origColor = iChunk.eval(xy);
+    float hover_frame = iArgs[7];
+    half3 cc = vec3(iArgs[1], iArgs[2], iArgs[3]);
+    half3 targetHSL = rgbToHsl(cc.r, cc.g, cc.b);
+    half3 hsl = rgbToHsl(color.r, color.g, color.b);
+    half3 rgb = hslToRgb(targetHSL[0], hsl[1] * (0.5), hsl[2]);
+    return half4(mix(rgb, origColor.rgb, (hover_frame/100)), origColor.a);
+}
