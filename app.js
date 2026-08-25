@@ -772,8 +772,8 @@ function updateSavedWallpaperSummary(mode) {
     ? Object.values(speedDial.enabled).filter(Boolean).length
     : 0;
   const speedDialLabel = enabledSpeedDialCount === 1
-    ? "1 Speed Dial option"
-    : `${enabledSpeedDialCount} Speed Dial options`;
+    ? "1 optional wallpaper setting"
+    : `${enabledSpeedDialCount} optional wallpaper settings`;
   summary.hidden = !selection;
   summary.textContent = selection
     ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name} · ${speedDialLabel}`
@@ -978,7 +978,7 @@ saveWallpaperButton.addEventListener("click", () => {
   );
   updateSavedWallpaperSummary(activeWallpaperMode);
   const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
-  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper and Speed Dial settings saved for this visit`;
+  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper settings saved for this visit`;
 });
 
 const speedDialPosition = document.querySelector("#speed-dial-position");
@@ -1256,7 +1256,7 @@ function renderBuildSummary() {
       ];
       if (speedDial) {
         const enabledCount = Object.values(speedDial.enabled).filter(Boolean).length;
-        details.push({ label: "Speed Dial overrides", value: `${enabledCount} enabled` });
+        details.push({ label: "Optional wallpaper settings", value: `${enabledCount} enabled` });
         if (speedDial.enabled.position) {
           details.push({ label: "Speed Dial position", value: speedDial.position });
         }
@@ -1287,7 +1287,7 @@ function renderBuildSummary() {
         details
       };
     });
-  appendBuildSummaryGroup("Wallpaper", "Saved wallpaper and Speed Dial settings", wallpaperItems);
+  appendBuildSummaryGroup("Wallpaper", "Saved wallpaper media and settings", wallpaperItems);
 
   const musicItems = modBuildState.music.tracks.map((track, index) => {
     const details = [

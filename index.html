@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260825-05">
-    <script src="app.js?v=20260825-05" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260825-06">
+    <script src="app.js?v=20260825-06" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -93,7 +93,7 @@
                 <span class="card-icon icon-wallpaper" aria-hidden="true"><i></i></span>
                 <span class="card-copy">
                   <strong>Wallpaper editor</strong>
-                  <small>Wallpapers and Speed Dial settings</small>
+                  <small>Media and browser layout settings</small>
                 </span>
                 <span class="card-arrow" aria-hidden="true">↗</span>
               </button>
@@ -141,6 +141,7 @@
             <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Keyboard sounds"><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Shaders"><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page effects</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card" type="button" data-category="Web modding"><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
@@ -356,10 +357,10 @@
             <div class="speed-dial-effects-heading">
               <div>
                 <p class="section-index">START PAGE</p>
-                <h3>Speed Dial settings</h3>
+                <h3>Wallpaper settings</h3>
               </div>
             </div>
-            <p class="control-description speed-dial-enable-note">Check a setting to enable it and include it in this mode’s mod data</p>
+            <p class="control-description speed-dial-enable-note">Check a setting to enable it and include it in this wallpaper mode’s mod data</p>
 
             <div class="speed-dial-position-control speed-dial-optional-setting" id="speed-dial-position-control" data-speed-dial-setting-row="position">
               <label class="speed-dial-setting-enable" for="enable-speed-dial-position"><input id="enable-speed-dial-position" type="checkbox" data-speed-dial-setting="position"><span id="speed-dial-position-label">Speed Dial position</span></label>
