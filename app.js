@@ -44,7 +44,7 @@ const savedThemeValues = {
 const speedDialEffectDefaults = {
   dark: {
     backgroundBlur: 0,
-    backgroundOpacity: 0,
+    backgroundOpacity: 50,
     focusMode: false,
     islandsOpacity: 0,
     position: "top",
@@ -54,7 +54,7 @@ const speedDialEffectDefaults = {
   },
   light: {
     backgroundBlur: 0,
-    backgroundOpacity: 0,
+    backgroundOpacity: 50,
     focusMode: false,
     islandsOpacity: 0,
     position: "top",
