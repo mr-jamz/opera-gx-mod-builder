@@ -1429,8 +1429,9 @@ async function setCursorTilePreview(tile, source, fileName) {
 function updateCursorChangeCount() {
   const count = cursorSelections.size;
   cursorChangeCount.textContent = count === 0
-    ? "Using all 48 Cyan defaults"
-    : `${count} custom ${count === 1 ? "cursor" : "cursors"} · ${48 - count} Cyan defaults`;
+    ? "No custom cursor files selected"
+    : `${count} custom ${count === 1 ? "cursor" : "cursors"} ready to save`;
+  cursorSaveButton.disabled = count === 0;
 }
 
 async function selectCursorFile(tile, file) {
@@ -1554,22 +1555,23 @@ function updateSavedCursorSummary() {
   const saved = modBuildState.cursors;
   savedCursorsBox.hidden = !saved;
   savedCursorsSummary.textContent = saved
-    ? `48 roles · ${saved.customCount} custom · ${48 - saved.customCount} Cyan defaults`
+    ? `${saved.customCount} custom ${saved.customCount === 1 ? "cursor" : "cursors"}`
     : "";
   cursorCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
   updateCreateModAvailability();
 }
 
 cursorSaveButton.addEventListener("click", () => {
-  const items = cursorDefinitions.map((definition) => {
+  if (cursorSelections.size === 0) {
+    return;
+  }
+  const items = cursorDefinitions.filter((definition) => cursorSelections.has(definition.type)).map((definition) => {
     const selection = cursorSelections.get(definition.type);
-    const extension = selection?.extension || "cur";
+    const extension = selection.extension;
     return {
-      file: selection?.file || null,
-      path: selection
-        ? `cursors/Custom/${cursorFileName(definition.type, extension)}`
-        : `cursors/Cyan/${cursorFileName(definition.type)}`,
-      source: selection ? "upload" : "included",
+      file: selection.file,
+      path: `cursors/Custom/${cursorFileName(definition.type, extension)}`,
+      source: "upload",
       type: definition.type
     };
   });
@@ -1578,7 +1580,7 @@ cursorSaveButton.addEventListener("click", () => {
     items
   };
   updateSavedCursorSummary();
-  cursorSaveStatus.textContent = `48 cursor roles saved for this visit · ${cursorSelections.size} custom`;
+  cursorSaveStatus.textContent = `${cursorSelections.size} custom cursor ${cursorSelections.size === 1 ? "role" : "roles"} saved for this visit`;
 });
 
 const musicTrackList = document.querySelector("#music-track-list");
@@ -1833,9 +1835,8 @@ function renderBuildSummary() {
         url: "ModTemplate2.0/cursors/Cyan/preview.png"
       },
       details: [
-        { label: "Cursor roles", value: String(modBuildState.cursors.items.length) },
-        { label: "Custom files", value: String(modBuildState.cursors.customCount) },
-        { label: "Cyan defaults", value: String(modBuildState.cursors.items.length - modBuildState.cursors.customCount) },
+        { label: "Custom cursor roles", value: String(modBuildState.cursors.items.length) },
+        { label: "Source", value: "User-provided files only" },
         { label: "Accepted formats", value: ".cur and .ani" }
       ]
     }]
