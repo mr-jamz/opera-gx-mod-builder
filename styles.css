@@ -3306,6 +3306,15 @@ h1 em {
   gap: 5px;
 }
 
+.saved-cursors-summary {
+  display: grid;
+  gap: 5px;
+}
+
+.saved-cursors-summary span {
+  overflow-wrap: anywhere;
+}
+
 .card-arrow {
   margin-left: auto;
   color: #625e69;
@@ -3899,6 +3908,14 @@ h1 em {
 .cursor-save-bar > div span {
   color: var(--muted);
   font-size: 0.65rem;
+}
+
+.cursor-save-status {
+  margin: 4px 0 0;
+}
+
+.cursor-save-status:not(:empty) {
+  color: #72e7ad;
 }
 
 .cursor-save-button {

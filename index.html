@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260828-15">
-    <script src="app.js?v=20260828-15" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260828-16">
+    <script src="app.js?v=20260828-16" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -139,7 +139,7 @@
               <button class="category-card" type="button" data-category="Cursors"><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
               <div class="saved-content-box" id="saved-cursors-box" hidden>
                 <strong>Saved cursor collection</strong>
-                <span class="saved-cursors-summary" id="saved-cursors-summary"></span>
+                <div class="saved-cursors-summary" id="saved-cursors-summary"></div>
               </div>
             </div>
             <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
@@ -561,10 +561,13 @@
         <div class="cursor-groups" id="cursor-groups"></div>
 
         <div class="cursor-save-bar">
-          <div><strong id="cursor-change-count">No custom cursor files selected</strong><span>Upload at least one cursor file to enable saving.</span></div>
+          <div>
+            <strong id="cursor-change-count">No custom cursor files selected</strong>
+            <span>Upload at least one cursor file to enable saving.</span>
+            <p class="theme-save-status cursor-save-status" id="cursor-save-status" role="status" aria-live="polite"></p>
+          </div>
           <button class="save-theme-button cursor-save-button" id="save-cursors" type="button" disabled><span>Save custom cursors</span><b aria-hidden="true">→</b></button>
         </div>
-        <p class="theme-save-status" id="cursor-save-status" role="status" aria-live="polite"></p>
       </section>
 
       <section class="view build-review" id="build-review" aria-labelledby="build-review-title" aria-hidden="true">

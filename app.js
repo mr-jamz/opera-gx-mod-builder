@@ -1554,9 +1554,12 @@ function renderCursorEditor() {
 function updateSavedCursorSummary() {
   const saved = modBuildState.cursors;
   savedCursorsBox.hidden = !saved;
-  savedCursorsSummary.textContent = saved
-    ? `${saved.customCount} custom ${saved.customCount === 1 ? "cursor" : "cursors"}`
-    : "";
+  savedCursorsSummary.replaceChildren();
+  saved?.items.forEach((item) => {
+    const mapping = document.createElement("span");
+    mapping.textContent = `${item.type} ← ${item.file.name}`;
+    savedCursorsSummary.append(mapping);
+  });
   cursorCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
   updateCreateModAvailability();
 }
@@ -1580,7 +1583,7 @@ cursorSaveButton.addEventListener("click", () => {
     items
   };
   updateSavedCursorSummary();
-  cursorSaveStatus.textContent = `${cursorSelections.size} custom cursor ${cursorSelections.size === 1 ? "role" : "roles"} saved for this visit`;
+  cursorSaveStatus.textContent = `Saved ${cursorSelections.size} cursor ${cursorSelections.size === 1 ? "file and mapping" : "files and mappings"} successfully`;
 });
 
 const musicTrackList = document.querySelector("#music-track-list");
