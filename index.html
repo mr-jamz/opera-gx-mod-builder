@@ -548,21 +548,21 @@
           <div>
             <p class="eyebrow">More modding / Cursors</p>
             <h2 id="cursor-editor-title">Cursor editor</h2>
-            <p class="cursor-editor-intro">Choose a tile to replace one cursor role. Every slot starts with the included Cyan cursor.</p>
+            <p class="cursor-editor-intro">Choose a tile to assign a custom cursor role. Cyan cursors are shown only as visual references and are never saved.</p>
           </div>
           <p class="schema-chip">48 roles</p>
         </div>
 
         <div class="cursor-format-note" role="note">
           <i aria-hidden="true"></i>
-          <div><strong>Windows cursor files only</strong><span>Drop or choose a <code>.cur</code> or <code>.ani</code> file. Animated cursors play inside their tile.</span></div>
+          <div><strong>Windows cursor files only</strong><span>Drop or choose a <code>.cur</code> or <code>.ani</code> file. Only uploaded files are saved; animated cursors play inside their tile.</span></div>
         </div>
 
         <div class="cursor-groups" id="cursor-groups"></div>
 
         <div class="cursor-save-bar">
-          <div><strong id="cursor-change-count">Using all 48 Cyan defaults</strong><span>Save the collection when your cursor choices are ready.</span></div>
-          <button class="save-theme-button cursor-save-button" id="save-cursors" type="button"><span>Save cursor collection</span><b aria-hidden="true">→</b></button>
+          <div><strong id="cursor-change-count">No custom cursor files selected</strong><span>Upload at least one cursor file to enable saving.</span></div>
+          <button class="save-theme-button cursor-save-button" id="save-cursors" type="button" disabled><span>Save custom cursors</span><b aria-hidden="true">→</b></button>
         </div>
         <p class="theme-save-status" id="cursor-save-status" role="status" aria-live="polite"></p>
       </section>
