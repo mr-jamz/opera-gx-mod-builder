@@ -1,0 +1,224 @@
+{
+   "description": "INSERT YOUR MOD DESCRIPTION HERE",
+   "developer": {
+      "name": "MOD DEVELOPER NAME HERE"
+   },
+   "icons": {
+      "512": "icon_512.png"
+   },
+   "manifest_version": 3,
+   "mod": {
+      "payload": {
+         "app_icon": [ {
+            "id": "AppIcon",
+            "name": "InsertModNameOrSomethingHere",
+            "path": "app_icon/classic_GX_logo.png"
+         } ],
+         "background_music": [ {
+            "author": "InsertAuthorHere",
+            "id": "music_0",
+            "name": "Track1",
+            "tracks": [ "music/track_1.mp3" ]
+         }, {
+            "author": "InsertAuthorHere",
+            "id": "music_1",
+            "name": "Track2",
+            "tracks": [ "music/track_2.mp3" ]
+         }, {
+            "author": "InsertAuthorHere",
+            "id": "music_2",
+            "name": "Track3",
+            "tracks": [ "music/track_3.mp3" ]
+         }, {
+            "author": "InsertAuthorHere",
+            "id": "music_3",
+            "name": "Track4",
+            "tracks": [ "music/track_4.mp3" ]
+         } ],
+         "browser_sounds": [ {
+            "id": "BrowserSounds",
+            "name": "InsertModNameOrSomethingHere",
+            "sounds": {
+               "CLICK": [ "sound/click.mp3" ],
+               "FEATURE_SWITCH_OFF": ["sound/feature_switch_off.mp3"],
+               "FEATURE_SWITCH_ON": ["sound/feature_switch_on.mp3"],
+               "HOVER": [ "sound/hover.mp3" ],
+               "HOVER_UP": [ "sound/hover.mp3" ],
+               "IMPORTANT_CLICK": [ "sound/click.mp3" ],
+               "LIMITER_OFF": [ "sound/toggle.mp3" ],
+               "LIMITER_ON": [ "sound/toggle.mp3" ],
+               "SWITCH_TOGGLE": [ "sound/toggle.mp3" ],
+               "TAB_CLOSE": [ "sound/tabclose.mp3" ],
+               "TAB_INSERT": [ "sound/tabopen.mp3" ],
+               "TAB_SLASH": [ "sound/tab_slash.mp3" ]
+            }
+         } ],
+         "keyboard_sounds": [ {
+            "id": "KeyboardSounds",
+            "name": "InsertModNameOrSomethingHere",
+            "sounds": {
+               "TYPING_BACKSPACE": [ "sound/keyboard1.mp3" ],
+               "TYPING_ENTER": [ "sound/keyboard3.mp3" ],
+               "TYPING_LETTER": [ "sound/keyboard1.mp3", "sound/keyboard2.mp3", "sound/keyboard3.mp3", "sound/keyboard4.mp3" ],
+               "TYPING_SPACE": [ "sound/keyboard4.mp3" ]
+            }
+         } ],
+         "image_overrides": [ {
+            "id": "ImageOverrides",
+            "name": "InsertModNameOrSomethingHere",
+            "images": {
+               "sidebar_activity_button": "icons_gx/gx_sidebar_tabs.json",
+               "sidebar_bookmarks_button": "icons_gx/gx_sidebar_bookmarks.json",
+               "sidebar_crypto_wallet_button": "icons_gx/gx_sidebar_crypto_wallet.json",
+               "sidebar_downloads_button": "icons_gx/gx_sidebar_downloads.json",
+               "sidebar_easy_share_button": "icons_gx/gx_sidebar_myflow.json",
+               "sidebar_extensions_button": "icons_gx/gx_sidebar_extensions.json",
+               "sidebar_gx_booster_button": "icons_gx/gx_sidebar_cleaner.json",
+               "sidebar_history_button": "icons_gx/gx_sidebar_history.json",
+               "sidebar_limiters_button": "icons_gx/gx_sidebar_limiters.json",
+               "sidebar_mods_button": "icons_gx/gx_sidebar_mods.json",
+               "sidebar_news_button": "icons_gx/gx_sidebar_news.json",
+               "sidebar_pinboards_button": "icons_gx/gx_sidebar_pinboards.json",
+               "sidebar_player_service_button": "icons_gx/gx_sidebar_player.json",
+               "sidebar_settings_button": "icons_gx/gx_sidebar_settings.json",
+               "sidebar_shaders_button": "icons_gx/gx_sidebar_shaders.json",
+               "sidebar_speeddial_button": "icons_gx/gx_sidebar_speeddial.json",
+               "sidebar_sticky_site_button": "icons_gx/gx_sidebar_gx_corner.json"
+            }
+         } ],
+         "mobile_image_overrides": [ {
+            "id": "MobileImageOverrides",
+            "name": "InsertModNameOrSomethingHere",
+            "images": {
+               "start_page_logo": "mobile_logo/mobile_logo1.png"
+            }
+         } ],
+         "splash_screen": [ {
+            "id": "SplashScreen",
+            "name": "InsertModNameOrSomethingHere",
+            "path": "splash/splash1.mp4"
+         } ],
+         "stickers": [ {
+            "id": "Stickers",
+            "name": "InsertModNameOrSomethingHere",
+            "images": [ "stickers/sticker1.webp", "stickers/sticker2.webp", "stickers/sticker3.webp", "stickers/sticker4.webp" ],
+            "preview": "stickers/sticker1.webp"
+         } ],
+         "shaders": [ {
+            "animation": {
+               "duration": 120,
+               "steps": 3600
+            },
+            "id": "shader",
+            "name": "",
+            "path": ""
+         } ],
+         "theme": [ {
+            "dark": {
+               "gx_accent": {
+                 "h": 4,
+                  "s": 83,
+                  "l": 72
+               },
+               "gx_secondary_base": {
+                  "h": 20,
+                  "s": 27,
+                  "l": 32
+               }
+            },
+            "id": "0",
+            "light": {
+               "gx_accent": {
+                  "h": 327,
+                  "s": 80,
+                  "l": 57
+               },
+               "gx_secondary_base": {
+                  "h": 6,
+                  "s": 15,
+                  "l": 25
+               }
+            },
+            "name": "InsertModNameOrSomethingHere"
+         } ],
+         "wallpaper": [ {
+            "id": "Wallpaper",
+            "name": "InsertModNameOrSomethingHere",
+            "dark": {
+               "first_frame": "wallpaper/first_frame_dark.jpg",
+               "image": "wallpaper/dark_logo_animated.mp4",
+               "image_mobile": "wallpaper/mobile_dark.mp4",
+               "speeddial_position": "top",
+               "text_color": "#FFFFFF",
+               "text_shadow": "#757575",
+               "ui_settings": {
+				  "background_opacity": 0,
+                  "background_blur": 0,
+                  "islands_opacity": 0,
+                  "vignette_strength": 35,
+				  "focus_mode": false
+               }
+            },
+            "light": {
+               "first_frame": "wallpaper/first_frame_light.jpg",
+               "image": "wallpaper/light_logo_animated.webm",
+               "image_mobile": "wallpaper/mobile_light.mp4",
+               "speeddial_position": "top",
+               "text_color": "#2C2735",
+               "text_shadow": "#FFFFFF",
+               "ui_settings": {
+				  "background_opacity": 0,
+                  "background_blur": 0,
+                  "islands_opacity": 0,
+                  "vignette_strength": 35,
+				  "focus_mode": false
+               }
+            }
+            }],
+			"sd_effects": [ {
+            "id": "sd_effects_01",
+            "name": "ShiftFX",
+            "shader": {
+               "animations": [ {
+                  "duration": 500,
+                  "infinite": false,
+                  "name": "hover",
+                  "preserve_last_frame": true,
+                  "reversible": true,
+                  "steps": 30,
+                  "type": "hover"
+               } ],
+               "args": [ "__hover-shader-frame" ],
+               "path": "sd_effects/sd-shiftfx.txt"
+            }
+         } ],
+            "page_styles": [ {
+            "css": [ "webmodding/opera.css"],
+            "id": "Webmodding1",
+            "matches": [ "https://*.opera.com/*" ],
+            "name": "InsertModNameOrSomethingHere"
+         }
+		],
+        "fonts": [ {
+            "body": {
+               "name": "NameOfFontGoesHere",
+               "variants": [ {
+                  "path": "fonts/blender-book.ttf"
+               } ]
+            },
+            "header": {
+               "name": "NameOfFontGoesHere",
+               "variants": [ {
+                  "path": "fonts/blender-bold.ttf"
+               } ]
+            },
+            "id": "Fonts",
+            "name": "InsertModNameOrSomethingHere"
+         } ]
+      },
+      "schema_version": 2
+   },
+   "name": "InsertModNameOrSomethingHere",
+   "update_url": "https://api.gx.me/store/mods/update",
+   "version": "1.0"
+}

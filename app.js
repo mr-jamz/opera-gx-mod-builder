@@ -1264,6 +1264,7 @@ const cursorChangeCount = document.querySelector("#cursor-change-count");
 const cursorSelections = new Map();
 const cursorPreviewStates = new Map();
 const cursorPreviewTokens = new Map();
+let savedCursorPreviewUrl = null;
 const savedCursorsBox = document.querySelector("#saved-cursors-box");
 const savedCursorsSummary = document.querySelector("#saved-cursors-summary");
 const cursorCategoryCard = document.querySelector('[data-category="Cursors"]');
@@ -1564,7 +1565,14 @@ function updateSavedCursorSummary() {
   updateCreateModAvailability();
 }
 
-cursorSaveButton.addEventListener("click", () => {
+async function createSavedCursorPreview(file) {
+  const buffer = await file.arrayBuffer();
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  const firstFrame = extension === "ani" ? parseAniFrames(buffer).frames[0] : buffer;
+  return URL.createObjectURL(extractCursorFrameBlob(firstFrame));
+}
+
+cursorSaveButton.addEventListener("click", async () => {
   if (cursorSelections.size === 0) {
     return;
   }
@@ -1578,9 +1586,18 @@ cursorSaveButton.addEventListener("click", () => {
       type: definition.type
     };
   });
+  const previewItem = items.find((item) => item.type === "POINTER") || items[0];
+  const nextPreviewUrl = await createSavedCursorPreview(previewItem.file);
+  if (savedCursorPreviewUrl) {
+    URL.revokeObjectURL(savedCursorPreviewUrl);
+  }
+  savedCursorPreviewUrl = nextPreviewUrl;
   modBuildState.cursors = {
     customCount: cursorSelections.size,
-    items
+    items,
+    previewFileName: previewItem.file.name,
+    previewType: previewItem.type,
+    previewUrl: savedCursorPreviewUrl
   };
   updateSavedCursorSummary();
   cursorSaveStatus.textContent = `Saved ${cursorSelections.size} cursor ${cursorSelections.size === 1 ? "file and mapping" : "files and mappings"} successfully`;
@@ -1833,12 +1850,13 @@ function renderBuildSummary() {
     ? [{
       title: "Cursor collection",
       preview: {
-        alt: "Cyan cursor collection preview",
+        alt: `${modBuildState.cursors.previewType} cursor preview from ${modBuildState.cursors.previewFileName}`,
         kind: "image",
-        url: "ModTemplate2.0/cursors/Cyan/preview.png"
+        url: modBuildState.cursors.previewUrl
       },
       details: [
         { label: "Custom cursor roles", value: String(modBuildState.cursors.items.length) },
+        { label: "Preview cursor", value: modBuildState.cursors.previewType },
         { label: "Source", value: "User-provided files only" },
         { label: "Accepted formats", value: ".cur and .ani" }
       ]
