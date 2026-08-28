@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260828-13">
-    <script src="app.js?v=20260828-13" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260828-14">
+    <script src="app.js?v=20260828-14" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -135,7 +135,13 @@
               </div>
             </div>
             <button class="category-card" type="button" data-category="Browser sounds"><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Cursors"><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Cursors"><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-cursors-box" hidden>
+                <strong>Saved cursor collection</strong>
+                <span class="saved-cursors-summary" id="saved-cursors-summary"></span>
+              </div>
+            </div>
             <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
             <button class="category-card is-not-supported" type="button" data-category="Game strips" disabled><span class="card-copy"><strong>Game strips</strong><small>Not supported yet</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
@@ -534,6 +540,31 @@
           <button class="save-theme-button music-save-button" id="save-music-tracks" type="button"><span>Save music tracks</span><b aria-hidden="true">→</b></button>
           <p class="theme-save-status" id="music-save-status" role="status" aria-live="polite"></p>
         </section>
+      </section>
+
+      <section class="view cursor-editor" id="cursor-editor" aria-labelledby="cursor-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-cursors" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Cursors</p>
+            <h2 id="cursor-editor-title">Cursor editor</h2>
+            <p class="cursor-editor-intro">Choose a tile to replace one cursor role. Every slot starts with the included Cyan cursor.</p>
+          </div>
+          <p class="schema-chip">48 roles</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>Windows cursor files only</strong><span>Drop or choose a <code>.cur</code> or <code>.ani</code> file. Animated cursors play inside their tile.</span></div>
+        </div>
+
+        <div class="cursor-groups" id="cursor-groups"></div>
+
+        <div class="cursor-save-bar">
+          <div><strong id="cursor-change-count">Using all 48 Cyan defaults</strong><span>Save the collection when your cursor choices are ready.</span></div>
+          <button class="save-theme-button cursor-save-button" id="save-cursors" type="button"><span>Save cursor collection</span><b aria-hidden="true">→</b></button>
+        </div>
+        <p class="theme-save-status" id="cursor-save-status" role="status" aria-live="polite"></p>
       </section>
 
       <section class="view build-review" id="build-review" aria-labelledby="build-review-title" aria-hidden="true">

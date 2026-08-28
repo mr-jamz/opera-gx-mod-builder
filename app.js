@@ -4,6 +4,7 @@ const themeEditorView = document.querySelector("#theme-editor");
 const appIconEditorView = document.querySelector("#app-icon-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
+const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
 const startButton = document.querySelector("#start-modding");
@@ -12,6 +13,7 @@ const backCreatorButton = document.querySelector("#back-creator");
 const backAppIconButton = document.querySelector("#back-app-icon");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
+const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
 const buildSummaryGroups = document.querySelector("#build-summary-groups");
@@ -93,6 +95,7 @@ const savedSpeedDialEffectValues = {
 };
 
 const modBuildState = {
+  cursors: null,
   music: {
     tracks: []
   }
@@ -188,6 +191,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Cursors") {
+      switchView(creatorView, cursorEditorView);
+      window.history.replaceState(null, "", "#cursor-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -210,6 +219,11 @@ backAppIconButton.addEventListener("click", () => {
 
 backMusicButton.addEventListener("click", () => {
   switchView(musicEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backCursorsButton.addEventListener("click", () => {
+  switchView(cursorEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -1138,6 +1152,435 @@ speedDialFocusMode.addEventListener("change", () => {
   renderWallpaperSpeedDialSettings();
 });
 
+const CURSOR_GROUPS = [
+  {
+    name: "Basic cursors",
+    key: "basic",
+    items: [
+      ["POINTER", "Default pointer", "Standard arrow for general browsing"]
+    ]
+  },
+  {
+    name: "Interactive cursors",
+    key: "interactive",
+    items: [
+      ["HAND", "Link select", "Clickable links and controls"],
+      ["HELP", "Help", "More information or help is available"],
+      ["CONTEXT_MENU", "Context menu", "A context menu is available"],
+      ["PROGRESS", "Progress", "Work continues in the background"],
+      ["WAIT", "Wait", "The browser is busy"]
+    ]
+  },
+  {
+    name: "Selection cursors",
+    key: "selection",
+    items: [
+      ["CROSS", "Crosshair", "Precise selection point"],
+      ["CELL", "Cell", "Table or spreadsheet cell selection"],
+      ["I_BEAM", "Text", "Horizontal text selection"],
+      ["VERTICAL_TEXT", "Vertical text", "Vertical text selection"]
+    ]
+  },
+  {
+    name: "Drag cursors",
+    key: "drag",
+    items: [
+      ["GRAB", "Grab", "Item is ready to be dragged"],
+      ["GRABBING", "Grabbing", "Item is being dragged"],
+      ["MOVE", "Move", "Move in any direction"],
+      ["COPY", "Copy", "Dragged item will be copied"],
+      ["ALIAS", "Alias", "Create a shortcut or alias"],
+      ["NO_DROP", "No drop", "Invalid drop target"],
+      ["NOT_ALLOWED", "Not allowed", "Action is unavailable"]
+    ]
+  },
+  {
+    name: "Resize cursors",
+    key: "resize",
+    items: [
+      ["COLUMN_RESIZE", "Column resize", "Resize a column"],
+      ["ROW_RESIZE", "Row resize", "Resize a row"],
+      ["NORTH_RESIZE", "North resize", "Resize from the top edge"],
+      ["EAST_RESIZE", "East resize", "Resize from the right edge"],
+      ["SOUTH_RESIZE", "South resize", "Resize from the bottom edge"],
+      ["WEST_RESIZE", "West resize", "Resize from the left edge"],
+      ["NORTH_EAST_RESIZE", "Northeast resize", "Resize from the top-right corner"],
+      ["NORTH_WEST_RESIZE", "Northwest resize", "Resize from the top-left corner"],
+      ["SOUTH_EAST_RESIZE", "Southeast resize", "Resize from the bottom-right corner"],
+      ["SOUTH_WEST_RESIZE", "Southwest resize", "Resize from the bottom-left corner"],
+      ["EAST_WEST_RESIZE", "East-west resize", "Resize horizontally"],
+      ["NORTH_SOUTH_RESIZE", "North-south resize", "Resize vertically"],
+      ["NORTH_EAST_SOUTH_WEST_RESIZE", "Northeast-southwest resize", "Resize diagonally from northeast to southwest"],
+      ["NORTH_WEST_SOUTH_EAST_RESIZE", "Northwest-southeast resize", "Resize diagonally from northwest to southeast"]
+    ]
+  },
+  {
+    name: "Panning cursors",
+    key: "panning",
+    items: [
+      ["MIDDLE_PANNING", "Pan in any direction", "Middle-button panning in all directions"],
+      ["MIDDLE_PANNING_HORIZONTAL", "Pan horizontally", "Middle-button horizontal panning"],
+      ["MIDDLE_PANNING_VERTICAL", "Pan vertically", "Middle-button vertical panning"],
+      ["NORTH_PANNING", "Pan north", "Scroll or pan upward"],
+      ["NORTH_EAST_PANNING", "Pan northeast", "Scroll or pan toward the upper right"],
+      ["EAST_PANNING", "Pan east", "Scroll or pan right"],
+      ["SOUTH_EAST_PANNING", "Pan southeast", "Scroll or pan toward the lower right"],
+      ["SOUTH_PANNING", "Pan south", "Scroll or pan downward"],
+      ["SOUTH_WEST_PANNING", "Pan southwest", "Scroll or pan toward the lower left"],
+      ["WEST_PANNING", "Pan west", "Scroll or pan left"],
+      ["NORTH_WEST_PANNING", "Pan northwest", "Scroll or pan toward the upper left"]
+    ]
+  },
+  {
+    name: "Unavailable resize cursors",
+    key: "blocked",
+    items: [
+      ["EAST_WEST_NO_RESIZE", "Horizontal resize unavailable", "Horizontal resizing is blocked"],
+      ["NORTH_SOUTH_NO_RESIZE", "Vertical resize unavailable", "Vertical resizing is blocked"],
+      ["NORTH_EAST_SOUTH_WEST_NO_RESIZE", "Northeast-southwest unavailable", "This diagonal resize is blocked"],
+      ["NORTH_WEST_SOUTH_EAST_NO_RESIZE", "Northwest-southeast unavailable", "This diagonal resize is blocked"]
+    ]
+  },
+  {
+    name: "Zoom cursors",
+    key: "zoom",
+    items: [
+      ["ZOOM_IN", "Zoom in", "Content can be enlarged"],
+      ["ZOOM_OUT", "Zoom out", "Content can be reduced"]
+    ]
+  }
+];
+
+const cursorDefinitions = CURSOR_GROUPS.flatMap((group) => group.items.map(([type, label, description]) => ({
+  description,
+  group: group.key,
+  label,
+  type
+})));
+const cursorGroupsContainer = document.querySelector("#cursor-groups");
+const cursorSaveButton = document.querySelector("#save-cursors");
+const cursorSaveStatus = document.querySelector("#cursor-save-status");
+const cursorChangeCount = document.querySelector("#cursor-change-count");
+const cursorSelections = new Map();
+const cursorPreviewStates = new Map();
+const cursorPreviewTokens = new Map();
+const savedCursorsBox = document.querySelector("#saved-cursors-box");
+const savedCursorsSummary = document.querySelector("#saved-cursors-summary");
+const cursorCategoryCard = document.querySelector('[data-category="Cursors"]');
+
+function cursorFileName(type, extension = "cur") {
+  return `${type.toLowerCase()}.${extension}`;
+}
+
+function readFourCc(view, offset) {
+  return String.fromCharCode(view.getUint8(offset), view.getUint8(offset + 1), view.getUint8(offset + 2), view.getUint8(offset + 3));
+}
+
+function isPngAt(view, offset) {
+  const signature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+  return signature.every((value, index) => view.getUint8(offset + index) === value);
+}
+
+function extractCursorFrameBlob(buffer) {
+  const view = new DataView(buffer);
+  if (view.byteLength < 22 || view.getUint16(0, true) !== 0 || ![1, 2].includes(view.getUint16(2, true))) {
+    throw new Error("The file does not contain a valid Windows cursor image");
+  }
+
+  const count = view.getUint16(4, true);
+  const entries = [];
+  for (let index = 0; index < count; index += 1) {
+    const entryOffset = 6 + index * 16;
+    if (entryOffset + 16 > view.byteLength) {
+      break;
+    }
+    const width = view.getUint8(entryOffset) || 256;
+    const height = view.getUint8(entryOffset + 1) || 256;
+    entries.push({
+      area: width * height,
+      offset: view.getUint32(entryOffset + 12, true),
+      size: view.getUint32(entryOffset + 8, true)
+    });
+  }
+
+  entries.sort((left, right) => right.area - left.area);
+  const pngEntry = entries.find((entry) => entry.offset + 8 <= view.byteLength && isPngAt(view, entry.offset));
+  if (pngEntry && pngEntry.offset + pngEntry.size <= view.byteLength) {
+    return new Blob([buffer.slice(pngEntry.offset, pngEntry.offset + pngEntry.size)], { type: "image/png" });
+  }
+
+  return new Blob([buffer], { type: "image/x-icon" });
+}
+
+function parseAniFrames(buffer) {
+  const view = new DataView(buffer);
+  if (view.byteLength < 12 || readFourCc(view, 0) !== "RIFF" || readFourCc(view, 8) !== "ACON") {
+    throw new Error("The file does not contain a valid animated Windows cursor");
+  }
+
+  const frames = [];
+  const rates = [];
+  const sequence = [];
+  let defaultRate = 6;
+
+  function readChunks(start, end) {
+    let offset = start;
+    while (offset + 8 <= end && offset + 8 <= view.byteLength) {
+      const id = readFourCc(view, offset);
+      const size = view.getUint32(offset + 4, true);
+      const dataStart = offset + 8;
+      const dataEnd = Math.min(dataStart + size, view.byteLength);
+
+      if (id === "anih" && size >= 32) {
+        defaultRate = view.getUint32(dataStart + 28, true) || defaultRate;
+      } else if (id === "rate") {
+        for (let itemOffset = dataStart; itemOffset + 4 <= dataEnd; itemOffset += 4) {
+          rates.push(view.getUint32(itemOffset, true));
+        }
+      } else if (id === "seq ") {
+        for (let itemOffset = dataStart; itemOffset + 4 <= dataEnd; itemOffset += 4) {
+          sequence.push(view.getUint32(itemOffset, true));
+        }
+      } else if (id === "icon") {
+        frames.push(buffer.slice(dataStart, dataEnd));
+      } else if (id === "LIST" && dataStart + 4 <= dataEnd) {
+        readChunks(dataStart + 4, dataEnd);
+      }
+
+      offset = dataStart + size + (size % 2);
+    }
+  }
+
+  readChunks(12, view.byteLength);
+  if (frames.length === 0) {
+    throw new Error("No cursor frames were found in this ANI file");
+  }
+
+  const orderedFrames = sequence.length
+    ? sequence.map((index) => frames[index]).filter(Boolean)
+    : frames;
+  const rate = rates[0] || defaultRate;
+  return {
+    frameDuration: Math.max(32, Math.round(rate * (1000 / 60))),
+    frames: orderedFrames
+  };
+}
+
+async function loadCursorPreview(source, fileName) {
+  const buffer = source instanceof File
+    ? await source.arrayBuffer()
+    : await fetch(source).then((response) => {
+      if (!response.ok) {
+        throw new Error("The included Cyan cursor could not be loaded");
+      }
+      return response.arrayBuffer();
+    });
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  const animation = extension === "ani"
+    ? parseAniFrames(buffer)
+    : { frameDuration: 0, frames: [buffer] };
+  const frameUrls = animation.frames.map((frame) => URL.createObjectURL(extractCursorFrameBlob(frame)));
+  const cursorUrl = source instanceof File ? URL.createObjectURL(source) : source;
+  return {
+    cursorUrl,
+    frameDuration: animation.frameDuration,
+    frameUrls,
+    ownedUrls: source instanceof File ? [...frameUrls, cursorUrl] : frameUrls
+  };
+}
+
+function clearCursorPreviewState(type) {
+  const state = cursorPreviewStates.get(type);
+  if (!state) {
+    return;
+  }
+  window.clearInterval(state.timer);
+  state.ownedUrls.forEach((url) => URL.revokeObjectURL(url));
+  cursorPreviewStates.delete(type);
+}
+
+async function setCursorTilePreview(tile, source, fileName) {
+  const type = tile.dataset.cursorType;
+  const token = Symbol(type);
+  cursorPreviewTokens.set(type, token);
+  const preview = await loadCursorPreview(source, fileName);
+  if (cursorPreviewTokens.get(type) !== token) {
+    preview.ownedUrls.forEach((url) => URL.revokeObjectURL(url));
+    return false;
+  }
+
+  clearCursorPreviewState(type);
+  const image = tile.querySelector(".cursor-preview-image");
+  const dropzone = tile.querySelector(".cursor-dropzone");
+  let frameIndex = 0;
+  image.hidden = false;
+  image.src = preview.frameUrls[0];
+  dropzone.style.cursor = `url("${preview.cursorUrl}"), pointer`;
+  const timer = preview.frameUrls.length > 1
+    ? window.setInterval(() => {
+      frameIndex = (frameIndex + 1) % preview.frameUrls.length;
+      image.src = preview.frameUrls[frameIndex];
+    }, preview.frameDuration)
+    : null;
+  cursorPreviewStates.set(type, { ...preview, timer });
+  return true;
+}
+
+function updateCursorChangeCount() {
+  const count = cursorSelections.size;
+  cursorChangeCount.textContent = count === 0
+    ? "Using all 48 Cyan defaults"
+    : `${count} custom ${count === 1 ? "cursor" : "cursors"} · ${48 - count} Cyan defaults`;
+}
+
+async function selectCursorFile(tile, file) {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  const status = tile.querySelector(".cursor-tile-status");
+  if (!['cur', 'ani'].includes(extension)) {
+    status.textContent = "Only .cur or .ani files are allowed";
+    tile.classList.add("has-error");
+    return;
+  }
+
+  tile.classList.remove("has-error");
+  status.textContent = "Reading cursor preview…";
+  try {
+    await setCursorTilePreview(tile, file, file.name);
+    cursorSelections.set(tile.dataset.cursorType, { extension, file });
+    tile.classList.add("has-custom-cursor");
+    tile.querySelector(".cursor-source-badge").textContent = "Custom";
+    tile.querySelector(".cursor-reset-button").hidden = false;
+    status.textContent = file.name;
+    cursorSaveStatus.textContent = "";
+    updateCursorChangeCount();
+  } catch (error) {
+    status.textContent = error.message || "This cursor file could not be previewed";
+    tile.classList.add("has-error");
+  }
+}
+
+async function resetCursorTile(tile) {
+  const type = tile.dataset.cursorType;
+  cursorSelections.delete(type);
+  tile.classList.remove("has-custom-cursor", "has-error");
+  tile.querySelector(".cursor-source-badge").textContent = "Cyan";
+  tile.querySelector(".cursor-reset-button").hidden = true;
+  tile.querySelector(".cursor-file-input").value = "";
+  tile.querySelector(".cursor-tile-status").textContent = "Included default";
+  cursorSaveStatus.textContent = "";
+  updateCursorChangeCount();
+  await setCursorTilePreview(tile, `ModTemplate2.0/cursors/Cyan/${cursorFileName(type)}`, cursorFileName(type));
+}
+
+function createCursorTile(definition) {
+  const tile = document.createElement("article");
+  const inputId = `cursor-file-${definition.type.toLowerCase()}`;
+  tile.className = "cursor-tile";
+  tile.dataset.cursorType = definition.type;
+  tile.innerHTML = `
+    <input class="cursor-file-input" id="${inputId}" type="file" accept=".cur,.ani">
+    <label class="cursor-dropzone" for="${inputId}">
+      <span class="cursor-preview-frame"><img class="cursor-preview-image" alt="${definition.label} cursor preview"><b aria-hidden="true">＋</b></span>
+      <span class="cursor-tile-copy">
+        <span class="cursor-tile-title"><strong>${definition.label}</strong><small class="cursor-source-badge">Cyan</small></span>
+        <span>${definition.description}</span>
+        <code>${definition.type}</code>
+      </span>
+    </label>
+    <div class="cursor-tile-footer">
+      <span class="cursor-tile-status" role="status" aria-live="polite">Included default</span>
+      <button class="cursor-reset-button" type="button" hidden>Use Cyan</button>
+    </div>`;
+
+  const input = tile.querySelector(".cursor-file-input");
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file) {
+      selectCursorFile(tile, file);
+    }
+  });
+  tile.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    tile.classList.add("is-dragging");
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "copy";
+    }
+  });
+  tile.addEventListener("dragleave", (event) => {
+    if (!tile.contains(event.relatedTarget)) {
+      tile.classList.remove("is-dragging");
+    }
+  });
+  tile.addEventListener("drop", (event) => {
+    event.preventDefault();
+    tile.classList.remove("is-dragging");
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      selectCursorFile(tile, file);
+    }
+  });
+  tile.querySelector(".cursor-reset-button").addEventListener("click", () => resetCursorTile(tile));
+  setCursorTilePreview(tile, `ModTemplate2.0/cursors/Cyan/${cursorFileName(definition.type)}`, cursorFileName(definition.type))
+    .catch(() => {
+      tile.querySelector(".cursor-tile-status").textContent = "Default preview unavailable";
+      tile.classList.add("has-error");
+    });
+  return tile;
+}
+
+function renderCursorEditor() {
+  if (cursorGroupsContainer.childElementCount > 0) {
+    return;
+  }
+  CURSOR_GROUPS.forEach((group) => {
+    const section = document.createElement("section");
+    section.className = "cursor-group";
+    section.dataset.group = group.key;
+    const heading = document.createElement("div");
+    heading.className = "cursor-group-heading";
+    heading.innerHTML = `<div><p class="section-index">${group.key}</p><h3>${group.name} <span>(${group.items.length})</span></h3></div><p>Click a tile or drop a Windows cursor file onto it.</p>`;
+    const grid = document.createElement("div");
+    grid.className = "cursor-grid";
+    group.items.forEach(([type]) => {
+      grid.append(createCursorTile(cursorDefinitions.find((definition) => definition.type === type)));
+    });
+    section.append(heading, grid);
+    cursorGroupsContainer.append(section);
+  });
+  updateCursorChangeCount();
+}
+
+function updateSavedCursorSummary() {
+  const saved = modBuildState.cursors;
+  savedCursorsBox.hidden = !saved;
+  savedCursorsSummary.textContent = saved
+    ? `48 roles · ${saved.customCount} custom · ${48 - saved.customCount} Cyan defaults`
+    : "";
+  cursorCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
+  updateCreateModAvailability();
+}
+
+cursorSaveButton.addEventListener("click", () => {
+  const items = cursorDefinitions.map((definition) => {
+    const selection = cursorSelections.get(definition.type);
+    const extension = selection?.extension || "cur";
+    return {
+      file: selection?.file || null,
+      path: selection
+        ? `cursors/Custom/${cursorFileName(definition.type, extension)}`
+        : `cursors/Cyan/${cursorFileName(definition.type)}`,
+      source: selection ? "upload" : "included",
+      type: definition.type
+    };
+  });
+  modBuildState.cursors = {
+    customCount: cursorSelections.size,
+    items
+  };
+  updateSavedCursorSummary();
+  cursorSaveStatus.textContent = `48 cursor roles saved for this visit · ${cursorSelections.size} custom`;
+});
+
 const musicTrackList = document.querySelector("#music-track-list");
 const addMusicTrackButton = document.querySelector("#add-music-track");
 const saveMusicTracksButton = document.querySelector("#save-music-tracks");
@@ -1171,7 +1614,8 @@ function hasSavedModOptions() {
   const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic;
+  const hasSavedCursors = Boolean(modBuildState.cursors);
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -1379,6 +1823,24 @@ function renderBuildSummary() {
     };
   });
   appendBuildSummaryGroup("Music", "Saved background music tracks", musicItems);
+
+  const cursorItems = modBuildState.cursors
+    ? [{
+      title: "Cursor collection",
+      preview: {
+        alt: "Cyan cursor collection preview",
+        kind: "image",
+        url: "ModTemplate2.0/cursors/Cyan/preview.png"
+      },
+      details: [
+        { label: "Cursor roles", value: String(modBuildState.cursors.items.length) },
+        { label: "Custom files", value: String(modBuildState.cursors.customCount) },
+        { label: "Cyan defaults", value: String(modBuildState.cursors.items.length - modBuildState.cursors.customCount) },
+        { label: "Accepted formats", value: ".cur and .ani" }
+      ]
+    }]
+    : [];
+  appendBuildSummaryGroup("Cursors", "Saved pointer collection", cursorItems);
 
 }
 
@@ -1700,12 +2162,13 @@ saveMusicTracksButton.addEventListener("click", () => {
 renderThemeEditor();
 renderAppIconEditor();
 renderWallpaperEditor();
+renderCursorEditor();
 
 if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#wallpaper-editor", "#music-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#wallpaper-editor", "#music-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -1714,6 +2177,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#wallpaper-editor", "#mus
     "#app-icon-editor": appIconEditorView,
     "#wallpaper-editor": wallpaperEditorView,
     "#music-editor": musicEditorView,
+    "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
   };
   let initialView = initialViews[window.location.hash];
