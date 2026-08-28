@@ -2850,6 +2850,55 @@ h1 em {
   gap: 10px;
 }
 
+.build-summary-content {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(180px, 0.46fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 22px;
+}
+
+.build-summary-content:not(:has(.build-summary-media)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.build-summary-media {
+  width: 100%;
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: #050407;
+}
+
+.build-summary-media[data-shape="square"] {
+  max-width: 190px;
+  aspect-ratio: 1;
+}
+
+.build-summary-media img,
+.build-summary-media video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.build-summary-media[data-kind="audio"] {
+  min-height: 76px;
+  padding: 14px;
+  display: grid;
+  place-items: center;
+  aspect-ratio: auto;
+  background: color-mix(in hsl, var(--surface-strong) 88%, black);
+}
+
+.build-summary-media audio {
+  width: 100%;
+  display: block;
+  accent-color: var(--red);
+}
+
 .build-summary-list dl > div {
   display: grid;
   grid-template-columns: minmax(120px, 0.32fr) minmax(0, 1fr);
@@ -3522,6 +3571,7 @@ h1 em {
   }
 
   .build-summary-list article,
+  .build-summary-content,
   .build-summary-list dl > div {
     grid-template-columns: 1fr;
   }

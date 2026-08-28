@@ -1200,6 +1200,47 @@ function appendBuildSummaryGroup(title, description, items) {
     const entry = document.createElement("article");
     const entryTitle = document.createElement("h4");
     entryTitle.textContent = item.title;
+    const entryContent = document.createElement("div");
+    entryContent.className = "build-summary-content";
+
+    if (item.preview) {
+      const preview = document.createElement("figure");
+      preview.className = "build-summary-media";
+      preview.dataset.kind = item.preview.kind;
+      if (item.preview.shape) {
+        preview.dataset.shape = item.preview.shape;
+      }
+
+      if (item.preview.kind === "video") {
+        const video = document.createElement("video");
+        video.src = item.preview.url;
+        video.muted = true;
+        video.loop = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute("aria-label", item.preview.alt);
+        video.play().catch(() => {});
+        preview.append(video);
+      } else if (item.preview.kind === "audio") {
+        const audio = document.createElement("audio");
+        audio.src = item.preview.url;
+        audio.controls = true;
+        audio.setAttribute("controlslist", "nodownload noplaybackrate noremoteplayback");
+        audio.disableRemotePlayback = true;
+        audio.preload = "metadata";
+        audio.setAttribute("aria-label", item.preview.alt);
+        preview.append(audio);
+      } else {
+        const image = document.createElement("img");
+        image.src = item.preview.url;
+        image.alt = item.preview.alt;
+        image.loading = "lazy";
+        preview.append(image);
+      }
+
+      entryContent.append(preview);
+    }
+
     const details = document.createElement("dl");
     item.details.forEach(({ label, value }) => {
       const row = document.createElement("div");
@@ -1210,7 +1251,8 @@ function appendBuildSummaryGroup(title, description, items) {
       row.append(term, descriptionValue);
       details.append(row);
     });
-    entry.append(entryTitle, details);
+    entryContent.append(details);
+    entry.append(entryTitle, entryContent);
     list.append(entry);
   });
 
@@ -1218,12 +1260,22 @@ function appendBuildSummaryGroup(title, description, items) {
   buildSummaryGroups.append(group);
 }
 
+let buildReviewObjectUrls = [];
+
 function renderBuildSummary() {
+  buildReviewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+  buildReviewObjectUrls = [];
   buildSummaryGroups.replaceChildren();
 
   const appIconItems = savedAppIconValue
     ? [{
       title: "App icon",
+      preview: {
+        alt: `Preview of ${savedAppIconValue.name}`,
+        kind: "image",
+        shape: "square",
+        url: savedAppIconValue.previewUrl
+      },
       details: [
         { label: "File", value: savedAppIconValue.name },
         { label: "Dimensions", value: `${savedAppIconValue.width}×${savedAppIconValue.height}` },
@@ -1284,6 +1336,11 @@ function renderBuildSummary() {
       }
       return {
         title: `${mode[0].toUpperCase() + mode.slice(1)} mode`,
+        preview: {
+          alt: `${mode} wallpaper preview for ${selection.name}`,
+          kind: selection.kind,
+          url: selection.previewUrl
+        },
         details
       };
     });
@@ -1307,7 +1364,19 @@ function renderBuildSummary() {
     } else {
       details.push({ label: "Saved audio", value: "No media selected" });
     }
-    return { title: `Track ${index + 1}`, details };
+    const audioPreviewUrl = track.media ? URL.createObjectURL(track.media.file) : null;
+    if (audioPreviewUrl) {
+      buildReviewObjectUrls.push(audioPreviewUrl);
+    }
+    return {
+      title: `Track ${index + 1}`,
+      preview: track.media ? {
+        alt: `Audio preview for ${track.songName}`,
+        kind: "audio",
+        url: audioPreviewUrl
+      } : null,
+      details
+    };
   });
   appendBuildSummaryGroup("Music", "Saved background music tracks", musicItems);
 
