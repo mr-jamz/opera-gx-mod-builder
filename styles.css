@@ -997,9 +997,15 @@ h1 em {
 
 .wallpaper-mode-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 18px;
   border-bottom: 1px solid var(--line);
+}
+
+#wallpaper-mobile-dark-tab {
+  margin-left: 12px;
+  border-left: 1px solid var(--line);
 }
 
 .wallpaper-mode-tab {
@@ -2689,6 +2695,85 @@ h1 em {
   color: var(--muted);
   font-size: 0.66rem;
   line-height: 1.5;
+}
+
+.desktop-wallpaper-only[hidden] {
+  display: none !important;
+}
+
+.mobile-wallpaper-ui {
+  display: none;
+}
+
+.speed-dial-preview.is-mobile-preview {
+  width: min(100%, 350px);
+  margin-inline: auto;
+  aspect-ratio: 9 / 19.5;
+  border: 8px solid color-mix(in hsl, var(--speed-text) 18%, #08080b);
+  border-radius: 42px;
+  background: var(--speed-bg);
+  box-shadow: 0 28px 70px rgb(0 0 0 / 0.48), 0 0 30px color-mix(in hsl, var(--speed-accent) 12%, transparent);
+}
+
+.speed-dial-preview.is-mobile-preview .speed-wallpaper-media {
+  z-index: 0;
+}
+
+.speed-dial-preview.is-mobile-preview::after {
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.22), transparent 24%, transparent 76%, rgb(0 0 0 / 0.2));
+}
+
+.speed-dial-preview.is-mobile-preview .speed-browser-topbar,
+.speed-dial-preview.is-mobile-preview .speed-toolbar,
+.speed-dial-preview.is-mobile-preview .speed-bookmarks,
+.speed-dial-preview.is-mobile-preview .speed-page,
+.speed-dial-preview.is-mobile-preview .speed-dial-effects-vignette {
+  display: none;
+}
+
+.speed-dial-preview.is-mobile-preview .mobile-wallpaper-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  pointer-events: none;
+}
+
+.mobile-speaker {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 34%;
+  height: 20px;
+  border-radius: 999px;
+  background: #050507;
+  transform: translateX(-50%);
+}
+
+.mobile-status {
+  position: absolute;
+  top: 15px;
+  right: 18px;
+  left: 18px;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  font: 700 0.54rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.8);
+}
+
+.mobile-home-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  width: 34%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.88);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.55);
+  transform: translateX(-50%);
 }
 
 .creator-heading {

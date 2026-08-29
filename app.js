@@ -730,11 +730,16 @@ const saveWallpaperButtonLabel = saveWallpaperButton.querySelector("span");
 const wallpaperSaveStatus = document.querySelector("#wallpaper-save-status");
 const wallpaperPreview = document.querySelector("#wallpaper-preview");
 const wallpaperPreviewMode = document.querySelector("#wallpaper-preview-mode");
+const wallpaperPreviewHeading = document.querySelector("#speed-dial-preview-heading");
+const wallpaperPresetLabel = document.querySelector("#wallpaper-preset-label");
+const desktopWallpaperControls = document.querySelectorAll(".desktop-wallpaper-only");
 const wallpaperPreviewImage = document.querySelector("#speed-wallpaper-image");
 const wallpaperPreviewVideo = document.querySelector("#speed-wallpaper-video");
 const wallpaperSelections = {
   dark: null,
-  light: null
+  light: null,
+  "mobile-dark": null,
+  "mobile-light": null
 };
 
 const includedWallpaperPresets = {
@@ -757,31 +762,68 @@ const includedWallpaperPresets = {
       name: "light_logo_animated.webm",
       url: "ModTemplate2.0/wallpaper/light_logo_animated.webm"
     }
+  },
+  "mobile-dark": {
+    image: {
+      name: "dark_logo.png",
+      url: "ModTemplate2.0/wallpaper/dark_logo.png"
+    },
+    video: {
+      name: "dark_logo_animated_mobile.mp4",
+      url: "ModTemplate2.0/wallpaper/dark_logo_animated_mobile.mp4"
+    }
+  },
+  "mobile-light": {
+    image: {
+      name: "light_logo.png",
+      url: "ModTemplate2.0/wallpaper/light_logo.png"
+    },
+    video: {
+      name: "light_logo_animated_mobile.mp4",
+      url: "ModTemplate2.0/wallpaper/light_logo_animated_mobile.mp4"
+    }
   }
 };
 
 const savedWallpaperSelections = {
   dark: null,
-  light: null
+  light: null,
+  "mobile-dark": null,
+  "mobile-light": null
 };
 
 const savedWallpaperSummaries = {
   dark: document.querySelector("#saved-dark-wallpaper-summary"),
-  light: document.querySelector("#saved-light-wallpaper-summary")
+  light: document.querySelector("#saved-light-wallpaper-summary"),
+  "mobile-dark": document.querySelector("#saved-mobile-dark-wallpaper-summary"),
+  "mobile-light": document.querySelector("#saved-mobile-light-wallpaper-summary")
 };
 const savedWallpaperBox = document.querySelector("#saved-wallpaper-box");
 const wallpaperCategoryCard = document.querySelector('[data-category="Wallpaper editor"]');
 
 let activeWallpaperMode = "dark";
 
+function isMobileWallpaperMode(mode) {
+  return mode.startsWith("mobile-");
+}
+
+function getWallpaperThemeMode(mode) {
+  return mode.endsWith("light") ? "light" : "dark";
+}
+
+function getWallpaperModeLabel(mode) {
+  return `${isMobileWallpaperMode(mode) ? "Mobile" : "Desktop"} ${getWallpaperThemeMode(mode)}`;
+}
+
 function getWallpaperTheme(mode) {
-  return savedThemeValues[mode] || themeValues[mode];
+  const themeMode = getWallpaperThemeMode(mode);
+  return savedThemeValues[themeMode] || themeValues[themeMode];
 }
 
 function updateSavedWallpaperSummary(mode) {
   const summary = savedWallpaperSummaries[mode];
   const selection = savedWallpaperSelections[mode];
-  const speedDial = savedSpeedDialEffectValues[mode];
+  const speedDial = isMobileWallpaperMode(mode) ? null : savedSpeedDialEffectValues[mode];
   const enabledSpeedDialCount = speedDial
     ? Object.values(speedDial.enabled).filter(Boolean).length
     : 0;
@@ -790,7 +832,7 @@ function updateSavedWallpaperSummary(mode) {
     : `${enabledSpeedDialCount} optional wallpaper settings`;
   summary.hidden = !selection;
   summary.textContent = selection
-    ? `${mode[0].toUpperCase() + mode.slice(1)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name} · ${speedDialLabel}`
+    ? `${getWallpaperModeLabel(mode)} · ${selection.kind === "video" ? "Animated" : "Static"} · ${selection.name}${speedDial ? ` · ${speedDialLabel}` : ""}`
     : "";
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   savedWallpaperBox.hidden = !hasSavedWallpaper;
@@ -812,7 +854,7 @@ function renderWallpaperMedia() {
   }
 
   wallpaperSelection.hidden = false;
-  wallpaperSelectionMode.textContent = activeWallpaperMode;
+  wallpaperSelectionMode.textContent = getWallpaperModeLabel(activeWallpaperMode).toLowerCase();
   wallpaperFileName.textContent = selection.name;
   wallpaperAnimationNotice.hidden = selection.kind !== "video";
 
@@ -826,15 +868,23 @@ function renderWallpaperMedia() {
 }
 
 function renderWallpaperEditor() {
-  const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
+  const modeLabel = getWallpaperModeLabel(activeWallpaperMode);
+  const themeMode = getWallpaperThemeMode(activeWallpaperMode);
+  const isMobile = isMobileWallpaperMode(activeWallpaperMode);
   const values = getWallpaperTheme(activeWallpaperMode);
-  wallpaperPreview.dataset.mode = activeWallpaperMode;
+  wallpaperPreview.dataset.mode = themeMode;
+  wallpaperPreview.classList.toggle("is-mobile-preview", isMobile);
   wallpaperPreview.style.setProperty("--speed-accent", hslString(values.accent));
   wallpaperPreview.style.setProperty("--speed-secondary-h", values.secondary.h);
   wallpaperPreview.style.setProperty("--speed-secondary-s", `${values.secondary.s}%`);
   wallpaperPreviewMode.textContent = modeLabel;
+  wallpaperPreviewHeading.textContent = isMobile ? "Mobile wallpaper" : "GX Speed Dial";
+  wallpaperPresetLabel.textContent = isMobile ? "Sample mobile wallpapers" : "Sample desktop wallpapers";
+  desktopWallpaperControls.forEach((control) => {
+    control.hidden = isMobile;
+  });
   saveWallpaperButton.disabled = !wallpaperSelections[activeWallpaperMode];
-  saveWallpaperButtonLabel.textContent = `Save ${activeWallpaperMode} wallpaper settings`;
+  saveWallpaperButtonLabel.textContent = `Save ${modeLabel.toLowerCase()} wallpaper`;
 
   wallpaperPresetButtons.forEach((button) => {
     const selection = wallpaperSelections[activeWallpaperMode];
@@ -850,7 +900,9 @@ function renderWallpaperEditor() {
   });
 
   renderWallpaperMedia();
-  renderWallpaperSpeedDialSettings();
+  if (!isMobile) {
+    renderWallpaperSpeedDialSettings();
+  }
 }
 
 wallpaperModeTabs.forEach((tab) => {
@@ -980,19 +1032,24 @@ saveWallpaperButton.addEventListener("click", () => {
   }
 
   savedWallpaperSelections[activeWallpaperMode] = {
+    device: isMobileWallpaperMode(activeWallpaperMode) ? "mobile" : "desktop",
     file: selection.file,
     isObjectUrl: selection.source === "local",
     kind: selection.kind,
+    manifestField: isMobileWallpaperMode(activeWallpaperMode) ? "image_mobile" : "image",
     name: selection.name,
     previewUrl: selection.source === "local" ? URL.createObjectURL(selection.file) : selection.url,
-    source: selection.source
+    source: selection.source,
+    themeMode: getWallpaperThemeMode(activeWallpaperMode)
   };
-  savedSpeedDialEffectValues[activeWallpaperMode] = copySpeedDialEffectValues(
-    speedDialEffectValues[activeWallpaperMode]
-  );
+  if (!isMobileWallpaperMode(activeWallpaperMode)) {
+    savedSpeedDialEffectValues[activeWallpaperMode] = copySpeedDialEffectValues(
+      speedDialEffectValues[activeWallpaperMode]
+    );
+  }
   updateSavedWallpaperSummary(activeWallpaperMode);
-  const modeLabel = activeWallpaperMode[0].toUpperCase() + activeWallpaperMode.slice(1);
-  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper settings saved for this visit`;
+  const modeLabel = getWallpaperModeLabel(activeWallpaperMode);
+  wallpaperSaveStatus.textContent = `${modeLabel} wallpaper saved for this visit`;
 });
 
 const speedDialPosition = document.querySelector("#speed-dial-position");
@@ -1766,11 +1823,13 @@ function renderBuildSummary() {
   const wallpaperItems = Object.entries(savedWallpaperSelections)
     .filter(([, selection]) => selection)
     .map(([mode, selection]) => {
-      const speedDial = savedSpeedDialEffectValues[mode];
+      const speedDial = isMobileWallpaperMode(mode) ? null : savedSpeedDialEffectValues[mode];
       const details = [
+        { label: "Target", value: selection.device === "mobile" ? "Mobile" : "Desktop" },
+        { label: "Manifest field", value: selection.manifestField },
         { label: "Type", value: selection.kind === "video" ? "Animated" : "Static" },
         { label: "File", value: selection.name },
-        { label: "Source", value: selection.source === "included" ? "Sample desktop wallpaper" : "Local upload" }
+        { label: "Source", value: selection.source === "included" ? `Sample ${selection.device} wallpaper` : "Local upload" }
       ];
       if (speedDial) {
         const enabledCount = Object.values(speedDial.enabled).filter(Boolean).length;
@@ -1801,9 +1860,9 @@ function renderBuildSummary() {
         }
       }
       return {
-        title: `${mode[0].toUpperCase() + mode.slice(1)} mode`,
+        title: getWallpaperModeLabel(mode),
         preview: {
-          alt: `${mode} wallpaper preview for ${selection.name}`,
+          alt: `${getWallpaperModeLabel(mode)} wallpaper preview for ${selection.name}`,
           kind: selection.kind,
           url: selection.previewUrl
         },

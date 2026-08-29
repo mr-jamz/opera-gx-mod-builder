@@ -6,8 +6,8 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260828-17">
-    <script src="app.js?v=20260828-17" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260828-18">
+    <script src="app.js?v=20260828-18" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -101,6 +101,8 @@
                 <strong>Saved wallpaper settings</strong>
                 <span class="saved-wallpaper-summary" id="saved-dark-wallpaper-summary" hidden></span>
                 <span class="saved-wallpaper-summary" id="saved-light-wallpaper-summary" hidden></span>
+                <span class="saved-wallpaper-summary" id="saved-mobile-dark-wallpaper-summary" hidden></span>
+                <span class="saved-wallpaper-summary" id="saved-mobile-light-wallpaper-summary" hidden></span>
               </div>
             </div>
 
@@ -325,8 +327,10 @@
         </div>
 
         <div class="wallpaper-mode-tabs" role="tablist" aria-label="Wallpaper preview mode">
-          <button class="wallpaper-mode-tab is-active" id="wallpaper-dark-tab" type="button" role="tab" aria-selected="true" data-wallpaper-mode="dark">Dark mode</button>
-          <button class="wallpaper-mode-tab" id="wallpaper-light-tab" type="button" role="tab" aria-selected="false" data-wallpaper-mode="light">Light mode</button>
+          <button class="wallpaper-mode-tab is-active" id="wallpaper-dark-tab" type="button" role="tab" aria-selected="true" data-wallpaper-mode="dark">Desktop dark</button>
+          <button class="wallpaper-mode-tab" id="wallpaper-light-tab" type="button" role="tab" aria-selected="false" data-wallpaper-mode="light">Desktop light</button>
+          <button class="wallpaper-mode-tab" id="wallpaper-mobile-dark-tab" type="button" role="tab" aria-selected="false" data-wallpaper-mode="mobile-dark">Mobile dark</button>
+          <button class="wallpaper-mode-tab" id="wallpaper-mobile-light-tab" type="button" role="tab" aria-selected="false" data-wallpaper-mode="mobile-light">Mobile light</button>
         </div>
 
         <div class="wallpaper-workspace">
@@ -344,7 +348,7 @@
             <p class="wallpaper-drop-status" id="wallpaper-drop-status" role="status" aria-live="polite"></p>
 
             <div class="wallpaper-presets">
-              <span>Sample desktop wallpapers</span>
+              <span id="wallpaper-preset-label">Sample desktop wallpapers</span>
               <div>
                 <button type="button" data-wallpaper-preset="image" aria-pressed="false"><b>Static</b><small>PNG</small></button>
                 <button type="button" data-wallpaper-preset="video" aria-pressed="false"><b>Animated</b><small>WEBM</small></button>
@@ -358,17 +362,17 @@
               <button id="clear-wallpaper" type="button">Remove file</button>
             </div>
 
-            <div class="control-divider"></div>
+            <div class="control-divider desktop-wallpaper-only"></div>
 
-            <div class="speed-dial-effects-heading">
+            <div class="speed-dial-effects-heading desktop-wallpaper-only">
               <div>
                 <p class="section-index">START PAGE</p>
                 <h3>Wallpaper settings</h3>
               </div>
             </div>
-            <p class="control-description speed-dial-enable-note">Enable additional settings here to custom tune your wallpaper page</p>
+            <p class="control-description speed-dial-enable-note desktop-wallpaper-only">Enable additional settings here to custom tune your wallpaper page</p>
 
-            <div class="speed-dial-position-control speed-dial-optional-setting" id="speed-dial-position-control" data-speed-dial-setting-row="position">
+            <div class="speed-dial-position-control speed-dial-optional-setting desktop-wallpaper-only" id="speed-dial-position-control" data-speed-dial-setting-row="position">
               <label class="speed-dial-setting-enable" for="enable-speed-dial-position"><input id="enable-speed-dial-position" type="checkbox" data-speed-dial-setting="position"><span id="speed-dial-position-label">Speed Dial position</span></label>
               <button class="speed-dial-position-trigger" id="speed-dial-position" type="button" aria-labelledby="speed-dial-position-label speed-dial-position-value" aria-haspopup="listbox" aria-expanded="false" disabled>
                 <strong id="speed-dial-position-value">Top</strong><i aria-hidden="true"></i>
@@ -381,7 +385,7 @@
               </div>
             </div>
 
-            <div class="speed-dial-color-controls">
+            <div class="speed-dial-color-controls desktop-wallpaper-only">
               <div class="speed-dial-color-setting speed-dial-optional-setting" data-speed-dial-setting-row="textColor">
                 <label class="speed-dial-setting-enable" for="enable-speed-dial-text-color"><input id="enable-speed-dial-text-color" type="checkbox" data-speed-dial-setting="textColor"><span>Text color</span></label>
                 <div><input id="speed-dial-text-color" type="color" value="#ffffff" aria-label="Text color" disabled><output id="speed-dial-text-color-value">#ffffff</output></div>
@@ -392,14 +396,14 @@
               </div>
             </div>
 
-            <div class="speed-dial-range-controls">
+            <div class="speed-dial-range-controls desktop-wallpaper-only">
               <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="backgroundBlur"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-background-blur"><input id="enable-speed-dial-background-blur" type="checkbox" data-speed-dial-setting="backgroundBlur"><span>Background blur</span></label><output id="speed-dial-background-blur-value">0</output></div><input id="speed-dial-background-blur" type="range" min="0" max="100" value="0" aria-label="Background blur" disabled></div>
               <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="backgroundOpacity"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-background-opacity"><input id="enable-speed-dial-background-opacity" type="checkbox" data-speed-dial-setting="backgroundOpacity"><span>Background opacity</span></label><output id="speed-dial-background-opacity-value">50</output></div><input id="speed-dial-background-opacity" type="range" min="0" max="100" value="50" aria-label="Background opacity" disabled></div>
               <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="islandsOpacity"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-islands-opacity"><input id="enable-speed-dial-islands-opacity" type="checkbox" data-speed-dial-setting="islandsOpacity"><span>Islands opacity</span></label><output id="speed-dial-islands-opacity-value">0</output></div><input id="speed-dial-islands-opacity" type="range" min="0" max="100" value="0" aria-label="Islands opacity" disabled></div>
               <div class="speed-dial-range-setting speed-dial-optional-setting" data-speed-dial-setting-row="vignetteStrength"><div><label class="speed-dial-setting-enable" for="enable-speed-dial-vignette-strength"><input id="enable-speed-dial-vignette-strength" type="checkbox" data-speed-dial-setting="vignetteStrength"><span>Vignette strength</span></label><output id="speed-dial-vignette-strength-value">35</output></div><input id="speed-dial-vignette-strength" type="range" min="0" max="100" value="35" aria-label="Vignette strength" disabled></div>
             </div>
 
-            <label class="speed-dial-focus-control" for="speed-dial-focus-mode">
+            <label class="speed-dial-focus-control desktop-wallpaper-only" for="speed-dial-focus-mode">
               <span><strong>Focus mode</strong><small>Reduce start-page distractions</small></span>
               <input id="speed-dial-focus-mode" type="checkbox">
             </label>
@@ -430,6 +434,11 @@
               <div class="speed-wallpaper-media" id="speed-wallpaper-image" aria-hidden="true"></div>
               <video class="speed-wallpaper-media" id="speed-wallpaper-video" muted loop autoplay playsinline hidden></video>
               <div class="speed-dial-effects-vignette" aria-hidden="true"></div>
+              <div class="mobile-wallpaper-ui" aria-hidden="true">
+                <span class="mobile-speaker"></span>
+                <div class="mobile-status"><span>9:41</span><span>● ◒ ▰</span></div>
+                <div class="mobile-home-indicator"></div>
+              </div>
 
               <div class="speed-browser-topbar">
                 <span class="speed-opera-mark" aria-hidden="true"></span>
