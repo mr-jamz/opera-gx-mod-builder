@@ -231,7 +231,7 @@
           <section class="app-icon-controls" aria-labelledby="app-icon-media-heading">
             <p class="section-index">ICON MEDIA</p>
             <h3 id="app-icon-media-heading">Choose an app icon</h3>
-            <p class="control-description">Add the image Opera GX will display for your mod</p>
+            <p class="control-description">This will be the desktop or mobile icon for the application</p>
 
             <input class="wallpaper-file-input" id="app-icon-file" type="file" accept="image/png,image/jpeg">
             <label class="wallpaper-file-button app-icon-dropzone" id="app-icon-dropzone" for="app-icon-file">
@@ -557,7 +557,7 @@
           <div>
             <p class="eyebrow">More modding / Cursors</p>
             <h2 id="cursor-editor-title">Cursor editor</h2>
-            <p class="cursor-editor-intro">Choose a tile to assign a custom cursor role. Cyan cursors are shown only as visual references and are never saved.</p>
+            <p class="cursor-editor-intro">Choose a tile to assign a custom cursor role. Pink cursors are shown only as visual references and are never saved.</p>
           </div>
           <p class="schema-chip">48 roles</p>
         </div>
@@ -576,6 +576,81 @@
             <p class="theme-save-status cursor-save-status" id="cursor-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-cursors" type="button" disabled><span>Save custom cursors</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view mod-icon-editor" id="mod-icon-editor" aria-labelledby="mod-icon-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-mod-icon" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">Final setup / Mod icon</p>
+            <h2 id="mod-icon-editor-title">Mod icon editor</h2>
+          </div>
+          <p class="schema-chip">512×512 PNG</p>
+        </div>
+
+        <div class="app-icon-workspace">
+          <section class="app-icon-controls" aria-labelledby="mod-icon-media-heading">
+            <p class="section-index">MOD ICON MEDIA</p>
+            <h3 id="mod-icon-media-heading">Choose your installed mod preview</h3>
+            <p class="control-description">This 512×512 image identifies your mod after it is installed in Opera GX</p>
+
+            <input class="wallpaper-file-input" id="mod-icon-file" type="file" accept="image/png,image/jpeg,image/webp">
+            <label class="wallpaper-file-button app-icon-dropzone" id="mod-icon-dropzone" for="mod-icon-file">
+              <span><strong>Drop icon here</strong><small>or choose a local file</small></span>
+              <b aria-hidden="true">＋</b>
+            </label>
+            <p class="wallpaper-file-types">PNG · JPG · WEBP</p>
+            <p class="app-icon-size-note">Output is always saved as icon_512.png</p>
+            <p class="wallpaper-drop-status" id="mod-icon-drop-status" role="status" aria-live="polite"></p>
+
+            <div class="wallpaper-selection app-icon-selection" id="mod-icon-selection" hidden>
+              <span>Selected mod icon</span>
+              <strong id="mod-icon-file-name"></strong>
+              <small id="mod-icon-dimensions"></small>
+              <button id="reset-mod-icon" type="button">Restore default icon</button>
+            </div>
+
+            <section class="app-icon-adjustments" id="mod-icon-adjustments" aria-labelledby="mod-icon-adjustments-heading" hidden>
+              <div>
+                <span class="section-index">ADJUST ICON</span>
+                <h4 id="mod-icon-adjustments-heading">Resize and position</h4>
+              </div>
+
+              <label class="app-icon-sizing-control" for="mod-icon-sizing">
+                <span>Sizing</span>
+                <select id="mod-icon-sizing">
+                  <option value="crop">Crop to fill</option>
+                  <option value="fit">Fit inside</option>
+                </select>
+              </label>
+
+              <div class="app-icon-range-controls">
+                <label for="mod-icon-zoom"><span>Zoom <output id="mod-icon-zoom-value">100%</output></span><input id="mod-icon-zoom" type="range" min="50" max="250" value="100"></label>
+                <label for="mod-icon-position-x"><span>Horizontal position <output id="mod-icon-position-x-value">0</output></span><input id="mod-icon-position-x" type="range" min="-100" max="100" value="0"></label>
+                <label for="mod-icon-position-y"><span>Vertical position <output id="mod-icon-position-y-value">0</output></span><input id="mod-icon-position-y" type="range" min="-100" max="100" value="0"></label>
+                <label for="mod-icon-corner-radius"><span>Corner curve <output id="mod-icon-corner-radius-value">0%</output></span><input id="mod-icon-corner-radius" type="range" min="0" max="50" value="0"></label>
+              </div>
+              <p>Curved corners are exported as transparent pixels</p>
+            </section>
+
+            <button class="save-theme-button" id="save-mod-icon" type="button" disabled><span>Save and continue</span><b aria-hidden="true">→</b></button>
+            <p class="theme-save-status" id="mod-icon-save-status" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="app-icon-preview-panel" aria-labelledby="mod-icon-preview-heading">
+            <div>
+              <p class="section-index">LIVE PREVIEW</p>
+              <h3 id="mod-icon-preview-heading">Installed mod icon</h3>
+            </div>
+            <div class="app-icon-preview-stage">
+              <div class="app-icon-preview-frame">
+                <span class="app-icon-preview-placeholder" id="mod-icon-preview-placeholder" aria-hidden="true"><i></i></span>
+                <canvas id="mod-icon-preview-canvas" width="512" height="512" aria-label="Adjusted mod icon preview" hidden></canvas>
+              </div>
+              <p id="mod-icon-preview-name">Loading icon_512.png</p>
+            </div>
+          </section>
         </div>
       </section>
 

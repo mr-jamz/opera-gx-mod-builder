@@ -488,6 +488,7 @@ h1 em {
 
 .theme-editor.is-active,
 .app-icon-editor.is-active,
+.mod-icon-editor.is-active,
 .wallpaper-editor.is-active,
 .speed-dial-effects-editor.is-active,
 .music-editor.is-active,
@@ -3552,6 +3553,7 @@ h1 em {
 
   .theme-editor.is-active,
   .app-icon-editor.is-active,
+  .mod-icon-editor.is-active,
   .wallpaper-editor.is-active,
   .speed-dial-effects-editor.is-active,
   .music-editor.is-active,

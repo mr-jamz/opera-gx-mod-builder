@@ -2,6 +2,7 @@ const landingView = document.querySelector("#home");
 const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
 const appIconEditorView = document.querySelector("#app-icon-editor");
+const modIconEditorView = document.querySelector("#mod-icon-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
@@ -11,6 +12,7 @@ const startButton = document.querySelector("#start-modding");
 const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
 const backAppIconButton = document.querySelector("#back-app-icon");
+const backModIconButton = document.querySelector("#back-mod-icon");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
 const backCursorsButton = document.querySelector("#back-cursors");
@@ -152,9 +154,10 @@ createModButton.addEventListener("click", () => {
   if (!hasSavedModOptions()) {
     return;
   }
-  renderBuildSummary();
-  switchView(creatorView, buildReviewView);
-  window.history.replaceState(null, "", "#build-review");
+  ensureDefaultModIcon().catch(() => {});
+  renderModIconEditor();
+  switchView(creatorView, modIconEditorView);
+  window.history.replaceState(null, "", "#mod-icon-editor");
 });
 
 backButton.addEventListener("click", () => {
@@ -214,6 +217,11 @@ backWallpaperButton.addEventListener("click", () => {
 
 backAppIconButton.addEventListener("click", () => {
   switchView(appIconEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backModIconButton.addEventListener("click", () => {
+  switchView(modIconEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -712,6 +720,286 @@ saveAppIconButton.addEventListener("click", async () => {
     appIconSaveStatus.textContent = error.message;
   } finally {
     saveAppIconButton.disabled = !appIconSelectionValue;
+  }
+});
+
+const modIconFileInput = document.querySelector("#mod-icon-file");
+const modIconDropzone = document.querySelector("#mod-icon-dropzone");
+const modIconDropStatus = document.querySelector("#mod-icon-drop-status");
+const modIconSelection = document.querySelector("#mod-icon-selection");
+const modIconFileName = document.querySelector("#mod-icon-file-name");
+const modIconDimensions = document.querySelector("#mod-icon-dimensions");
+const resetModIconButton = document.querySelector("#reset-mod-icon");
+const saveModIconButton = document.querySelector("#save-mod-icon");
+const modIconSaveStatus = document.querySelector("#mod-icon-save-status");
+const modIconAdjustments = document.querySelector("#mod-icon-adjustments");
+const modIconSizing = document.querySelector("#mod-icon-sizing");
+const modIconPreviewCanvas = document.querySelector("#mod-icon-preview-canvas");
+const modIconPreviewPlaceholder = document.querySelector("#mod-icon-preview-placeholder");
+const modIconPreviewName = document.querySelector("#mod-icon-preview-name");
+const modIconAdjustmentControls = [
+  {
+    input: document.querySelector("#mod-icon-zoom"),
+    key: "zoom",
+    output: document.querySelector("#mod-icon-zoom-value"),
+    suffix: "%"
+  },
+  {
+    input: document.querySelector("#mod-icon-position-x"),
+    key: "positionX",
+    output: document.querySelector("#mod-icon-position-x-value"),
+    suffix: ""
+  },
+  {
+    input: document.querySelector("#mod-icon-position-y"),
+    key: "positionY",
+    output: document.querySelector("#mod-icon-position-y-value"),
+    suffix: ""
+  },
+  {
+    input: document.querySelector("#mod-icon-corner-radius"),
+    key: "cornerRadius",
+    output: document.querySelector("#mod-icon-corner-radius-value"),
+    suffix: "%"
+  }
+];
+
+const defaultModIcon = {
+  name: "icon_512.png",
+  url: "ModTemplate2.0/icon_512.png"
+};
+let modIconSelectionValue = null;
+let savedModIconValue = null;
+let modIconDefaultLoadPromise = null;
+
+function releaseUnsavedModIconSelection() {
+  if (modIconSelectionValue?.isObjectUrl && modIconSelectionValue.previewUrl !== savedModIconValue?.previewUrl) {
+    URL.revokeObjectURL(modIconSelectionValue.previewUrl);
+  }
+}
+
+function renderAdjustedModIcon() {
+  const selection = modIconSelectionValue;
+  const context = modIconPreviewCanvas.getContext("2d");
+  context.clearRect(0, 0, 512, 512);
+
+  if (!selection) {
+    return;
+  }
+
+  const adjustments = selection.adjustments;
+  const baseScale = adjustments.sizing === "fit"
+    ? Math.min(512 / selection.width, 512 / selection.height)
+    : Math.max(512 / selection.width, 512 / selection.height);
+  const scale = baseScale * (adjustments.zoom / 100);
+  const drawWidth = selection.width * scale;
+  const drawHeight = selection.height * scale;
+  const drawX = (512 - drawWidth) / 2 + adjustments.positionX * 2.56;
+  const drawY = (512 - drawHeight) / 2 + adjustments.positionY * 2.56;
+  const radius = 512 * (adjustments.cornerRadius / 100);
+
+  context.save();
+  addRoundedRectanglePath(context, 0, 0, 512, 512, radius);
+  context.clip();
+  context.drawImage(selection.sourceImage, drawX, drawY, drawWidth, drawHeight);
+  context.restore();
+}
+
+function renderModIconEditor() {
+  const selection = modIconSelectionValue;
+  modIconSelection.hidden = !selection;
+  modIconAdjustments.hidden = !selection;
+  saveModIconButton.disabled = !selection;
+  modIconFileName.textContent = selection?.name || "";
+  modIconDimensions.textContent = selection ? `Original ${selection.width}×${selection.height} · Output 512×512 PNG` : "";
+  modIconPreviewCanvas.hidden = !selection;
+  modIconPreviewPlaceholder.hidden = Boolean(selection);
+  modIconPreviewName.textContent = selection?.name || "Loading icon_512.png";
+
+  if (selection) {
+    modIconSizing.value = selection.adjustments.sizing;
+    modIconAdjustmentControls.forEach(({ input, key, output, suffix }) => {
+      input.value = selection.adjustments[key];
+      output.textContent = `${selection.adjustments[key]}${suffix}`;
+    });
+  }
+
+  renderAdjustedModIcon();
+}
+
+function selectDefaultModIcon(force = false) {
+  if (!force && modIconSelectionValue) {
+    return Promise.resolve(modIconSelectionValue);
+  }
+  if (!force && modIconDefaultLoadPromise) {
+    return modIconDefaultLoadPromise;
+  }
+
+  modIconDefaultLoadPromise = new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => {
+      releaseUnsavedModIconSelection();
+      modIconSelectionValue = {
+        adjustments: createDefaultAppIconAdjustments(),
+        file: null,
+        height: image.naturalHeight,
+        isObjectUrl: false,
+        name: defaultModIcon.name,
+        previewUrl: defaultModIcon.url,
+        source: "default",
+        sourceImage: image,
+        width: image.naturalWidth
+      };
+      modIconDropStatus.textContent = "Default mod icon ready for preview";
+      modIconSaveStatus.textContent = "";
+      renderModIconEditor();
+      resolve(modIconSelectionValue);
+    }, { once: true });
+    image.addEventListener("error", () => {
+      modIconDropStatus.textContent = "The default icon_512.png could not be opened";
+      reject(new Error("The default mod icon could not be opened"));
+    }, { once: true });
+    image.src = defaultModIcon.url;
+  }).finally(() => {
+    modIconDefaultLoadPromise = null;
+  });
+
+  return modIconDefaultLoadPromise;
+}
+
+function ensureDefaultModIcon() {
+  return selectDefaultModIcon(false);
+}
+
+function selectModIcon(file) {
+  const validTypes = ["image/png", "image/jpeg", "image/webp"];
+  if (!file || !validTypes.includes(file.type)) {
+    modIconDropStatus.textContent = "Choose a PNG, JPG, or WEBP image";
+    return;
+  }
+
+  const previewUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.addEventListener("load", () => {
+    releaseUnsavedModIconSelection();
+    modIconSelectionValue = {
+      adjustments: createDefaultAppIconAdjustments(),
+      file,
+      height: image.naturalHeight,
+      isObjectUrl: true,
+      name: file.name,
+      previewUrl,
+      source: "local",
+      sourceImage: image,
+      width: image.naturalWidth
+    };
+    modIconDropStatus.textContent = image.naturalWidth === 512 && image.naturalHeight === 512
+      ? "Icon ready for preview"
+      : `Icon loaded at ${image.naturalWidth}×${image.naturalHeight} · adjust the 512×512 crop below`;
+    modIconSaveStatus.textContent = "";
+    renderModIconEditor();
+  }, { once: true });
+  image.addEventListener("error", () => {
+    URL.revokeObjectURL(previewUrl);
+    modIconDropStatus.textContent = "This image could not be opened";
+  }, { once: true });
+  image.src = previewUrl;
+}
+
+modIconSizing.addEventListener("change", () => {
+  if (!modIconSelectionValue) {
+    return;
+  }
+  modIconSelectionValue.adjustments.sizing = modIconSizing.value;
+  modIconSaveStatus.textContent = "";
+  renderModIconEditor();
+});
+
+modIconAdjustmentControls.forEach(({ input, key }) => {
+  input.addEventListener("input", () => {
+    if (!modIconSelectionValue) {
+      return;
+    }
+    modIconSelectionValue.adjustments[key] = Number(input.value);
+    modIconSaveStatus.textContent = "";
+    renderModIconEditor();
+  });
+});
+
+modIconFileInput.addEventListener("change", () => {
+  selectModIcon(modIconFileInput.files[0]);
+  modIconFileInput.value = "";
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  modIconDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    modIconDropzone.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  modIconDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    modIconDropzone.classList.remove("is-dragging");
+  });
+});
+
+modIconDropzone.addEventListener("drop", (event) => {
+  selectModIcon(event.dataTransfer.files[0]);
+});
+
+resetModIconButton.addEventListener("click", () => {
+  selectDefaultModIcon(true).catch(() => {});
+});
+
+function exportAdjustedModIcon() {
+  return new Promise((resolve, reject) => {
+    modIconPreviewCanvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("The adjusted mod icon could not be exported"));
+        return;
+      }
+      resolve(blob);
+    }, "image/png");
+  });
+}
+
+saveModIconButton.addEventListener("click", async () => {
+  if (!modIconSelectionValue) {
+    return;
+  }
+
+  saveModIconButton.disabled = true;
+  modIconSaveStatus.textContent = "Preparing icon_512.png";
+
+  try {
+    const blob = await exportAdjustedModIcon();
+    const outputFile = new File([blob], "icon_512.png", { type: "image/png" });
+    const outputUrl = URL.createObjectURL(outputFile);
+
+    if (savedModIconValue?.isObjectUrl) {
+      URL.revokeObjectURL(savedModIconValue.previewUrl);
+    }
+    savedModIconValue = {
+      adjustments: { ...modIconSelectionValue.adjustments },
+      file: outputFile,
+      height: 512,
+      isObjectUrl: true,
+      name: "icon_512.png",
+      originalName: modIconSelectionValue.name,
+      previewUrl: outputUrl,
+      source: modIconSelectionValue.source,
+      width: 512
+    };
+    modIconSaveStatus.textContent = "icon_512.png saved for this visit";
+    renderBuildSummary();
+    switchView(modIconEditorView, buildReviewView);
+    window.history.replaceState(null, "", "#build-review");
+  } catch (error) {
+    modIconSaveStatus.textContent = error.message;
+  } finally {
+    saveModIconButton.disabled = !modIconSelectionValue;
   }
 });
 
@@ -1429,7 +1717,7 @@ async function loadCursorPreview(source, fileName) {
     ? await source.arrayBuffer()
     : await fetch(source).then((response) => {
       if (!response.ok) {
-        throw new Error("The included Cyan cursor could not be loaded");
+        throw new Error("The included Pink cursor could not be loaded");
       }
       return response.arrayBuffer();
     });
@@ -1522,13 +1810,13 @@ async function resetCursorTile(tile) {
   const type = tile.dataset.cursorType;
   cursorSelections.delete(type);
   tile.classList.remove("has-custom-cursor", "has-error");
-  tile.querySelector(".cursor-source-badge").textContent = "Cyan";
+  tile.querySelector(".cursor-source-badge").textContent = "Pink";
   tile.querySelector(".cursor-reset-button").hidden = true;
   tile.querySelector(".cursor-file-input").value = "";
   tile.querySelector(".cursor-tile-status").textContent = "Included default";
   cursorSaveStatus.textContent = "";
   updateCursorChangeCount();
-  await setCursorTilePreview(tile, `ModTemplate2.0/cursors/Cyan/${cursorFileName(type)}`, cursorFileName(type));
+  await setCursorTilePreview(tile, `ModTemplate2.0/cursors/Pink/${cursorFileName(type)}`, cursorFileName(type));
 }
 
 function createCursorTile(definition) {
@@ -1541,14 +1829,14 @@ function createCursorTile(definition) {
     <label class="cursor-dropzone" for="${inputId}">
       <span class="cursor-preview-frame"><img class="cursor-preview-image" alt="${definition.label} cursor preview"><b aria-hidden="true">＋</b></span>
       <span class="cursor-tile-copy">
-        <span class="cursor-tile-title"><strong>${definition.label}</strong><small class="cursor-source-badge">Cyan</small></span>
+        <span class="cursor-tile-title"><strong>${definition.label}</strong><small class="cursor-source-badge">Pink</small></span>
         <span>${definition.description}</span>
         <code>${definition.type}</code>
       </span>
     </label>
     <div class="cursor-tile-footer">
       <span class="cursor-tile-status" role="status" aria-live="polite">Included default</span>
-      <button class="cursor-reset-button" type="button" hidden>Use Cyan</button>
+      <button class="cursor-reset-button" type="button" hidden>Use Pink</button>
     </div>`;
 
   const input = tile.querySelector(".cursor-file-input");
@@ -1579,7 +1867,7 @@ function createCursorTile(definition) {
     }
   });
   tile.querySelector(".cursor-reset-button").addEventListener("click", () => resetCursorTile(tile));
-  setCursorTilePreview(tile, `ModTemplate2.0/cursors/Cyan/${cursorFileName(definition.type)}`, cursorFileName(definition.type))
+  setCursorTilePreview(tile, `ModTemplate2.0/cursors/Pink/${cursorFileName(definition.type)}`, cursorFileName(definition.type))
     .catch(() => {
       tile.querySelector(".cursor-tile-status").textContent = "Default preview unavailable";
       tile.classList.add("has-error");
@@ -1789,6 +2077,26 @@ function renderBuildSummary() {
   buildReviewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
   buildReviewObjectUrls = [];
   buildSummaryGroups.replaceChildren();
+
+  const modIconItems = savedModIconValue
+    ? [{
+      title: "Mod icon",
+      preview: {
+        alt: `Preview of ${savedModIconValue.name}`,
+        kind: "image",
+        shape: "square",
+        url: savedModIconValue.previewUrl
+      },
+      details: [
+        { label: "File", value: savedModIconValue.name },
+        { label: "Dimensions", value: `${savedModIconValue.width}×${savedModIconValue.height}` },
+        { label: "Original", value: savedModIconValue.originalName },
+        { label: "Corner curve", value: `${savedModIconValue.adjustments.cornerRadius}%` },
+        { label: "Source", value: savedModIconValue.source === "default" ? "Default template icon" : "Local upload" }
+      ]
+    }]
+    : [];
+  appendBuildSummaryGroup("Mod icon", "Installed mod preview image", modIconItems);
 
   const appIconItems = savedAppIconValue
     ? [{
@@ -2242,20 +2550,23 @@ saveMusicTracksButton.addEventListener("click", () => {
 
 renderThemeEditor();
 renderAppIconEditor();
+renderModIconEditor();
 renderWallpaperEditor();
 renderCursorEditor();
+ensureDefaultModIcon().catch(() => {});
 
 if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#wallpaper-editor", "#music-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
     "#creator": creatorView,
     "#theme-editor": themeEditorView,
     "#app-icon-editor": appIconEditorView,
+    "#mod-icon-editor": modIconEditorView,
     "#wallpaper-editor": wallpaperEditorView,
     "#music-editor": musicEditorView,
     "#cursor-editor": cursorEditorView,
@@ -2276,6 +2587,9 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#wallpaper-editor", "#mus
   }
   if (initialView === appIconEditorView) {
     renderAppIconEditor();
+  }
+  if (initialView === modIconEditorView) {
+    ensureDefaultModIcon().then(renderModIconEditor).catch(() => {});
   }
   if (initialView === buildReviewView) {
     renderBuildSummary();
