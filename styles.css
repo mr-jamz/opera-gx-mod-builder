@@ -2059,6 +2059,7 @@ h1 em {
 
 .wallpaper-save-button {
   position: relative;
+  min-height: 72px;
   justify-content: center;
   text-align: center;
 }
@@ -2070,6 +2071,7 @@ h1 em {
   width: max-content;
   max-width: calc(100% - 88px);
   text-align: center;
+  line-height: 1.15;
   transform: translate(-50%, -50%);
 }
 
