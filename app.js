@@ -51,7 +51,7 @@ const speedDialEffectDefaults = {
     backgroundOpacity: 50,
     focusMode: false,
     islandsOpacity: 0,
-    position: "top",
+    position: "auto",
     textColor: "#ffffff",
     textShadow: "#757575",
     vignetteStrength: 35
@@ -61,7 +61,7 @@ const speedDialEffectDefaults = {
     backgroundOpacity: 50,
     focusMode: false,
     islandsOpacity: 0,
-    position: "top",
+    position: "auto",
     textColor: "#2c2735",
     textShadow: "#ffffff",
     vignetteStrength: 0
@@ -349,16 +349,16 @@ async function createWallpaperFirstFrame(videoBlob) {
 
 function applySavedWallpaperSettings(target, settings) {
   if (!settings) return;
-  if (settings.enabled.position) target.speeddial_position = settings.position;
-  if (settings.enabled.textColor) target.text_color = settings.textColor;
-  if (settings.enabled.textShadow) target.text_shadow = settings.textShadow;
-  const uiSettings = {};
-  if (settings.enabled.backgroundOpacity) uiSettings.background_opacity = settings.backgroundOpacity;
-  if (settings.enabled.backgroundBlur) uiSettings.background_blur = settings.backgroundBlur;
-  if (settings.enabled.islandsOpacity) uiSettings.islands_opacity = settings.islandsOpacity;
-  if (settings.enabled.vignetteStrength) uiSettings.vignette_strength = settings.vignetteStrength;
-  if (settings.enabled.focusMode) uiSettings.focus_mode = settings.focusMode;
-  if (Object.keys(uiSettings).length) target.ui_settings = uiSettings;
+  target.speeddial_position = settings.position;
+  target.text_color = settings.textColor;
+  target.text_shadow = settings.textShadow;
+  target.ui_settings = {
+    background_opacity: settings.backgroundOpacity,
+    background_blur: settings.backgroundBlur,
+    islands_opacity: settings.islandsOpacity,
+    vignette_strength: settings.vignetteStrength,
+    focus_mode: settings.focusMode
+  };
 }
 
 async function buildModArchive() {
@@ -369,16 +369,16 @@ async function buildModArchive() {
   if (!manifestResponse.ok) throw new Error("The mod manifest template could not be loaded");
 
   const templateManifest = await manifestResponse.json();
-  const entries = [{ path: "MyMod/", data: "" }];
+  const entries = [];
   const usedPaths = new Set();
-  modTemplateDirectories.forEach((directory) => entries.push({ path: `MyMod/${directory}/`, data: "" }));
-  if (licenseResponse.ok) entries.push({ path: "MyMod/license.txt", data: await licenseResponse.blob() });
+  modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
+  if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
   const build = { appIcon: Boolean(savedAppIconValue), cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
-  entries.push({ path: "MyMod/icon_512.png", data: modIconBlob });
-  if (savedAppIconValue) entries.push({ path: "MyMod/app_icon/classic_GX_logo.png", data: savedAppIconValue.file });
+  entries.push({ path: "icon_512.png", data: modIconBlob });
+  if (savedAppIconValue) entries.push({ path: "app_icon/classic_GX_logo.png", data: savedAppIconValue.file });
 
   ["dark", "light"].forEach((mode) => {
     if (savedThemeValues[mode]) build.theme[mode] = copyThemeValues(savedThemeValues[mode]);
@@ -392,22 +392,25 @@ async function buildModArchive() {
     build.wallpaper[selection.themeMode] = target;
     const wallpaperBlob = await getSavedWallpaperBlob(selection);
     const outputPath = reserveBuildPath("wallpaper", selection.name, usedPaths);
-    entries.push({ path: `MyMod/${outputPath}`, data: wallpaperBlob });
+    entries.push({ path: outputPath, data: wallpaperBlob });
     target[selection.manifestField] = outputPath;
     wallpaperBlobs[mode] = wallpaperBlob;
-    if (selection.device === "desktop") applySavedWallpaperSettings(target, savedSpeedDialEffectValues[selection.themeMode]);
   }
 
   for (const themeMode of ["dark", "light"]) {
     const target = build.wallpaper[themeMode];
     if (!target) continue;
+    applySavedWallpaperSettings(
+      target,
+      savedSpeedDialEffectValues[themeMode] || createSpeedDialEffectValues(themeMode)
+    );
     const mobileMode = `mobile-${themeMode}`;
     const animatedMode = savedWallpaperSelections[themeMode]?.kind === "video"
       ? themeMode
       : (savedWallpaperSelections[mobileMode]?.kind === "video" ? mobileMode : null);
     if (animatedMode) {
       const firstFramePath = `wallpaper/first_frame_${themeMode}.jpg`;
-      entries.push({ path: `MyMod/${firstFramePath}`, data: await createWallpaperFirstFrame(wallpaperBlobs[animatedMode]) });
+      entries.push({ path: firstFramePath, data: await createWallpaperFirstFrame(wallpaperBlobs[animatedMode]) });
       target.first_frame = firstFramePath;
     }
   }
@@ -415,7 +418,7 @@ async function buildModArchive() {
   modBuildState.music.tracks.forEach((track) => {
     if (!track.media?.file) return;
     const outputPath = reserveBuildPath("music", track.media.file.name, usedPaths);
-    entries.push({ path: `MyMod/${outputPath}`, data: track.media.file });
+    entries.push({ path: outputPath, data: track.media.file });
     build.music.push({ author: track.author || "", name: track.songName, path: outputPath });
   });
 
@@ -423,18 +426,18 @@ async function buildModArchive() {
     const cursorItems = modBuildState.cursors.items.map((item) => {
       const extension = item.file.name.split(".").pop().toLowerCase();
       const outputPath = `cursors/MyCursor/${cursorFileName(item.type, extension)}`;
-      entries.push({ path: `MyMod/${outputPath}`, data: item.file });
+      entries.push({ path: outputPath, data: item.file });
       return { path: outputPath, type: item.type };
     });
     const previewPath = "cursors/MyCursor/preview.png";
-    entries.push({ path: `MyMod/${previewPath}`, data: await fetchBuildBlob(modBuildState.cursors.previewUrl, "The cursor preview") });
-    entries.push({ path: "MyMod/cursors/MyCursor/", data: "" });
+    entries.push({ path: previewPath, data: await fetchBuildBlob(modBuildState.cursors.previewUrl, "The cursor preview") });
+    entries.push({ path: "cursors/MyCursor/", data: "" });
     build.cursors = { items: cursorItems, preview: previewPath };
   }
 
   const manifest = ModPackager.createManifest(templateManifest, build);
   entries.push({
-    path: "MyMod/manifest.json",
+    path: "manifest.json",
     data: `${JSON.stringify(manifest, null, 3).replace(/\n/g, "\r\n")}\r\n`
   });
   return ModPackager.createZipBlob(entries);
