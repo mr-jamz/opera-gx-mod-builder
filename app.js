@@ -251,9 +251,194 @@ buildDonationDialog.addEventListener("click", (event) => {
   }
 });
 
-downloadModButton.addEventListener("click", () => {
-  downloadModStatus.textContent = "Mod packaging will be connected in the next build step";
+downloadModButton.addEventListener("click", async () => {
+  downloadModButton.disabled = true;
+  downloadModStatus.textContent = "Building MyMod.zip…";
+
+  try {
+    const zipBlob = await buildModArchive();
+    const downloadUrl = URL.createObjectURL(zipBlob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "MyMod.zip";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 60000);
+    downloadModStatus.textContent = "MyMod.zip is ready";
+  } catch (error) {
+    downloadModStatus.textContent = error.message || "The mod could not be packaged";
+  } finally {
+    downloadModButton.disabled = false;
+  }
 });
+
+const modTemplateDirectories = [
+  "app_icon", "cursors", "fonts", "game", "icons", "keyboard", "mobile_logo", "music",
+  "sd_effects", "shaders", "sound", "splash", "stickers", "wallpaper", "webmodding"
+];
+
+function safeBuildFileName(name, fallbackName) {
+  const leafName = String(name || fallbackName).split(/[\\/]/).pop();
+  return leafName.replace(/[<>:"|?*\u0000-\u001f]/g, "_") || fallbackName;
+}
+
+function reserveBuildPath(directory, requestedName, usedPaths) {
+  const safeName = safeBuildFileName(requestedName, "file");
+  const dotIndex = safeName.lastIndexOf(".");
+  const baseName = dotIndex > 0 ? safeName.slice(0, dotIndex) : safeName;
+  const extension = dotIndex > 0 ? safeName.slice(dotIndex) : "";
+  let candidate = `${directory}/${safeName}`;
+  let suffix = 2;
+  while (usedPaths.has(candidate.toLowerCase())) {
+    candidate = `${directory}/${baseName}_${suffix}${extension}`;
+    suffix += 1;
+  }
+  usedPaths.add(candidate.toLowerCase());
+  return candidate;
+}
+
+async function fetchBuildBlob(url, label) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`${label} could not be loaded`);
+  return response.blob();
+}
+
+async function getSavedWallpaperBlob(selection) {
+  return selection.file || fetchBuildBlob(selection.previewUrl, selection.name);
+}
+
+function canvasToJpegBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("A wallpaper first frame could not be created")), "image/jpeg", 0.92);
+  });
+}
+
+async function createWallpaperFirstFrame(videoBlob) {
+  const videoUrl = URL.createObjectURL(videoBlob);
+  const video = document.createElement("video");
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+
+  try {
+    await new Promise((resolve, reject) => {
+      const timeout = window.setTimeout(() => reject(new Error("The animated wallpaper preview timed out")), 30000);
+      video.addEventListener("loadeddata", () => {
+        window.clearTimeout(timeout);
+        resolve();
+      }, { once: true });
+      video.addEventListener("error", () => {
+        window.clearTimeout(timeout);
+        reject(new Error("The animated wallpaper first frame could not be decoded"));
+      }, { once: true });
+      video.src = videoUrl;
+      video.load();
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    return canvasToJpegBlob(canvas);
+  } finally {
+    video.removeAttribute("src");
+    video.load();
+    URL.revokeObjectURL(videoUrl);
+  }
+}
+
+function applySavedWallpaperSettings(target, settings) {
+  if (!settings) return;
+  if (settings.enabled.position) target.speeddial_position = settings.position;
+  if (settings.enabled.textColor) target.text_color = settings.textColor;
+  if (settings.enabled.textShadow) target.text_shadow = settings.textShadow;
+  const uiSettings = {};
+  if (settings.enabled.backgroundOpacity) uiSettings.background_opacity = settings.backgroundOpacity;
+  if (settings.enabled.backgroundBlur) uiSettings.background_blur = settings.backgroundBlur;
+  if (settings.enabled.islandsOpacity) uiSettings.islands_opacity = settings.islandsOpacity;
+  if (settings.enabled.vignetteStrength) uiSettings.vignette_strength = settings.vignetteStrength;
+  if (settings.enabled.focusMode) uiSettings.focus_mode = settings.focusMode;
+  if (Object.keys(uiSettings).length) target.ui_settings = uiSettings;
+}
+
+async function buildModArchive() {
+  const [manifestResponse, licenseResponse] = await Promise.all([
+    fetch("ModTemplate2.0/manifest.json"),
+    fetch("ModTemplate2.0/license.txt")
+  ]);
+  if (!manifestResponse.ok) throw new Error("The mod manifest template could not be loaded");
+
+  const templateManifest = await manifestResponse.json();
+  const entries = [{ path: "MyMod/", data: "" }];
+  const usedPaths = new Set();
+  modTemplateDirectories.forEach((directory) => entries.push({ path: `MyMod/${directory}/`, data: "" }));
+  if (licenseResponse.ok) entries.push({ path: "MyMod/license.txt", data: await licenseResponse.blob() });
+
+  const build = { appIcon: Boolean(savedAppIconValue), cursors: null, music: [], theme: {}, wallpaper: {} };
+  const modIconBlob = savedModIconValue?.file
+    || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
+  entries.push({ path: "MyMod/icon_512.png", data: modIconBlob });
+  if (savedAppIconValue) entries.push({ path: "MyMod/app_icon/classic_GX_logo.png", data: savedAppIconValue.file });
+
+  ["dark", "light"].forEach((mode) => {
+    if (savedThemeValues[mode]) build.theme[mode] = copyThemeValues(savedThemeValues[mode]);
+  });
+
+  const wallpaperBlobs = {};
+  for (const mode of ["dark", "light", "mobile-dark", "mobile-light"]) {
+    const selection = savedWallpaperSelections[mode];
+    if (!selection) continue;
+    const target = build.wallpaper[selection.themeMode] || {};
+    build.wallpaper[selection.themeMode] = target;
+    const wallpaperBlob = await getSavedWallpaperBlob(selection);
+    const outputPath = reserveBuildPath("wallpaper", selection.name, usedPaths);
+    entries.push({ path: `MyMod/${outputPath}`, data: wallpaperBlob });
+    target[selection.manifestField] = outputPath;
+    wallpaperBlobs[mode] = wallpaperBlob;
+    if (selection.device === "desktop") applySavedWallpaperSettings(target, savedSpeedDialEffectValues[selection.themeMode]);
+  }
+
+  for (const themeMode of ["dark", "light"]) {
+    const target = build.wallpaper[themeMode];
+    if (!target) continue;
+    const mobileMode = `mobile-${themeMode}`;
+    const animatedMode = savedWallpaperSelections[themeMode]?.kind === "video"
+      ? themeMode
+      : (savedWallpaperSelections[mobileMode]?.kind === "video" ? mobileMode : null);
+    if (animatedMode) {
+      const firstFramePath = `wallpaper/first_frame_${themeMode}.jpg`;
+      entries.push({ path: `MyMod/${firstFramePath}`, data: await createWallpaperFirstFrame(wallpaperBlobs[animatedMode]) });
+      target.first_frame = firstFramePath;
+    }
+  }
+
+  modBuildState.music.tracks.forEach((track) => {
+    if (!track.media?.file) return;
+    const outputPath = reserveBuildPath("music", track.media.file.name, usedPaths);
+    entries.push({ path: `MyMod/${outputPath}`, data: track.media.file });
+    build.music.push({ author: track.author || "", name: track.songName, path: outputPath });
+  });
+
+  if (modBuildState.cursors?.items.length) {
+    const cursorItems = modBuildState.cursors.items.map((item) => {
+      const extension = item.file.name.split(".").pop().toLowerCase();
+      const outputPath = `cursors/MyCursor/${cursorFileName(item.type, extension)}`;
+      entries.push({ path: `MyMod/${outputPath}`, data: item.file });
+      return { path: outputPath, type: item.type };
+    });
+    const previewPath = "cursors/MyCursor/preview.png";
+    entries.push({ path: `MyMod/${previewPath}`, data: await fetchBuildBlob(modBuildState.cursors.previewUrl, "The cursor preview") });
+    entries.push({ path: "MyMod/cursors/MyCursor/", data: "" });
+    build.cursors = { items: cursorItems, preview: previewPath };
+  }
+
+  const manifest = ModPackager.createManifest(templateManifest, build);
+  entries.push({
+    path: "MyMod/manifest.json",
+    data: `${JSON.stringify(manifest, null, 3).replace(/\n/g, "\r\n")}\r\n`
+  });
+  return ModPackager.createZipBlob(entries);
+}
 
 const modeTabs = document.querySelectorAll(".mode-tab");
 const colorInputs = document.querySelectorAll(".hsl-picker input");
@@ -1926,7 +2111,7 @@ cursorSaveButton.addEventListener("click", async () => {
     const extension = selection.extension;
     return {
       file: selection.file,
-      path: `cursors/Custom/${cursorFileName(definition.type, extension)}`,
+      path: `cursors/MyCursor/${cursorFileName(definition.type, extension)}`,
       source: "upload",
       type: definition.type
     };
