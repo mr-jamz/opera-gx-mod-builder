@@ -120,6 +120,7 @@ button {
 
 .wallpaper-editor,
 .browser-sounds-editor,
+.keyboard-sounds-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
 }
@@ -494,6 +495,7 @@ h1 em {
 .speed-dial-effects-editor.is-active,
 .music-editor.is-active,
 .browser-sounds-editor.is-active,
+.keyboard-sounds-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
   display: block;
@@ -3562,6 +3564,7 @@ h1 em {
   .speed-dial-effects-editor.is-active,
   .music-editor.is-active,
   .browser-sounds-editor.is-active,
+  .keyboard-sounds-editor.is-active,
   .cursor-editor.is-active,
   .build-review.is-active {
     padding-block: 36px 70px;

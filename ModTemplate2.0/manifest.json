@@ -44,12 +44,13 @@
                "FEATURE_SWITCH_ON": ["sound/feature_switch_on.mp3"],
                "HOVER": [ "sound/hover.mp3" ],
                "HOVER_UP": [ "sound/hover.mp3" ],
-               "IMPORTANT_CLICK": [ "sound/click.mp3" ],
-               "LIMITER_OFF": [ "sound/toggle.mp3" ],
-               "LIMITER_ON": [ "sound/toggle.mp3" ],
-               "SWITCH_TOGGLE": [ "sound/toggle.mp3" ],
-               "TAB_CLOSE": [ "sound/tabclose.mp3" ],
-               "TAB_INSERT": [ "sound/tabopen.mp3" ],
+               "IMPORTANT_CLICK": [ "sound/important_click.mp3" ],
+			   "LEVEL_UPGRADE": [ "sound/level_upgrade.mp3"],
+               "LIMITER_OFF": [ "sound/limiter_off.mp3" ],
+               "LIMITER_ON": [ "sound/limiter_on.mp3" ],
+               "SWITCH_TOGGLE": [ "sound/switch.mp3" ],
+               "TAB_CLOSE": [ "sound/tab_close.mp3" ],
+               "TAB_INSERT": [ "sound/tab_insert.mp3" ],
                "TAB_SLASH": [ "sound/tab_slash.mp3" ]
             }
          } ],
@@ -57,10 +58,10 @@
             "id": "KeyboardSounds",
             "name": "InsertModNameOrSomethingHere",
             "sounds": {
-               "TYPING_BACKSPACE": [ "sound/keyboard1.mp3" ],
-               "TYPING_ENTER": [ "sound/keyboard3.mp3" ],
-               "TYPING_LETTER": [ "sound/keyboard1.mp3", "sound/keyboard2.mp3", "sound/keyboard3.mp3", "sound/keyboard4.mp3" ],
-               "TYPING_SPACE": [ "sound/keyboard4.mp3" ]
+               "TYPING_BACKSPACE": [ "keyboard/backspace.wav" ],
+               "TYPING_ENTER": [ "keyboard/enter.wav" ],
+               "TYPING_LETTER": [ "keyboard/letter_1.wav", "keyboard/letter_2.wav", "keyboard/letter_3.wav" ],
+               "TYPING_SPACE": [ "keyboard/space.wav" ]
             }
          } ],
          "image_overrides": [ {

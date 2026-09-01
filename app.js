@@ -6,6 +6,7 @@ const modIconEditorView = document.querySelector("#mod-icon-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
 const browserSoundsEditorView = document.querySelector("#browser-sounds-editor");
+const keyboardSoundsEditorView = document.querySelector("#keyboard-sounds-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
@@ -17,6 +18,7 @@ const backModIconButton = document.querySelector("#back-mod-icon");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
 const backBrowserSoundsButton = document.querySelector("#back-browser-sounds");
+const backKeyboardSoundsButton = document.querySelector("#back-keyboard-sounds");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
@@ -100,6 +102,7 @@ const savedSpeedDialEffectValues = {
 
 const modBuildState = {
   browserSounds: null,
+  keyboardSounds: null,
   cursors: null,
   music: {
     tracks: []
@@ -209,6 +212,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Keyboard sounds") {
+      switchView(creatorView, keyboardSoundsEditorView);
+      window.history.replaceState(null, "", "#keyboard-sounds-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -242,6 +251,12 @@ backMusicButton.addEventListener("click", () => {
 backBrowserSoundsButton.addEventListener("click", () => {
   stopBrowserSoundPreview();
   switchView(browserSoundsEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backKeyboardSoundsButton.addEventListener("click", () => {
+  stopKeyboardSoundPreview();
+  switchView(keyboardSoundsEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -389,7 +404,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -442,6 +457,16 @@ async function buildModArchive() {
       return { path: outputPath, type: item.type };
     });
     build.browserSounds = { items };
+  }
+
+  if (modBuildState.keyboardSounds?.items.length) {
+    const items = modBuildState.keyboardSounds.items.map((item) => {
+      const extension = item.file.name.split(".").pop().toLowerCase();
+      const outputPath = `keyboard/${keyboardSoundFileName(item.slot, extension)}`;
+      entries.push({ path: outputPath, data: item.file });
+      return { path: outputPath, slot: item.slot, type: item.type };
+    });
+    build.keyboardSounds = { items };
   }
 
   if (modBuildState.cursors?.items.length) {
@@ -1717,12 +1742,13 @@ const BROWSER_SOUND_DEFINITIONS = [
   ["FEATURE_SWITCH_ON", "Feature switch on", "feature_switch_on.mp3"],
   ["HOVER", "Hover", "hover.mp3"],
   ["HOVER_UP", "Hover release", "hover.mp3"],
-  ["IMPORTANT_CLICK", "Important click", "click.mp3"],
-  ["LIMITER_OFF", "Limiter off", "toggle.mp3"],
-  ["LIMITER_ON", "Limiter on", "toggle.mp3"],
-  ["SWITCH_TOGGLE", "Switch toggle", "toggle.mp3"],
-  ["TAB_CLOSE", "Tab close", "tabclose.mp3"],
-  ["TAB_INSERT", "Tab open", "tabopen.mp3"],
+  ["IMPORTANT_CLICK", "Important click", "important_click.mp3"],
+  ["LEVEL_UPGRADE", "Level upgrade", "level_upgrade.mp3"],
+  ["LIMITER_OFF", "Limiter off", "limiter_off.mp3"],
+  ["LIMITER_ON", "Limiter on", "limiter_on.mp3"],
+  ["SWITCH_TOGGLE", "Switch toggle", "switch.mp3"],
+  ["TAB_CLOSE", "Tab close", "tab_close.mp3"],
+  ["TAB_INSERT", "Tab open", "tab_insert.mp3"],
   ["TAB_SLASH", "Tab slash", "tab_slash.mp3"]
 ].map(([type, label, sampleFile]) => ({
   label,
@@ -1900,6 +1926,192 @@ browserSoundSaveButton.addEventListener("click", () => {
   modBuildState.browserSounds = { items };
   updateSavedBrowserSoundsSummary();
   browserSoundSaveStatus.textContent = `Saved ${items.length} browser ${items.length === 1 ? "sound" : "sounds"} successfully`;
+});
+
+const KEYBOARD_SOUND_DEFINITIONS = [
+  ["TYPING_BACKSPACE", "Backspace", "backspace", "backspace.wav"],
+  ["TYPING_ENTER", "Enter", "enter", "enter.wav"],
+  ["TYPING_LETTER", "Letter variation 1", "letter_1", "letter_1.wav"],
+  ["TYPING_LETTER", "Letter variation 2", "letter_2", "letter_2.wav"],
+  ["TYPING_LETTER", "Letter variation 3", "letter_3", "letter_3.wav"],
+  ["TYPING_SPACE", "Space", "space", "space.wav"]
+].map(([type, label, slot, sampleFile]) => ({
+  label,
+  sampleFile,
+  sampleUrl: `ModTemplate2.0/keyboard/${sampleFile}`,
+  slot,
+  type
+}));
+
+const keyboardSoundGrid = document.querySelector("#keyboard-sound-grid");
+const keyboardSoundChangeCount = document.querySelector("#keyboard-sound-change-count");
+const keyboardSoundSaveButton = document.querySelector("#save-keyboard-sounds");
+const keyboardSoundSaveStatus = document.querySelector("#keyboard-sound-save-status");
+const savedKeyboardSoundsBox = document.querySelector("#saved-keyboard-sounds-box");
+const savedKeyboardSoundsSummary = document.querySelector("#saved-keyboard-sounds-summary");
+const keyboardSoundsCategoryCard = document.querySelector('[data-category="Keyboard sounds"]');
+const keyboardSoundSelections = new Map();
+let activeKeyboardSoundAudio = null;
+let activeKeyboardSoundButton = null;
+
+function keyboardSoundFileName(slot, extension = "wav") {
+  return `${slot}.${extension}`;
+}
+
+function stopKeyboardSoundPreview() {
+  if (activeKeyboardSoundAudio) {
+    activeKeyboardSoundAudio.pause();
+    activeKeyboardSoundAudio.currentTime = 0;
+    activeKeyboardSoundAudio = null;
+  }
+  if (activeKeyboardSoundButton) {
+    activeKeyboardSoundButton.textContent = "Play";
+    activeKeyboardSoundButton.classList.remove("is-playing");
+    activeKeyboardSoundButton = null;
+  }
+}
+
+function updateKeyboardSoundChangeCount() {
+  const count = keyboardSoundSelections.size;
+  keyboardSoundChangeCount.textContent = count
+    ? `${count} custom keyboard ${count === 1 ? "sound" : "sounds"} selected`
+    : "No custom keyboard sounds selected";
+  keyboardSoundSaveButton.disabled = count === 0;
+  keyboardSoundSaveStatus.textContent = "";
+}
+
+function setKeyboardSoundTileSelection(tile, definition, file) {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (!extension || !["mp3", "wav", "ogg"].includes(extension)) {
+    tile.querySelector(".browser-sound-status").textContent = "Choose an MP3, WAV, or OGG file";
+    return;
+  }
+  const previous = keyboardSoundSelections.get(definition.slot);
+  if (previous) URL.revokeObjectURL(previous.previewUrl);
+  keyboardSoundSelections.set(definition.slot, { extension, file, previewUrl: URL.createObjectURL(file) });
+  tile.classList.add("has-custom-sound");
+  tile.querySelector(".cursor-source-badge").textContent = "Custom";
+  tile.querySelector(".browser-sound-status").textContent = file.name;
+  tile.querySelector(".browser-sound-reset").hidden = false;
+  updateKeyboardSoundChangeCount();
+}
+
+function resetKeyboardSoundTile(tile, definition) {
+  stopKeyboardSoundPreview();
+  const selection = keyboardSoundSelections.get(definition.slot);
+  if (selection) URL.revokeObjectURL(selection.previewUrl);
+  keyboardSoundSelections.delete(definition.slot);
+  tile.classList.remove("has-custom-sound", "is-dragging");
+  tile.querySelector(".cursor-source-badge").textContent = "Sample";
+  tile.querySelector(".browser-sound-status").textContent = definition.sampleFile;
+  tile.querySelector(".browser-sound-reset").hidden = true;
+  tile.querySelector(".browser-sound-file-input").value = "";
+  updateKeyboardSoundChangeCount();
+}
+
+function playKeyboardSound(tile, definition) {
+  const playButton = tile.querySelector(".browser-sound-play");
+  if (activeKeyboardSoundButton === playButton) {
+    stopKeyboardSoundPreview();
+    return;
+  }
+  stopKeyboardSoundPreview();
+  const selection = keyboardSoundSelections.get(definition.slot);
+  const audio = new Audio(selection?.previewUrl || definition.sampleUrl);
+  activeKeyboardSoundAudio = audio;
+  activeKeyboardSoundButton = playButton;
+  playButton.textContent = "Stop";
+  playButton.classList.add("is-playing");
+  const finish = () => {
+    if (activeKeyboardSoundAudio === audio) stopKeyboardSoundPreview();
+  };
+  audio.addEventListener("ended", finish, { once: true });
+  audio.addEventListener("error", () => {
+    tile.querySelector(".browser-sound-status").textContent = "This sound could not be played";
+    finish();
+  }, { once: true });
+  audio.play().catch(() => {
+    tile.querySelector(".browser-sound-status").textContent = "This sound could not be played";
+    finish();
+  });
+}
+
+function createKeyboardSoundTile(definition, index) {
+  const tile = document.createElement("article");
+  const inputId = `keyboard-sound-${index}`;
+  tile.className = "browser-sound-tile";
+  tile.dataset.keyboardSoundSlot = definition.slot;
+  tile.innerHTML = `
+    <div class="browser-sound-heading">
+      <span><span class="browser-sound-title"><strong>${definition.label}</strong><small class="cursor-source-badge">Sample</small></span><code>${definition.type}</code></span>
+      <button class="browser-sound-play" type="button" aria-label="Play ${definition.label}">Play</button>
+    </div>
+    <input class="browser-sound-file-input" id="${inputId}" type="file" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg">
+    <label class="browser-sound-dropzone" for="${inputId}"><strong>Drop audio here</strong><small>or choose a local file</small></label>
+    <div class="browser-sound-footer">
+      <span class="browser-sound-status">${definition.sampleFile}</span>
+      <button class="cursor-reset-button browser-sound-reset" type="button" hidden>Use sample</button>
+    </div>`;
+  const input = tile.querySelector(".browser-sound-file-input");
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file) setKeyboardSoundTileSelection(tile, definition, file);
+  });
+  tile.querySelector(".browser-sound-play").addEventListener("click", () => playKeyboardSound(tile, definition));
+  tile.querySelector(".browser-sound-reset").addEventListener("click", () => resetKeyboardSoundTile(tile, definition));
+  ["dragenter", "dragover"].forEach((eventName) => tile.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    tile.classList.add("is-dragging");
+  }));
+  tile.addEventListener("dragleave", (event) => {
+    if (!tile.contains(event.relatedTarget)) tile.classList.remove("is-dragging");
+  });
+  tile.addEventListener("drop", (event) => {
+    event.preventDefault();
+    tile.classList.remove("is-dragging");
+    const file = event.dataTransfer?.files?.[0];
+    if (file) setKeyboardSoundTileSelection(tile, definition, file);
+  });
+  return tile;
+}
+
+function renderKeyboardSoundsEditor() {
+  if (keyboardSoundGrid.childElementCount) return;
+  KEYBOARD_SOUND_DEFINITIONS.forEach((definition, index) => {
+    keyboardSoundGrid.append(createKeyboardSoundTile(definition, index));
+  });
+  updateKeyboardSoundChangeCount();
+}
+
+function updateSavedKeyboardSoundsSummary() {
+  const saved = modBuildState.keyboardSounds;
+  savedKeyboardSoundsSummary.replaceChildren();
+  saved?.items.forEach((item) => {
+    const summary = document.createElement("span");
+    summary.textContent = `${item.type} (${item.slot}) ← ${item.file.name}`;
+    savedKeyboardSoundsSummary.append(summary);
+  });
+  savedKeyboardSoundsBox.hidden = !saved;
+  keyboardSoundsCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
+  updateCreateModAvailability();
+}
+
+keyboardSoundSaveButton.addEventListener("click", () => {
+  if (!keyboardSoundSelections.size) return;
+  const items = KEYBOARD_SOUND_DEFINITIONS
+    .filter((definition) => keyboardSoundSelections.has(definition.slot))
+    .map((definition) => {
+      const selection = keyboardSoundSelections.get(definition.slot);
+      return {
+        file: selection.file,
+        path: `keyboard/${keyboardSoundFileName(definition.slot, selection.extension)}`,
+        slot: definition.slot,
+        type: definition.type
+      };
+    });
+  modBuildState.keyboardSounds = { items };
+  updateSavedKeyboardSoundsSummary();
+  keyboardSoundSaveStatus.textContent = `Saved ${items.length} keyboard ${items.length === 1 ? "sound" : "sounds"} successfully`;
 });
 
 const CURSOR_GROUPS = [
@@ -2387,8 +2599,9 @@ function hasSavedModOptions() {
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
   const hasSavedBrowserSounds = Boolean(modBuildState.browserSounds);
+  const hasSavedKeyboardSounds = Boolean(modBuildState.keyboardSounds);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -2603,6 +2816,25 @@ function renderBuildSummary() {
     };
   });
   appendBuildSummaryGroup("Browser sounds", "Saved browser event audio", browserSoundItems);
+
+  const keyboardSoundItems = (modBuildState.keyboardSounds?.items || []).map((item) => {
+    const audioPreviewUrl = URL.createObjectURL(item.file);
+    buildReviewObjectUrls.push(audioPreviewUrl);
+    return {
+      title: item.slot,
+      preview: {
+        alt: `Audio preview for ${item.slot}`,
+        kind: "audio",
+        url: audioPreviewUrl
+      },
+      details: [
+        { label: "Keyboard event", value: item.type },
+        { label: "Saved audio", value: item.file.name },
+        { label: "Manifest path", value: item.path }
+      ]
+    };
+  });
+  appendBuildSummaryGroup("Keyboard sounds", "Saved typing feedback audio", keyboardSoundItems);
 
   const musicItems = modBuildState.music.tracks.map((track, index) => {
     const details = [
@@ -2978,6 +3210,7 @@ renderAppIconEditor();
 renderModIconEditor();
 renderWallpaperEditor();
 renderBrowserSoundsEditor();
+renderKeyboardSoundsEditor();
 renderCursorEditor();
 ensureDefaultModIcon().catch(() => {});
 
@@ -2985,7 +3218,7 @@ if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -2996,6 +3229,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#wallpaper-editor": wallpaperEditorView,
     "#music-editor": musicEditorView,
     "#browser-sounds-editor": browserSoundsEditorView,
+    "#keyboard-sounds-editor": keyboardSoundsEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
   };

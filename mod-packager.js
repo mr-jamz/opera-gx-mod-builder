@@ -39,6 +39,19 @@
       }];
     }
 
+    if (build.keyboardSounds) {
+      const sounds = {};
+      build.keyboardSounds.items.forEach(({ path, type }) => {
+        if (!sounds[type]) sounds[type] = [];
+        sounds[type].push(path);
+      });
+      payload.keyboard_sounds = [{
+        id: "KeyboardSounds",
+        name: "MyMod",
+        sounds
+      }];
+    }
+
     if (build.cursors) {
       payload.cursors = [{
         id: "Cursors",
