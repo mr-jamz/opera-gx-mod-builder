@@ -1929,19 +1929,11 @@ browserSoundSaveButton.addEventListener("click", () => {
 });
 
 const KEYBOARD_SOUND_DEFINITIONS = [
-  ["TYPING_BACKSPACE", "Backspace", "backspace", "backspace.wav"],
-  ["TYPING_ENTER", "Enter", "enter", "enter.wav"],
-  ["TYPING_LETTER", "Letter variation 1", "letter_1", "letter_1.wav"],
-  ["TYPING_LETTER", "Letter variation 2", "letter_2", "letter_2.wav"],
-  ["TYPING_LETTER", "Letter variation 3", "letter_3", "letter_3.wav"],
-  ["TYPING_SPACE", "Space", "space", "space.wav"]
-].map(([type, label, slot, sampleFile]) => ({
-  label,
-  sampleFile,
-  sampleUrl: `ModTemplate2.0/keyboard/${sampleFile}`,
-  slot,
-  type
-}));
+  { type: "TYPING_BACKSPACE", label: "Backspace", slot: "backspace", sampleFiles: ["backspace.wav"] },
+  { type: "TYPING_ENTER", label: "Enter", slot: "enter", sampleFiles: ["enter.wav"] },
+  { type: "TYPING_LETTER", label: "Letter variations", slot: "letter", sampleFiles: ["letter_1.wav", "letter_2.wav", "letter_3.wav"], multiple: true },
+  { type: "TYPING_SPACE", label: "Space", slot: "space", sampleFiles: ["space.wav"] }
+];
 
 const keyboardSoundGrid = document.querySelector("#keyboard-sound-grid");
 const keyboardSoundChangeCount = document.querySelector("#keyboard-sound-change-count");
@@ -1951,6 +1943,7 @@ const savedKeyboardSoundsBox = document.querySelector("#saved-keyboard-sounds-bo
 const savedKeyboardSoundsSummary = document.querySelector("#saved-keyboard-sounds-summary");
 const keyboardSoundsCategoryCard = document.querySelector('[data-category="Keyboard sounds"]');
 const keyboardSoundSelections = new Map();
+const keyboardSoundPlaybackIndexes = new Map();
 let activeKeyboardSoundAudio = null;
 let activeKeyboardSoundButton = null;
 
@@ -1972,7 +1965,7 @@ function stopKeyboardSoundPreview() {
 }
 
 function updateKeyboardSoundChangeCount() {
-  const count = keyboardSoundSelections.size;
+  const count = Array.from(keyboardSoundSelections.values()).reduce((total, selections) => total + selections.length, 0);
   keyboardSoundChangeCount.textContent = count
     ? `${count} custom keyboard ${count === 1 ? "sound" : "sounds"} selected`
     : "No custom keyboard sounds selected";
@@ -1980,32 +1973,46 @@ function updateKeyboardSoundChangeCount() {
   keyboardSoundSaveStatus.textContent = "";
 }
 
-function setKeyboardSoundTileSelection(tile, definition, file) {
-  const extension = file.name.split(".").pop()?.toLowerCase();
-  if (!extension || !["mp3", "wav", "ogg"].includes(extension)) {
+function setKeyboardSoundTileSelection(tile, definition, files, append = false) {
+  const validFiles = Array.from(files).filter((file) => {
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    return extension && ["mp3", "wav", "ogg"].includes(extension);
+  });
+  if (!validFiles.length) {
     tile.querySelector(".browser-sound-status").textContent = "Choose an MP3, WAV, or OGG file";
     return;
   }
-  const previous = keyboardSoundSelections.get(definition.slot);
-  if (previous) URL.revokeObjectURL(previous.previewUrl);
-  keyboardSoundSelections.set(definition.slot, { extension, file, previewUrl: URL.createObjectURL(file) });
+  const previous = keyboardSoundSelections.get(definition.slot) || [];
+  if (!append) previous.forEach((selection) => URL.revokeObjectURL(selection.previewUrl));
+  const selections = append ? [...previous] : [];
+  validFiles.forEach((file) => {
+    selections.push({
+      extension: file.name.split(".").pop().toLowerCase(),
+      file,
+      previewUrl: URL.createObjectURL(file)
+    });
+  });
+  keyboardSoundSelections.set(definition.slot, selections);
   tile.classList.add("has-custom-sound");
   tile.querySelector(".cursor-source-badge").textContent = "Custom";
-  tile.querySelector(".browser-sound-status").textContent = file.name;
+  tile.querySelector(".browser-sound-status").textContent = selections.map((selection) => selection.file.name).join(", ");
   tile.querySelector(".browser-sound-reset").hidden = false;
   updateKeyboardSoundChangeCount();
 }
 
 function resetKeyboardSoundTile(tile, definition) {
   stopKeyboardSoundPreview();
-  const selection = keyboardSoundSelections.get(definition.slot);
-  if (selection) URL.revokeObjectURL(selection.previewUrl);
+  const selections = keyboardSoundSelections.get(definition.slot) || [];
+  selections.forEach((selection) => URL.revokeObjectURL(selection.previewUrl));
   keyboardSoundSelections.delete(definition.slot);
+  keyboardSoundPlaybackIndexes.delete(definition.slot);
   tile.classList.remove("has-custom-sound", "is-dragging");
   tile.querySelector(".cursor-source-badge").textContent = "Sample";
-  tile.querySelector(".browser-sound-status").textContent = definition.sampleFile;
+  tile.querySelector(".browser-sound-status").textContent = definition.sampleFiles.join(", ");
   tile.querySelector(".browser-sound-reset").hidden = true;
   tile.querySelector(".browser-sound-file-input").value = "";
+  const addInput = tile.querySelector(".keyboard-sound-add-input");
+  if (addInput) addInput.value = "";
   updateKeyboardSoundChangeCount();
 }
 
@@ -2016,8 +2023,13 @@ function playKeyboardSound(tile, definition) {
     return;
   }
   stopKeyboardSoundPreview();
-  const selection = keyboardSoundSelections.get(definition.slot);
-  const audio = new Audio(selection?.previewUrl || definition.sampleUrl);
+  const selections = keyboardSoundSelections.get(definition.slot) || [];
+  const sources = selections.length
+    ? selections.map((selection) => selection.previewUrl)
+    : definition.sampleFiles.map((fileName) => `ModTemplate2.0/keyboard/${fileName}`);
+  const sourceIndex = keyboardSoundPlaybackIndexes.get(definition.slot) || 0;
+  keyboardSoundPlaybackIndexes.set(definition.slot, (sourceIndex + 1) % sources.length);
+  const audio = new Audio(sources[sourceIndex % sources.length]);
   activeKeyboardSoundAudio = audio;
   activeKeyboardSoundButton = playButton;
   playButton.textContent = "Stop";
@@ -2039,6 +2051,7 @@ function playKeyboardSound(tile, definition) {
 function createKeyboardSoundTile(definition, index) {
   const tile = document.createElement("article");
   const inputId = `keyboard-sound-${index}`;
+  const addInputId = `keyboard-sound-add-${index}`;
   tile.className = "browser-sound-tile";
   tile.dataset.keyboardSoundSlot = definition.slot;
   tile.innerHTML = `
@@ -2048,14 +2061,19 @@ function createKeyboardSoundTile(definition, index) {
     </div>
     <input class="browser-sound-file-input" id="${inputId}" type="file" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg">
     <label class="browser-sound-dropzone" for="${inputId}"><strong>Drop audio here</strong><small>or choose a local file</small></label>
+    ${definition.multiple ? `<input class="browser-sound-file-input keyboard-sound-add-input" id="${addInputId}" type="file" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg" multiple><label class="keyboard-sound-add-button" for="${addInputId}">＋ Add more sounds</label>` : ""}
     <div class="browser-sound-footer">
-      <span class="browser-sound-status">${definition.sampleFile}</span>
+      <span class="browser-sound-status">${definition.sampleFiles.join(", ")}</span>
       <button class="cursor-reset-button browser-sound-reset" type="button" hidden>Use sample</button>
     </div>`;
   const input = tile.querySelector(".browser-sound-file-input");
   input.addEventListener("change", () => {
     const file = input.files?.[0];
-    if (file) setKeyboardSoundTileSelection(tile, definition, file);
+    if (file) setKeyboardSoundTileSelection(tile, definition, [file]);
+  });
+  const addInput = tile.querySelector(".keyboard-sound-add-input");
+  addInput?.addEventListener("change", () => {
+    if (addInput.files?.length) setKeyboardSoundTileSelection(tile, definition, addInput.files, true);
   });
   tile.querySelector(".browser-sound-play").addEventListener("click", () => playKeyboardSound(tile, definition));
   tile.querySelector(".browser-sound-reset").addEventListener("click", () => resetKeyboardSoundTile(tile, definition));
@@ -2070,7 +2088,7 @@ function createKeyboardSoundTile(definition, index) {
     event.preventDefault();
     tile.classList.remove("is-dragging");
     const file = event.dataTransfer?.files?.[0];
-    if (file) setKeyboardSoundTileSelection(tile, definition, file);
+    if (file) setKeyboardSoundTileSelection(tile, definition, [file]);
   });
   return tile;
 }
@@ -2100,15 +2118,15 @@ keyboardSoundSaveButton.addEventListener("click", () => {
   if (!keyboardSoundSelections.size) return;
   const items = KEYBOARD_SOUND_DEFINITIONS
     .filter((definition) => keyboardSoundSelections.has(definition.slot))
-    .map((definition) => {
-      const selection = keyboardSoundSelections.get(definition.slot);
+    .flatMap((definition) => keyboardSoundSelections.get(definition.slot).map((selection, index) => {
+      const outputSlot = definition.multiple ? `${definition.slot}_${index + 1}` : definition.slot;
       return {
         file: selection.file,
-        path: `keyboard/${keyboardSoundFileName(definition.slot, selection.extension)}`,
-        slot: definition.slot,
+        path: `keyboard/${keyboardSoundFileName(outputSlot, selection.extension)}`,
+        slot: outputSlot,
         type: definition.type
       };
-    });
+    }));
   modBuildState.keyboardSounds = { items };
   updateSavedKeyboardSoundsSummary();
   keyboardSoundSaveStatus.textContent = `Saved ${items.length} keyboard ${items.length === 1 ? "sound" : "sounds"} successfully`;

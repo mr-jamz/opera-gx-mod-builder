@@ -3869,6 +3869,23 @@ h1 em {
   font: 600 0.58rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
+.keyboard-sound-add-button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font: 700 0.62rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.keyboard-sound-add-button:hover {
+  color: var(--red-bright);
+  border-color: var(--red);
+}
+
 .browser-sound-footer {
   min-width: 0;
   display: flex;
