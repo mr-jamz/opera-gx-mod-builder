@@ -7,15 +7,16 @@
 
   function createManifest(templateManifest, build) {
     const manifest = clone(templateManifest);
+    const templatePayload = templateManifest.mod?.payload || {};
     const payload = {};
+    const defaultComponentName = (section) => templatePayload[section]?.[0]?.name || templateManifest.name;
 
-    manifest.name = "MyMod";
     manifest.mod.payload = payload;
 
     if (build.appIcon) {
       payload.app_icon = [{
         id: "AppIcon",
-        name: "MyMod",
+        name: defaultComponentName("app_icon"),
         path: "app_icon/classic_GX_logo.png"
       }];
     }
@@ -32,7 +33,7 @@
     if (build.browserSounds) {
       payload.browser_sounds = [{
         id: "BrowserSounds",
-        name: "MyMod",
+        name: defaultComponentName("browser_sounds"),
         sounds: Object.fromEntries(
           build.browserSounds.items.map(({ path, type }) => [type, [path]])
         )
@@ -47,7 +48,7 @@
       });
       payload.keyboard_sounds = [{
         id: "KeyboardSounds",
-        name: "MyMod",
+        name: defaultComponentName("keyboard_sounds"),
         sounds
       }];
     }
@@ -56,14 +57,14 @@
       payload.cursors = [{
         id: "Cursors",
         items: build.cursors.items.map(({ path, type }) => ({ path, type })),
-        name: "MyCursor",
+        name: defaultComponentName("cursors"),
         preview: build.cursors.preview
       }];
     }
 
     const savedThemeModes = Object.entries(build.theme);
     if (savedThemeModes.length) {
-      const theme = { id: "0", name: "MyMod" };
+      const theme = { id: "0", name: defaultComponentName("theme") };
       savedThemeModes.forEach(([mode, values]) => {
         theme[mode] = {
           gx_accent: clone(values.accent),
@@ -75,7 +76,7 @@
 
     const savedWallpaperModes = Object.entries(build.wallpaper);
     if (savedWallpaperModes.length) {
-      const wallpaper = { id: "Wallpaper", name: "MyMod" };
+      const wallpaper = { id: "Wallpaper", name: defaultComponentName("wallpaper") };
       savedWallpaperModes.forEach(([mode, values]) => {
         wallpaper[mode] = clone(values);
       });
