@@ -310,7 +310,7 @@
               "type": "SOUTH_EAST_PANNING"
             }
           ],
-          "name": "Pink White Cyberpunk Cursor",
+          "name": "InsertModNameOrSomethingHere",
           "preview": "cursors/Pink/preview.png"
         }
       ],
@@ -327,7 +327,7 @@
                   "l": 32
                }
             },
-            "id": "0",
+            "id": "theme",
             "light": {
                "gx_accent": {
                   "h": 327,

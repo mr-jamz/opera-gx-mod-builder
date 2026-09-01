@@ -404,10 +404,7 @@ async function buildModArchive() {
       target,
       savedSpeedDialEffectValues[themeMode] || createSpeedDialEffectValues(themeMode)
     );
-    const mobileMode = `mobile-${themeMode}`;
-    const animatedMode = savedWallpaperSelections[themeMode]?.kind === "video"
-      ? themeMode
-      : (savedWallpaperSelections[mobileMode]?.kind === "video" ? mobileMode : null);
+    const animatedMode = savedWallpaperSelections[themeMode]?.kind === "video" ? themeMode : null;
     if (animatedMode) {
       const firstFramePath = `wallpaper/first_frame_${themeMode}.jpg`;
       entries.push({ path: firstFramePath, data: await createWallpaperFirstFrame(wallpaperBlobs[animatedMode]) });
@@ -436,9 +433,13 @@ async function buildModArchive() {
   }
 
   const manifest = ModPackager.createManifest(templateManifest, build);
+  const manifestJson = JSON.stringify(manifest, null, 3).replace(
+    /(\"tracks\": )\[\n\s+(\"[^\n]+\")\n\s+\]/g,
+    "$1[$2]"
+  );
   entries.push({
     path: "manifest.json",
-    data: `${JSON.stringify(manifest, null, 3).replace(/\n/g, "\r\n")}\r\n`
+    data: `${manifestJson.replace(/\n/g, "\r\n")}\r\n`
   });
   return ModPackager.createZipBlob(entries);
 }
