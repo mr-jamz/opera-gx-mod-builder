@@ -421,6 +421,5 @@
       "schema_version": 2
    },
    "name": "InsertModNameOrSomethingHere",
-   "update_url": "https://api.gx.me/store/mods/update",
    "version": "1.0"
 }

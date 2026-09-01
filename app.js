@@ -276,7 +276,12 @@ buildModButton.addEventListener("click", () => {
 });
 
 buildDonationDialog.addEventListener("click", (event) => {
-  if (event.target === buildDonationDialog) {
+  const bounds = buildDonationDialog.getBoundingClientRect();
+  const clickedOutside = event.clientX < bounds.left
+    || event.clientX > bounds.right
+    || event.clientY < bounds.top
+    || event.clientY > bounds.bottom;
+  if (clickedOutside) {
     buildDonationDialog.close();
   }
 });
@@ -310,7 +315,9 @@ const modTemplateDirectories = [
 
 function safeBuildFileName(name, fallbackName) {
   const leafName = String(name || fallbackName).split(/[\\/]/).pop();
-  return leafName.replace(/[<>:"|?*\u0000-\u001f]/g, "_") || fallbackName;
+  return leafName
+    .replace(/\s+/g, "_")
+    .replace(/[<>:"|?*\u0000-\u001f]/g, "_") || fallbackName;
 }
 
 function reserveBuildPath(directory, requestedName, usedPaths) {
@@ -336,6 +343,47 @@ async function fetchBuildBlob(url, label) {
 
 async function getSavedWallpaperBlob(selection) {
   return selection.file || fetchBuildBlob(selection.previewUrl, selection.name);
+}
+
+function validateBuildFileReferences(entries, build) {
+  const entryPaths = new Set(entries.filter((entry) => !entry.path.endsWith("/")).map((entry) => entry.path));
+  const invalidPath = entries.find((entry) => /\s/.test(entry.path));
+  if (invalidPath) throw new Error(`The packaged file path contains whitespace: ${invalidPath.path}`);
+
+  const references = ["icon_512.png"];
+  if (build.appIcon) references.push("app_icon/classic_GX_logo.png");
+  build.music.forEach((track) => references.push(track.path));
+  build.browserSounds?.items.forEach((item) => references.push(item.path));
+  build.keyboardSounds?.items.forEach((item) => references.push(item.path));
+  if (build.cursors) {
+    references.push(build.cursors.preview);
+    build.cursors.items.forEach((item) => references.push(item.path));
+  }
+  Object.values(build.wallpaper).forEach((wallpaper) => {
+    ["image", "image_mobile", "first_frame"].forEach((field) => {
+      if (wallpaper[field]) references.push(wallpaper[field]);
+    });
+  });
+
+  const invalidReference = references.find((reference) => /\s/.test(reference));
+  if (invalidReference) throw new Error(`The manifest file reference contains whitespace: ${invalidReference}`);
+  const missingReference = references.find((reference) => !entryPaths.has(reference));
+  if (missingReference) throw new Error(`The manifest references a file that was not packaged: ${missingReference}`);
+}
+
+function addFileChangeLogEntry(changeLog, originalName, outputPath) {
+  const cleanOriginalName = String(originalName || "Unknown file").replace(/[\r\n]+/g, " ");
+  changeLog.push(`${cleanOriginalName} -> ${outputPath}`);
+}
+
+function createFileChangeLog(changeLog) {
+  const lines = [
+    "GX Mod Builder - File Change Log",
+    "",
+    "Original filename -> Packaged filename",
+    ...changeLog
+  ];
+  return `${lines.join("\r\n")}\r\n`;
 }
 
 function canvasToJpegBlob(canvas) {
@@ -400,6 +448,7 @@ async function buildModArchive() {
 
   const templateManifest = await manifestResponse.json();
   const entries = [];
+  const fileChangeLog = [];
   const usedPaths = new Set();
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
@@ -408,7 +457,11 @@ async function buildModArchive() {
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
-  if (savedAppIconValue) entries.push({ path: "app_icon/classic_GX_logo.png", data: savedAppIconValue.file });
+  if (savedModIconValue) addFileChangeLogEntry(fileChangeLog, savedModIconValue.originalName, "icon_512.png");
+  if (savedAppIconValue) {
+    entries.push({ path: "app_icon/classic_GX_logo.png", data: savedAppIconValue.file });
+    addFileChangeLogEntry(fileChangeLog, savedAppIconValue.originalName, "app_icon/classic_GX_logo.png");
+  }
 
   ["dark", "light"].forEach((mode) => {
     if (savedThemeValues[mode]) build.theme[mode] = copyThemeValues(savedThemeValues[mode]);
@@ -423,6 +476,7 @@ async function buildModArchive() {
     const wallpaperBlob = await getSavedWallpaperBlob(selection);
     const outputPath = reserveBuildPath("wallpaper", selection.name, usedPaths);
     entries.push({ path: outputPath, data: wallpaperBlob });
+    addFileChangeLogEntry(fileChangeLog, selection.name, outputPath);
     target[selection.manifestField] = outputPath;
     wallpaperBlobs[mode] = wallpaperBlob;
   }
@@ -446,6 +500,7 @@ async function buildModArchive() {
     if (!track.media?.file) return;
     const outputPath = reserveBuildPath("music", track.media.file.name, usedPaths);
     entries.push({ path: outputPath, data: track.media.file });
+    addFileChangeLogEntry(fileChangeLog, track.media.sourceName || track.media.file.name, outputPath);
     build.music.push({ author: track.author || "", name: track.songName, path: outputPath });
   });
 
@@ -454,6 +509,7 @@ async function buildModArchive() {
       const extension = item.file.name.split(".").pop().toLowerCase();
       const outputPath = `sound/${browserSoundFileName(item.type, extension)}`;
       entries.push({ path: outputPath, data: item.file });
+      addFileChangeLogEntry(fileChangeLog, item.file.name, outputPath);
       return { path: outputPath, type: item.type };
     });
     build.browserSounds = { items };
@@ -464,6 +520,7 @@ async function buildModArchive() {
       const extension = item.file.name.split(".").pop().toLowerCase();
       const outputPath = `keyboard/${keyboardSoundFileName(item.slot, extension)}`;
       entries.push({ path: outputPath, data: item.file });
+      addFileChangeLogEntry(fileChangeLog, item.file.name, outputPath);
       return { path: outputPath, slot: item.slot, type: item.type };
     });
     build.keyboardSounds = { items };
@@ -474,6 +531,7 @@ async function buildModArchive() {
       const extension = item.file.name.split(".").pop().toLowerCase();
       const outputPath = `cursors/MyCursor/${cursorFileName(item.type, extension)}`;
       entries.push({ path: outputPath, data: item.file });
+      addFileChangeLogEntry(fileChangeLog, item.file.name, outputPath);
       return { path: outputPath, type: item.type };
     });
     const previewPath = "cursors/MyCursor/preview.png";
@@ -482,6 +540,8 @@ async function buildModArchive() {
     build.cursors = { items: cursorItems, preview: previewPath };
   }
 
+  entries.push({ path: "Change_Log.txt", data: createFileChangeLog(fileChangeLog) });
+  validateBuildFileReferences(entries, build);
   const manifest = ModPackager.createManifest(templateManifest, build);
   const manifestJson = JSON.stringify(manifest, null, 3).replace(
     /(\"tracks\": )\[\n\s+(\"[^\n]+\")\n\s+\]/g,
