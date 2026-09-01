@@ -29,6 +29,16 @@
       }));
     }
 
+    if (build.browserSounds) {
+      payload.browser_sounds = [{
+        id: "BrowserSounds",
+        name: "MyMod",
+        sounds: Object.fromEntries(
+          build.browserSounds.items.map(({ path, type }) => [type, [path]])
+        )
+      }];
+    }
+
     if (build.cursors) {
       payload.cursors = [{
         id: "Cursors",

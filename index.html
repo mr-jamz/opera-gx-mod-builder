@@ -7,8 +7,8 @@
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
     <link rel="stylesheet" href="styles.css?v=20260828-18">
-    <script src="mod-packager.js?v=20260831-1" defer></script>
-    <script src="app.js?v=20260831-5" defer></script>
+    <script src="mod-packager.js?v=20260901-1" defer></script>
+    <script src="app.js?v=20260901-1" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -137,7 +137,13 @@
                 <span class="saved-app-icon-summary" id="saved-app-icon-summary"></span>
               </div>
             </div>
-            <button class="category-card" type="button" data-category="Browser sounds"><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Browser sounds"><span class="card-copy"><strong>Browser sounds</strong><small>Clicks and navigation</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-browser-sounds-box" hidden>
+                <strong>Saved browser sounds</strong>
+                <div class="saved-browser-sounds-summary" id="saved-browser-sounds-summary"></div>
+              </div>
+            </div>
             <div class="additional-category-item">
               <button class="category-card" type="button" data-category="Cursors"><span class="card-copy"><strong>Cursors</strong><small>Pointer collection</small></span><span class="card-arrow">↗</span></button>
               <div class="saved-content-box" id="saved-cursors-box" hidden>
@@ -145,15 +151,15 @@
                 <div class="saved-cursors-summary" id="saved-cursors-summary"></div>
               </div>
             </div>
-            <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Fonts" disabled><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <button class="category-card is-not-supported" type="button" data-category="Game strips" disabled><span class="card-copy"><strong>Game strips</strong><small>Not supported yet</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
-            <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Keyboard sounds"><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Shaders"><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page effects</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
-            <button class="category-card" type="button" data-category="Web modding"><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Icons" disabled><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Keyboard sounds" disabled><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Shaders" disabled><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Speed Dial effects" disabled><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Splash screen" disabled><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Stickers" disabled><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <button class="category-card is-not-supported" type="button" data-category="Web modding" disabled><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
           </div>
         </section>
 
@@ -550,6 +556,34 @@
           <button class="save-theme-button music-save-button" id="save-music-tracks" type="button"><span>Save music tracks</span><b aria-hidden="true">→</b></button>
           <p class="theme-save-status" id="music-save-status" role="status" aria-live="polite"></p>
         </section>
+      </section>
+
+      <section class="view browser-sounds-editor" id="browser-sounds-editor" aria-labelledby="browser-sounds-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-browser-sounds" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Browser sounds</p>
+            <h2 id="browser-sounds-editor-title">Browser sounds</h2>
+            <p class="cursor-editor-intro">Preview each included sound or upload a replacement for that browser event.</p>
+          </div>
+          <p class="schema-chip">12 roles</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>Browser audio files</strong><span>Drop or choose an <code>.mp3</code>, <code>.wav</code>, or <code>.ogg</code> file. The Play button uses your uploaded sound immediately.</span></div>
+        </div>
+
+        <div class="browser-sound-grid" id="browser-sound-grid"></div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="browser-sound-change-count">No custom browser sounds selected</strong>
+            <span>Upload at least one sound to enable saving.</span>
+            <p class="theme-save-status cursor-save-status" id="browser-sound-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-browser-sounds" type="button" disabled><span>Save browser sounds</span><b aria-hidden="true">→</b></button>
+        </div>
       </section>
 
       <section class="view cursor-editor" id="cursor-editor" aria-labelledby="cursor-editor-title" aria-hidden="true">

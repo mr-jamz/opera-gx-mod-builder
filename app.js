@@ -5,6 +5,7 @@ const appIconEditorView = document.querySelector("#app-icon-editor");
 const modIconEditorView = document.querySelector("#mod-icon-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
+const browserSoundsEditorView = document.querySelector("#browser-sounds-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
@@ -15,6 +16,7 @@ const backAppIconButton = document.querySelector("#back-app-icon");
 const backModIconButton = document.querySelector("#back-mod-icon");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
+const backBrowserSoundsButton = document.querySelector("#back-browser-sounds");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
@@ -97,6 +99,7 @@ const savedSpeedDialEffectValues = {
 };
 
 const modBuildState = {
+  browserSounds: null,
   cursors: null,
   music: {
     tracks: []
@@ -200,6 +203,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Browser sounds") {
+      switchView(creatorView, browserSoundsEditorView);
+      window.history.replaceState(null, "", "#browser-sounds-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -227,6 +236,12 @@ backModIconButton.addEventListener("click", () => {
 
 backMusicButton.addEventListener("click", () => {
   switchView(musicEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backBrowserSoundsButton.addEventListener("click", () => {
+  stopBrowserSoundPreview();
+  switchView(browserSoundsEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -374,7 +389,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -418,6 +433,16 @@ async function buildModArchive() {
     entries.push({ path: outputPath, data: track.media.file });
     build.music.push({ author: track.author || "", name: track.songName, path: outputPath });
   });
+
+  if (modBuildState.browserSounds?.items.length) {
+    const items = modBuildState.browserSounds.items.map((item) => {
+      const extension = item.file.name.split(".").pop().toLowerCase();
+      const outputPath = `sound/${browserSoundFileName(item.type, extension)}`;
+      entries.push({ path: outputPath, data: item.file });
+      return { path: outputPath, type: item.type };
+    });
+    build.browserSounds = { items };
+  }
 
   if (modBuildState.cursors?.items.length) {
     const cursorItems = modBuildState.cursors.items.map((item) => {
@@ -1686,6 +1711,197 @@ speedDialFocusMode.addEventListener("change", () => {
   renderWallpaperSpeedDialSettings();
 });
 
+const BROWSER_SOUND_DEFINITIONS = [
+  ["CLICK", "Standard click", "click.mp3"],
+  ["FEATURE_SWITCH_OFF", "Feature switch off", "feature_switch_off.mp3"],
+  ["FEATURE_SWITCH_ON", "Feature switch on", "feature_switch_on.mp3"],
+  ["HOVER", "Hover", "hover.mp3"],
+  ["HOVER_UP", "Hover release", "hover.mp3"],
+  ["IMPORTANT_CLICK", "Important click", "click.mp3"],
+  ["LIMITER_OFF", "Limiter off", "toggle.mp3"],
+  ["LIMITER_ON", "Limiter on", "toggle.mp3"],
+  ["SWITCH_TOGGLE", "Switch toggle", "toggle.mp3"],
+  ["TAB_CLOSE", "Tab close", "tabclose.mp3"],
+  ["TAB_INSERT", "Tab open", "tabopen.mp3"],
+  ["TAB_SLASH", "Tab slash", "tab_slash.mp3"]
+].map(([type, label, sampleFile]) => ({
+  label,
+  sampleFile,
+  sampleUrl: `ModTemplate2.0/sound/${sampleFile}`,
+  type
+}));
+
+const browserSoundGrid = document.querySelector("#browser-sound-grid");
+const browserSoundChangeCount = document.querySelector("#browser-sound-change-count");
+const browserSoundSaveButton = document.querySelector("#save-browser-sounds");
+const browserSoundSaveStatus = document.querySelector("#browser-sound-save-status");
+const savedBrowserSoundsBox = document.querySelector("#saved-browser-sounds-box");
+const savedBrowserSoundsSummary = document.querySelector("#saved-browser-sounds-summary");
+const browserSoundsCategoryCard = document.querySelector('[data-category="Browser sounds"]');
+const browserSoundSelections = new Map();
+let activeBrowserSoundAudio = null;
+let activeBrowserSoundButton = null;
+
+function browserSoundFileName(type, extension = "mp3") {
+  return `${type.toLowerCase()}.${extension}`;
+}
+
+function stopBrowserSoundPreview() {
+  if (activeBrowserSoundAudio) {
+    activeBrowserSoundAudio.pause();
+    activeBrowserSoundAudio.currentTime = 0;
+    activeBrowserSoundAudio = null;
+  }
+  if (activeBrowserSoundButton) {
+    activeBrowserSoundButton.textContent = "Play";
+    activeBrowserSoundButton.classList.remove("is-playing");
+    activeBrowserSoundButton = null;
+  }
+}
+
+function updateBrowserSoundChangeCount() {
+  const count = browserSoundSelections.size;
+  browserSoundChangeCount.textContent = count
+    ? `${count} custom browser ${count === 1 ? "sound" : "sounds"} selected`
+    : "No custom browser sounds selected";
+  browserSoundSaveButton.disabled = count === 0;
+  browserSoundSaveStatus.textContent = "";
+}
+
+function setBrowserSoundTileSelection(tile, definition, file) {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (!extension || !["mp3", "wav", "ogg"].includes(extension)) {
+    tile.querySelector(".browser-sound-status").textContent = "Choose an MP3, WAV, or OGG file";
+    return;
+  }
+  const previous = browserSoundSelections.get(definition.type);
+  if (previous) URL.revokeObjectURL(previous.previewUrl);
+  const selection = { extension, file, previewUrl: URL.createObjectURL(file) };
+  browserSoundSelections.set(definition.type, selection);
+  tile.classList.add("has-custom-sound");
+  tile.querySelector(".cursor-source-badge").textContent = "Custom";
+  tile.querySelector(".browser-sound-status").textContent = file.name;
+  tile.querySelector(".browser-sound-reset").hidden = false;
+  updateBrowserSoundChangeCount();
+}
+
+function resetBrowserSoundTile(tile, definition) {
+  stopBrowserSoundPreview();
+  const selection = browserSoundSelections.get(definition.type);
+  if (selection) URL.revokeObjectURL(selection.previewUrl);
+  browserSoundSelections.delete(definition.type);
+  tile.classList.remove("has-custom-sound", "is-dragging");
+  tile.querySelector(".cursor-source-badge").textContent = "Sample";
+  tile.querySelector(".browser-sound-status").textContent = definition.sampleFile;
+  tile.querySelector(".browser-sound-reset").hidden = true;
+  tile.querySelector(".browser-sound-file-input").value = "";
+  updateBrowserSoundChangeCount();
+}
+
+function playBrowserSound(tile, definition) {
+  const playButton = tile.querySelector(".browser-sound-play");
+  if (activeBrowserSoundButton === playButton) {
+    stopBrowserSoundPreview();
+    return;
+  }
+  stopBrowserSoundPreview();
+  const selection = browserSoundSelections.get(definition.type);
+  const audio = new Audio(selection?.previewUrl || definition.sampleUrl);
+  activeBrowserSoundAudio = audio;
+  activeBrowserSoundButton = playButton;
+  playButton.textContent = "Stop";
+  playButton.classList.add("is-playing");
+  const finish = () => {
+    if (activeBrowserSoundAudio === audio) stopBrowserSoundPreview();
+  };
+  audio.addEventListener("ended", finish, { once: true });
+  audio.addEventListener("error", () => {
+    tile.querySelector(".browser-sound-status").textContent = "This sound could not be played";
+    finish();
+  }, { once: true });
+  audio.play().catch(() => {
+    tile.querySelector(".browser-sound-status").textContent = "This sound could not be played";
+    finish();
+  });
+}
+
+function createBrowserSoundTile(definition, index) {
+  const tile = document.createElement("article");
+  const inputId = `browser-sound-${index}`;
+  tile.className = "browser-sound-tile";
+  tile.dataset.browserSoundType = definition.type;
+  tile.innerHTML = `
+    <div class="browser-sound-heading">
+      <span><span class="browser-sound-title"><strong>${definition.label}</strong><small class="cursor-source-badge">Sample</small></span><code>${definition.type}</code></span>
+      <button class="browser-sound-play" type="button" aria-label="Play ${definition.label}">Play</button>
+    </div>
+    <input class="browser-sound-file-input" id="${inputId}" type="file" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg">
+    <label class="browser-sound-dropzone" for="${inputId}"><strong>Drop audio here</strong><small>or choose a local file</small></label>
+    <div class="browser-sound-footer">
+      <span class="browser-sound-status">${definition.sampleFile}</span>
+      <button class="cursor-reset-button browser-sound-reset" type="button" hidden>Use sample</button>
+    </div>`;
+  const input = tile.querySelector(".browser-sound-file-input");
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file) setBrowserSoundTileSelection(tile, definition, file);
+  });
+  tile.querySelector(".browser-sound-play").addEventListener("click", () => playBrowserSound(tile, definition));
+  tile.querySelector(".browser-sound-reset").addEventListener("click", () => resetBrowserSoundTile(tile, definition));
+  ["dragenter", "dragover"].forEach((eventName) => tile.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    tile.classList.add("is-dragging");
+  }));
+  tile.addEventListener("dragleave", (event) => {
+    if (!tile.contains(event.relatedTarget)) tile.classList.remove("is-dragging");
+  });
+  tile.addEventListener("drop", (event) => {
+    event.preventDefault();
+    tile.classList.remove("is-dragging");
+    const file = event.dataTransfer?.files?.[0];
+    if (file) setBrowserSoundTileSelection(tile, definition, file);
+  });
+  return tile;
+}
+
+function renderBrowserSoundsEditor() {
+  if (browserSoundGrid.childElementCount) return;
+  BROWSER_SOUND_DEFINITIONS.forEach((definition, index) => {
+    browserSoundGrid.append(createBrowserSoundTile(definition, index));
+  });
+  updateBrowserSoundChangeCount();
+}
+
+function updateSavedBrowserSoundsSummary() {
+  const saved = modBuildState.browserSounds;
+  savedBrowserSoundsSummary.replaceChildren();
+  saved?.items.forEach((item) => {
+    const summary = document.createElement("span");
+    summary.textContent = `${item.type} ← ${item.file.name}`;
+    savedBrowserSoundsSummary.append(summary);
+  });
+  savedBrowserSoundsBox.hidden = !saved;
+  browserSoundsCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
+  updateCreateModAvailability();
+}
+
+browserSoundSaveButton.addEventListener("click", () => {
+  if (!browserSoundSelections.size) return;
+  const items = BROWSER_SOUND_DEFINITIONS
+    .filter((definition) => browserSoundSelections.has(definition.type))
+    .map((definition) => {
+      const selection = browserSoundSelections.get(definition.type);
+      return {
+        file: selection.file,
+        path: `sound/${browserSoundFileName(definition.type, selection.extension)}`,
+        type: definition.type
+      };
+    });
+  modBuildState.browserSounds = { items };
+  updateSavedBrowserSoundsSummary();
+  browserSoundSaveStatus.textContent = `Saved ${items.length} browser ${items.length === 1 ? "sound" : "sounds"} successfully`;
+});
+
 const CURSOR_GROUPS = [
   {
     name: "Basic cursors",
@@ -2170,8 +2386,9 @@ function hasSavedModOptions() {
   const hasSavedTheme = Object.values(savedThemeValues).some(Boolean);
   const hasSavedWallpaper = Object.values(savedWallpaperSelections).some(Boolean);
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
+  const hasSavedBrowserSounds = Boolean(modBuildState.browserSounds);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -2367,6 +2584,25 @@ function renderBuildSummary() {
       };
     });
   appendBuildSummaryGroup("Wallpaper", "Saved wallpaper media and settings", wallpaperItems);
+
+  const browserSoundItems = (modBuildState.browserSounds?.items || []).map((item) => {
+    const audioPreviewUrl = URL.createObjectURL(item.file);
+    buildReviewObjectUrls.push(audioPreviewUrl);
+    return {
+      title: item.type,
+      preview: {
+        alt: `Audio preview for ${item.type}`,
+        kind: "audio",
+        url: audioPreviewUrl
+      },
+      details: [
+        { label: "Browser event", value: item.type },
+        { label: "Saved audio", value: item.file.name },
+        { label: "Manifest path", value: item.path }
+      ]
+    };
+  });
+  appendBuildSummaryGroup("Browser sounds", "Saved browser event audio", browserSoundItems);
 
   const musicItems = modBuildState.music.tracks.map((track, index) => {
     const details = [
@@ -2741,6 +2977,7 @@ renderThemeEditor();
 renderAppIconEditor();
 renderModIconEditor();
 renderWallpaperEditor();
+renderBrowserSoundsEditor();
 renderCursorEditor();
 ensureDefaultModIcon().catch(() => {});
 
@@ -2748,7 +2985,7 @@ if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -2758,6 +2995,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#mod-icon-editor": modIconEditorView,
     "#wallpaper-editor": wallpaperEditorView,
     "#music-editor": musicEditorView,
+    "#browser-sounds-editor": browserSoundsEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
   };

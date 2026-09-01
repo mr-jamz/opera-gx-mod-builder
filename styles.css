@@ -119,6 +119,7 @@ button {
 }
 
 .wallpaper-editor,
+.browser-sounds-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
 }
@@ -492,6 +493,7 @@ h1 em {
 .wallpaper-editor.is-active,
 .speed-dial-effects-editor.is-active,
 .music-editor.is-active,
+.browser-sounds-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
   display: block;
@@ -3559,6 +3561,7 @@ h1 em {
   .wallpaper-editor.is-active,
   .speed-dial-effects-editor.is-active,
   .music-editor.is-active,
+  .browser-sounds-editor.is-active,
   .cursor-editor.is-active,
   .build-review.is-active {
     padding-block: 36px 70px;
@@ -3751,6 +3754,140 @@ h1 em {
 
 .cursor-format-note code {
   color: var(--red-bright);
+}
+
+.browser-sound-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.browser-sound-tile {
+  min-width: 0;
+  padding: 18px;
+  display: grid;
+  gap: 15px;
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface-raised) 42%, transparent);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.browser-sound-tile:hover,
+.browser-sound-tile.is-dragging,
+.browser-sound-tile.has-custom-sound {
+  border-color: color-mix(in hsl, var(--red) 62%, var(--line));
+  background: color-mix(in hsl, var(--red) 7%, var(--surface-raised));
+}
+
+.browser-sound-tile:hover,
+.browser-sound-tile.is-dragging {
+  transform: translateY(-2px);
+}
+
+.browser-sound-heading {
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+
+.browser-sound-heading > span {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.browser-sound-title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.browser-sound-heading strong {
+  font-size: 0.88rem;
+}
+
+.browser-sound-heading code {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.56rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browser-sound-play {
+  min-width: 72px;
+  padding: 9px 12px;
+  color: var(--text);
+  border: 1px solid var(--red);
+  background: color-mix(in hsl, var(--red) 14%, var(--surface));
+  cursor: pointer;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.browser-sound-play.is-playing {
+  color: var(--surface);
+  background: var(--red-bright);
+}
+
+.browser-sound-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.browser-sound-dropzone {
+  min-height: 92px;
+  padding: 15px;
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  text-align: center;
+  border: 1px dashed var(--line-strong);
+  cursor: pointer;
+}
+
+.browser-sound-dropzone strong {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.browser-sound-dropzone small,
+.browser-sound-status {
+  color: var(--muted);
+  font: 600 0.58rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.browser-sound-footer {
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.browser-sound-status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saved-browser-sounds-summary {
+  display: grid;
+  gap: 4px;
+}
+
+.saved-browser-sounds-summary span {
+  color: var(--red);
+  font: 650 0.61rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 .cursor-groups {
@@ -4027,8 +4164,18 @@ h1 em {
 }
 
 @media (max-width: 1120px) {
+  .browser-sound-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .cursor-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .browser-sound-grid {
+    grid-template-columns: 1fr;
   }
 }
 
