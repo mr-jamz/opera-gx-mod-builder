@@ -2260,6 +2260,7 @@ const fontPreviews = {
   header: document.querySelector(".font-header-preview"),
   body: document.querySelector(".font-body-preview")
 };
+const fontDropzones = document.querySelectorAll("[data-font-dropzone]");
 const fontChangeCount = document.querySelector("#font-change-count");
 const fontSaveButton = document.querySelector("#save-fonts");
 const fontSaveStatus = document.querySelector("#font-save-status");
@@ -2348,6 +2349,26 @@ Object.entries(fontInputs).forEach(([role, input]) => {
   input.addEventListener("change", async () => {
     if (input.files?.length) await addFontFiles(role, input.files);
     input.value = "";
+  });
+});
+
+fontDropzones.forEach((dropzone) => {
+  const role = dropzone.dataset.fontDropzone;
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.add("is-dragging");
+    });
+  });
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove("is-dragging");
+    });
+  });
+  dropzone.addEventListener("drop", async (event) => {
+    const files = event.dataTransfer?.files;
+    if (files?.length) await addFontFiles(role, files);
   });
 });
 

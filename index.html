@@ -6,9 +6,9 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260903-2">
-    <script src="mod-packager.js?v=20260903-2" defer></script>
-    <script src="app.js?v=20260903-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260903-3">
+    <script src="mod-packager.js?v=20260903-3" defer></script>
+    <script src="app.js?v=20260903-3" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -654,7 +654,7 @@
             <p class="font-live-preview font-header-preview">The quick brown fox jumps over the lazy dog</p>
             <div class="font-selection-list" data-font-list="header"></div>
             <input class="font-file-input" id="header-font-input" type="file" accept=".ttf,font/ttf,application/x-font-ttf" multiple>
-            <label class="keyboard-sound-add-button font-add-button" for="header-font-input">＋ Add font</label>
+            <label class="font-add-button" for="header-font-input" data-font-dropzone="header"><strong>Drop TTF files here</strong><span>or click to add fonts</span></label>
           </section>
 
           <section class="font-category" data-font-role="body">
@@ -662,7 +662,7 @@
             <p class="font-live-preview font-body-preview">Pack my box with five dozen liquor jugs. 0123456789</p>
             <div class="font-selection-list" data-font-list="body"></div>
             <input class="font-file-input" id="body-font-input" type="file" accept=".ttf,font/ttf,application/x-font-ttf" multiple>
-            <label class="keyboard-sound-add-button font-add-button" for="body-font-input">＋ Add font</label>
+            <label class="font-add-button" for="body-font-input" data-font-dropzone="body"><strong>Drop TTF files here</strong><span>or click to add fonts</span></label>
           </section>
         </div>
 

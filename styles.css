@@ -4085,9 +4085,34 @@ h1 em {
 }
 
 .font-add-button {
-  width: fit-content;
-  min-width: 180px;
-  padding-inline: 20px;
+  min-height: 92px;
+  padding: 18px;
+  display: grid;
+  place-content: center;
+  gap: 7px;
+  color: var(--text);
+  text-align: center;
+  border: 1px dashed var(--line-strong);
+  background: color-mix(in hsl, var(--surface-raised) 60%, transparent);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.font-add-button strong {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.font-add-button span {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.font-add-button:hover,
+.font-add-button.is-dragging {
+  color: var(--red-bright);
+  border-color: var(--red-bright);
+  background: color-mix(in hsl, var(--red) 12%, var(--surface-raised));
 }
 
 .cursor-groups {
