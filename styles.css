@@ -1,3 +1,9 @@
+@font-face {
+  font-family: "GX Builder Mephisto";
+  src: url("ModTemplate2.0/fonts/Mephisto.ttf") format("truetype");
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
   font-size: 17px;
@@ -121,6 +127,7 @@ button {
 .wallpaper-editor,
 .browser-sounds-editor,
 .keyboard-sounds-editor,
+.font-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
 }
@@ -496,6 +503,7 @@ h1 em {
 .music-editor.is-active,
 .browser-sounds-editor.is-active,
 .keyboard-sounds-editor.is-active,
+.font-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
   display: block;
@@ -2993,6 +3001,23 @@ h1 em {
   accent-color: var(--red);
 }
 
+.build-summary-media[data-kind="font"] {
+  min-height: 120px;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  aspect-ratio: auto;
+  background: var(--surface-raised);
+}
+
+.build-summary-media[data-kind="font"] p {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.2rem, 2.6vw, 2rem);
+  line-height: 1.15;
+  text-align: center;
+}
+
 .build-summary-list dl > div {
   display: grid;
   grid-template-columns: minmax(120px, 0.32fr) minmax(0, 1fr);
@@ -3565,6 +3590,7 @@ h1 em {
   .music-editor.is-active,
   .browser-sounds-editor.is-active,
   .keyboard-sounds-editor.is-active,
+  .font-editor.is-active,
   .cursor-editor.is-active,
   .build-review.is-active {
     padding-block: 36px 70px;
@@ -3908,6 +3934,98 @@ h1 em {
 .saved-browser-sounds-summary span {
   color: var(--red);
   font: 650 0.61rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.font-category-list {
+  display: grid;
+  gap: 24px;
+}
+
+.font-category {
+  padding: 28px;
+  display: grid;
+  gap: 20px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.font-category-heading,
+.font-selection-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.font-category-heading h3 {
+  margin: 5px 0 0;
+  font-size: 1.35rem;
+}
+
+.font-live-preview {
+  min-height: 112px;
+  margin: 0;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-raised);
+  font-family: "GX Builder Mephisto", sans-serif;
+}
+
+.font-header-preview {
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1.05;
+}
+
+.font-body-preview {
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  line-height: 1.55;
+}
+
+.font-selection-list {
+  display: grid;
+  gap: 8px;
+}
+
+.font-selection-item {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+}
+
+.font-selection-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 650 0.68rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.font-selection-remove {
+  flex: 0 0 auto;
+  color: var(--red-bright);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: 700 0.62rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.font-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.font-add-button {
+  width: fit-content;
+  min-width: 180px;
+  padding-inline: 20px;
 }
 
 .cursor-groups {

@@ -403,15 +403,15 @@
 		],
         "fonts": [ {
             "body": {
-               "name": "NameOfFontGoesHere",
+               "name": "Mephisto",
                "variants": [ {
-                  "path": "fonts/blender-book.ttf"
+                  "path": "fonts/Mephisto.ttf"
                } ]
             },
             "header": {
-               "name": "NameOfFontGoesHere",
+               "name": "Mephisto",
                "variants": [ {
-                  "path": "fonts/blender-bold.ttf"
+                  "path": "fonts/Mephisto.ttf"
                } ]
             },
             "id": "Fonts",

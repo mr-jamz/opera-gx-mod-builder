@@ -53,6 +53,21 @@
       }];
     }
 
+    if (Object.keys(build.fonts || {}).length) {
+      const fonts = {
+        id: "Fonts",
+        name: defaultComponentName("fonts")
+      };
+      for (const role of ["header", "body"]) {
+        if (!build.fonts[role]) continue;
+        fonts[role] = {
+          name: build.fonts[role].name,
+          variants: clone(build.fonts[role].variants)
+        };
+      }
+      payload.fonts = [fonts];
+    }
+
     if (build.cursors) {
       payload.cursors = [{
         id: "Cursors",

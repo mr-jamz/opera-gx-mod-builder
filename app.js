@@ -7,6 +7,7 @@ const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
 const browserSoundsEditorView = document.querySelector("#browser-sounds-editor");
 const keyboardSoundsEditorView = document.querySelector("#keyboard-sounds-editor");
+const fontEditorView = document.querySelector("#font-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
@@ -19,6 +20,7 @@ const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
 const backBrowserSoundsButton = document.querySelector("#back-browser-sounds");
 const backKeyboardSoundsButton = document.querySelector("#back-keyboard-sounds");
+const backFontsButton = document.querySelector("#back-fonts");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
@@ -103,6 +105,7 @@ const savedSpeedDialEffectValues = {
 const modBuildState = {
   browserSounds: null,
   keyboardSounds: null,
+  fonts: null,
   cursors: null,
   music: {
     tracks: []
@@ -218,6 +221,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Fonts") {
+      switchView(creatorView, fontEditorView);
+      window.history.replaceState(null, "", "#font-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -257,6 +266,11 @@ backBrowserSoundsButton.addEventListener("click", () => {
 backKeyboardSoundsButton.addEventListener("click", () => {
   stopKeyboardSoundPreview();
   switchView(keyboardSoundsEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backFontsButton.addEventListener("click", () => {
+  switchView(fontEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -355,6 +369,7 @@ function validateBuildFileReferences(entries, build) {
   build.music.forEach((track) => references.push(track.path));
   build.browserSounds?.items.forEach((item) => references.push(item.path));
   build.keyboardSounds?.items.forEach((item) => references.push(item.path));
+  Object.values(build.fonts || {}).forEach((fontRole) => fontRole.variants.forEach((variant) => references.push(variant.path)));
   if (build.cursors) {
     references.push(build.cursors.preview);
     build.cursors.items.forEach((item) => references.push(item.path));
@@ -453,7 +468,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -524,6 +539,20 @@ async function buildModArchive() {
       return { path: outputPath, slot: item.slot, type: item.type };
     });
     build.keyboardSounds = { items };
+  }
+
+  if (modBuildState.fonts) {
+    for (const role of ["header", "body"]) {
+      const savedRole = modBuildState.fonts[role];
+      if (!savedRole?.items.length) continue;
+      const variants = savedRole.items.map((item) => {
+        const outputPath = reserveBuildPath("fonts", item.file.name, usedPaths);
+        entries.push({ path: outputPath, data: item.file });
+        addFileChangeLogEntry(fileChangeLog, item.file.name, outputPath);
+        return { path: outputPath };
+      });
+      build.fonts[role] = { name: savedRole.name, variants };
+    }
   }
 
   if (modBuildState.cursors?.items.length) {
@@ -2192,6 +2221,140 @@ keyboardSoundSaveButton.addEventListener("click", () => {
   keyboardSoundSaveStatus.textContent = `Saved ${items.length} keyboard ${items.length === 1 ? "sound" : "sounds"} successfully`;
 });
 
+const fontSelections = { header: [], body: [] };
+const fontInputs = {
+  header: document.querySelector("#header-font-input"),
+  body: document.querySelector("#body-font-input")
+};
+const fontLists = {
+  header: document.querySelector('[data-font-list="header"]'),
+  body: document.querySelector('[data-font-list="body"]')
+};
+const fontPreviews = {
+  header: document.querySelector(".font-header-preview"),
+  body: document.querySelector(".font-body-preview")
+};
+const fontChangeCount = document.querySelector("#font-change-count");
+const fontSaveButton = document.querySelector("#save-fonts");
+const fontSaveStatus = document.querySelector("#font-save-status");
+const savedFontsBox = document.querySelector("#saved-fonts-box");
+const savedFontsSummary = document.querySelector("#saved-fonts-summary");
+const fontsCategoryCard = document.querySelector('[data-category="Fonts"]');
+let fontFamilySequence = 0;
+
+function fontDisplayName(fileName) {
+  return fileName.replace(/\.ttf$/i, "").replace(/[_-]+/g, " ").trim() || "Custom font";
+}
+
+function updateFontChangeCount() {
+  const count = fontSelections.header.length + fontSelections.body.length;
+  fontChangeCount.textContent = count
+    ? `${count} custom font ${count === 1 ? "file" : "files"} selected`
+    : "No custom fonts selected";
+  fontSaveButton.disabled = count === 0;
+  fontSaveStatus.textContent = "";
+}
+
+function updateFontPreview(role) {
+  const latest = fontSelections[role].at(-1);
+  fontPreviews[role].style.fontFamily = latest
+    ? `"${latest.family}", sans-serif`
+    : '"GX Builder Mephisto", sans-serif';
+  document.querySelector(`[data-font-role="${role}"] .cursor-source-badge`).textContent = latest
+    ? fontDisplayName(latest.file.name)
+    : "Mephisto default";
+}
+
+function removeFontSelection(role, selection) {
+  const index = fontSelections[role].indexOf(selection);
+  if (index === -1) return;
+  fontSelections[role].splice(index, 1);
+  document.fonts.delete(selection.fontFace);
+  URL.revokeObjectURL(selection.previewUrl);
+  renderFontSelectionList(role);
+  updateFontPreview(role);
+  updateFontChangeCount();
+}
+
+function renderFontSelectionList(role) {
+  fontLists[role].replaceChildren();
+  fontSelections[role].forEach((selection) => {
+    const item = document.createElement("div");
+    item.className = "font-selection-item";
+    const name = document.createElement("span");
+    name.textContent = selection.file.name;
+    const removeButton = document.createElement("button");
+    removeButton.className = "font-selection-remove";
+    removeButton.type = "button";
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", () => removeFontSelection(role, selection));
+    item.append(name, removeButton);
+    fontLists[role].append(item);
+  });
+}
+
+async function addFontFiles(role, files) {
+  const rejected = [];
+  for (const file of Array.from(files)) {
+    if (!/\.ttf$/i.test(file.name)) {
+      rejected.push(file.name);
+      continue;
+    }
+    const previewUrl = URL.createObjectURL(file);
+    const family = `GXBuilderFont${fontFamilySequence += 1}`;
+    const fontFace = new FontFace(family, `url("${previewUrl}") format("truetype")`);
+    try {
+      await fontFace.load();
+      document.fonts.add(fontFace);
+      fontSelections[role].push({ family, file, fontFace, previewUrl });
+    } catch {
+      URL.revokeObjectURL(previewUrl);
+      rejected.push(file.name);
+    }
+  }
+  renderFontSelectionList(role);
+  updateFontPreview(role);
+  updateFontChangeCount();
+  if (rejected.length) fontSaveStatus.textContent = `Could not load: ${rejected.join(", ")}`;
+}
+
+Object.entries(fontInputs).forEach(([role, input]) => {
+  input.addEventListener("change", async () => {
+    if (input.files?.length) await addFontFiles(role, input.files);
+    input.value = "";
+  });
+});
+
+function updateSavedFontsSummary() {
+  savedFontsSummary.replaceChildren();
+  for (const role of ["header", "body"]) {
+    const savedRole = modBuildState.fonts?.[role];
+    if (!savedRole) continue;
+    const summary = document.createElement("span");
+    summary.textContent = `${role.toUpperCase()} · ${savedRole.items.length} ${savedRole.items.length === 1 ? "variant" : "variants"}`;
+    savedFontsSummary.append(summary);
+  }
+  savedFontsBox.hidden = !modBuildState.fonts;
+  fontsCategoryCard.classList.toggle("has-saved-data", Boolean(modBuildState.fonts));
+  updateCreateModAvailability();
+}
+
+fontSaveButton.addEventListener("click", () => {
+  const saved = {};
+  for (const role of ["header", "body"]) {
+    if (!fontSelections[role].length) continue;
+    saved[role] = {
+      items: fontSelections[role].map((selection) => ({ family: selection.family, file: selection.file })),
+      name: fontDisplayName(fontSelections[role][0].file.name)
+    };
+  }
+  if (!Object.keys(saved).length) return;
+  modBuildState.fonts = saved;
+  updateSavedFontsSummary();
+  const count = Object.values(saved).reduce((total, role) => total + role.items.length, 0);
+  fontSaveStatus.textContent = `Saved ${count} font ${count === 1 ? "file" : "files"} successfully`;
+});
+
 const CURSOR_GROUPS = [
   {
     name: "Basic cursors",
@@ -2678,8 +2841,9 @@ function hasSavedModOptions() {
   const hasSavedMusic = modBuildState.music.tracks.length > 0;
   const hasSavedBrowserSounds = Boolean(modBuildState.browserSounds);
   const hasSavedKeyboardSounds = Boolean(modBuildState.keyboardSounds);
+  const hasSavedFonts = Boolean(modBuildState.fonts);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -2738,6 +2902,12 @@ function appendBuildSummaryGroup(title, description, items) {
         audio.preload = "metadata";
         audio.setAttribute("aria-label", item.preview.alt);
         preview.append(audio);
+      } else if (item.preview.kind === "font") {
+        const sample = document.createElement("p");
+        sample.textContent = item.preview.text;
+        sample.style.fontFamily = `"${item.preview.family}", sans-serif`;
+        sample.setAttribute("aria-label", item.preview.alt);
+        preview.append(sample);
       } else {
         const image = document.createElement("img");
         image.src = item.preview.url;
@@ -2913,6 +3083,26 @@ function renderBuildSummary() {
     };
   });
   appendBuildSummaryGroup("Keyboard sounds", "Saved typing feedback audio", keyboardSoundItems);
+
+  const fontItems = ["header", "body"].flatMap((role) => {
+    const savedRole = modBuildState.fonts?.[role];
+    if (!savedRole) return [];
+    return savedRole.items.map((item, index) => ({
+      title: `${role} variant ${index + 1}`,
+      preview: {
+        alt: `${role} font preview`,
+        family: item.family,
+        kind: "font",
+        text: role === "header" ? "The quick brown fox" : "Pack my box with five dozen liquor jugs"
+      },
+      details: [
+        { label: "Font role", value: role },
+        { label: "Font family", value: savedRole.name },
+        { label: "Original file", value: item.file.name }
+      ]
+    }));
+  });
+  appendBuildSummaryGroup("Fonts", "Saved header and body font variants", fontItems);
 
   const musicItems = modBuildState.music.tracks.map((track, index) => {
     const details = [
@@ -3296,7 +3486,7 @@ if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -3308,6 +3498,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#music-editor": musicEditorView,
     "#browser-sounds-editor": browserSoundsEditorView,
     "#keyboard-sounds-editor": keyboardSoundsEditorView,
+    "#font-editor": fontEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
   };

@@ -6,9 +6,9 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260901-2">
-    <script src="mod-packager.js?v=20260901-2" defer></script>
-    <script src="app.js?v=20260901-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260903-1">
+    <script src="mod-packager.js?v=20260903-1" defer></script>
+    <script src="app.js?v=20260903-1" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -151,7 +151,13 @@
                 <div class="saved-cursors-summary" id="saved-cursors-summary"></div>
               </div>
             </div>
-            <button class="category-card is-not-supported" type="button" data-category="Fonts" disabled><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Fonts"><span class="card-copy"><strong>Fonts</strong><small>Header and body type</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-fonts-box" hidden>
+                <strong>Saved fonts</strong>
+                <div class="saved-browser-sounds-summary" id="saved-fonts-summary"></div>
+              </div>
+            </div>
             <button class="category-card is-not-supported" type="button" data-category="Game strips" disabled><span class="card-copy"><strong>Game strips</strong><small>Not supported yet</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <button class="category-card is-not-supported" type="button" data-category="Icons" disabled><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <div class="additional-category-item">
@@ -617,6 +623,50 @@
             <p class="theme-save-status cursor-save-status" id="keyboard-sound-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-keyboard-sounds" type="button" disabled><span>Save keyboard sounds</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view font-editor" id="font-editor" aria-labelledby="font-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-fonts" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Fonts</p>
+            <h2 id="font-editor-title">Font editor</h2>
+            <p class="cursor-editor-intro">Assign one or more TrueType font variants to Opera GX headers and body text.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>TrueType fonts only</strong><span>Choose <code>.ttf</code> files. Uploaded fonts are previewed locally and included only after you save.</span></div>
+        </div>
+
+        <div class="font-category-list">
+          <section class="font-category" data-font-role="header">
+            <div class="font-category-heading"><div><p class="section-index">HEADER</p><h3>Header fonts</h3></div><span class="cursor-source-badge">Mephisto default</span></div>
+            <p class="font-live-preview font-header-preview">The quick brown fox jumps over the lazy dog</p>
+            <div class="font-selection-list" data-font-list="header"></div>
+            <input class="font-file-input" id="header-font-input" type="file" accept=".ttf,font/ttf,application/x-font-ttf" multiple>
+            <label class="keyboard-sound-add-button font-add-button" for="header-font-input">＋ Add font</label>
+          </section>
+
+          <section class="font-category" data-font-role="body">
+            <div class="font-category-heading"><div><p class="section-index">BODY</p><h3>Body fonts</h3></div><span class="cursor-source-badge">Mephisto default</span></div>
+            <p class="font-live-preview font-body-preview">Pack my box with five dozen liquor jugs. 0123456789</p>
+            <div class="font-selection-list" data-font-list="body"></div>
+            <input class="font-file-input" id="body-font-input" type="file" accept=".ttf,font/ttf,application/x-font-ttf" multiple>
+            <label class="keyboard-sound-add-button font-add-button" for="body-font-input">＋ Add font</label>
+          </section>
+        </div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="font-change-count">No custom fonts selected</strong>
+            <span>Add at least one TTF file to enable saving.</span>
+            <p class="theme-save-status cursor-save-status" id="font-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-fonts" type="button" disabled><span>Save fonts</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 
