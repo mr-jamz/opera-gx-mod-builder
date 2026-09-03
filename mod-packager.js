@@ -68,6 +68,14 @@
       payload.fonts = [fonts];
     }
 
+    if (build.splashScreen) {
+      payload.splash_screen = [{
+        id: "SplashScreen",
+        name: defaultComponentName("splash_screen"),
+        path: build.splashScreen.path
+      }];
+    }
+
     if (build.cursors) {
       payload.cursors = [{
         id: "Cursors",

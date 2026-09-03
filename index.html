@@ -6,9 +6,9 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260903-1">
-    <script src="mod-packager.js?v=20260903-1" defer></script>
-    <script src="app.js?v=20260903-1" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260903-2">
+    <script src="mod-packager.js?v=20260903-2" defer></script>
+    <script src="app.js?v=20260903-2" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -169,7 +169,13 @@
             </div>
             <button class="category-card is-not-supported" type="button" data-category="Shaders" disabled><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <button class="category-card is-not-supported" type="button" data-category="Speed Dial effects" disabled><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
-            <button class="category-card is-not-supported" type="button" data-category="Splash screen" disabled><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-splash-box" hidden>
+                <strong>Saved splash screen</strong>
+                <span class="saved-app-icon-summary" id="saved-splash-summary"></span>
+              </div>
+            </div>
             <button class="category-card is-not-supported" type="button" data-category="Stickers" disabled><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <button class="category-card is-not-supported" type="button" data-category="Web modding" disabled><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
           </div>
@@ -667,6 +673,58 @@
             <p class="theme-save-status cursor-save-status" id="font-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-fonts" type="button" disabled><span>Save fonts</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view splash-editor" id="splash-editor" aria-labelledby="splash-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-splash" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Splash screen</p>
+            <h2 id="splash-editor-title">Splash screen editor</h2>
+            <p class="cursor-editor-intro">Choose the short startup video that plays when Opera GX opens.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>MP4 video only</strong><span>Choose a short <code>.mp4</code> with audio. Use the video controls to preview its picture and sound.</span></div>
+        </div>
+
+        <div class="splash-workspace">
+          <section class="splash-upload-panel">
+            <p class="section-index">STARTUP VIDEO</p>
+            <h3>Choose splash media</h3>
+            <input class="wallpaper-file-input" id="splash-file" type="file" accept=".mp4,video/mp4">
+            <label class="wallpaper-file-button app-icon-dropzone" id="splash-dropzone" for="splash-file">
+              <span><strong>Drop MP4 here</strong><small>or choose a local file</small></span>
+              <b aria-hidden="true">＋</b>
+            </label>
+            <p class="wallpaper-file-types">MP4</p>
+            <p class="wallpaper-drop-status" id="splash-drop-status" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="splash-preview-panel" aria-labelledby="splash-preview-heading">
+            <p class="section-index">LIVE PREVIEW</p>
+            <h3 id="splash-preview-heading">Browser startup</h3>
+            <div class="splash-video-frame" id="splash-video-frame">
+              <video id="splash-preview-video" controls playsinline preload="metadata"></video>
+            </div>
+            <dl class="splash-video-details">
+              <div><dt>File</dt><dd id="splash-preview-name">splash1.mp4</dd></div>
+              <div><dt>Dimensions</dt><dd id="splash-preview-dimensions">Loading…</dd></div>
+            </dl>
+          </section>
+        </div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="splash-save-copy">Template splash screen selected</strong>
+            <span>Save the displayed video to include it in the mod.</span>
+            <p class="theme-save-status cursor-save-status" id="splash-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-splash" type="button"><span>Save splash screen</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 

@@ -8,6 +8,7 @@ const musicEditorView = document.querySelector("#music-editor");
 const browserSoundsEditorView = document.querySelector("#browser-sounds-editor");
 const keyboardSoundsEditorView = document.querySelector("#keyboard-sounds-editor");
 const fontEditorView = document.querySelector("#font-editor");
+const splashEditorView = document.querySelector("#splash-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
 const brandHomeLink = document.querySelector(".brand");
@@ -21,6 +22,7 @@ const backMusicButton = document.querySelector("#back-music");
 const backBrowserSoundsButton = document.querySelector("#back-browser-sounds");
 const backKeyboardSoundsButton = document.querySelector("#back-keyboard-sounds");
 const backFontsButton = document.querySelector("#back-fonts");
+const backSplashButton = document.querySelector("#back-splash");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
 const createModButton = document.querySelector("#create-mod");
@@ -106,6 +108,7 @@ const modBuildState = {
   browserSounds: null,
   keyboardSounds: null,
   fonts: null,
+  splashScreen: null,
   cursors: null,
   music: {
     tracks: []
@@ -227,6 +230,13 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Splash screen") {
+      renderSplashEditor();
+      switchView(creatorView, splashEditorView);
+      window.history.replaceState(null, "", "#splash-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -271,6 +281,12 @@ backKeyboardSoundsButton.addEventListener("click", () => {
 
 backFontsButton.addEventListener("click", () => {
   switchView(fontEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backSplashButton.addEventListener("click", () => {
+  splashPreviewVideo.pause();
+  switchView(splashEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -370,6 +386,7 @@ function validateBuildFileReferences(entries, build) {
   build.browserSounds?.items.forEach((item) => references.push(item.path));
   build.keyboardSounds?.items.forEach((item) => references.push(item.path));
   Object.values(build.fonts || {}).forEach((fontRole) => fontRole.variants.forEach((variant) => references.push(variant.path)));
+  if (build.splashScreen) references.push(build.splashScreen.path);
   if (build.cursors) {
     references.push(build.cursors.preview);
     build.cursors.items.forEach((item) => references.push(item.path));
@@ -468,7 +485,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -553,6 +570,15 @@ async function buildModArchive() {
       });
       build.fonts[role] = { name: savedRole.name, variants };
     }
+  }
+
+  if (modBuildState.splashScreen) {
+    const splash = modBuildState.splashScreen;
+    const splashBlob = splash.file || await fetchBuildBlob(splash.url, splash.name);
+    const outputPath = reserveBuildPath("splash", splash.name, usedPaths);
+    entries.push({ path: outputPath, data: splashBlob });
+    addFileChangeLogEntry(fileChangeLog, splash.name, outputPath);
+    build.splashScreen = { path: outputPath };
   }
 
   if (modBuildState.cursors?.items.length) {
@@ -2355,6 +2381,118 @@ fontSaveButton.addEventListener("click", () => {
   fontSaveStatus.textContent = `Saved ${count} font ${count === 1 ? "file" : "files"} successfully`;
 });
 
+const splashFileInput = document.querySelector("#splash-file");
+const splashDropzone = document.querySelector("#splash-dropzone");
+const splashDropStatus = document.querySelector("#splash-drop-status");
+const splashPreviewVideo = document.querySelector("#splash-preview-video");
+const splashVideoFrame = document.querySelector("#splash-video-frame");
+const splashPreviewName = document.querySelector("#splash-preview-name");
+const splashPreviewDimensions = document.querySelector("#splash-preview-dimensions");
+const splashSaveCopy = document.querySelector("#splash-save-copy");
+const splashSaveButton = document.querySelector("#save-splash");
+const splashSaveStatus = document.querySelector("#splash-save-status");
+const savedSplashBox = document.querySelector("#saved-splash-box");
+const savedSplashSummary = document.querySelector("#saved-splash-summary");
+const splashCategoryCard = document.querySelector('[data-category="Splash screen"]');
+const defaultSplashSelection = {
+  file: null,
+  height: 0,
+  name: "splash1.mp4",
+  source: "default",
+  url: "ModTemplate2.0/splash/splash1.mp4",
+  width: 0
+};
+let splashSelection = { ...defaultSplashSelection };
+
+function updateSplashVideoDimensions() {
+  const width = splashPreviewVideo.videoWidth;
+  const height = splashPreviewVideo.videoHeight;
+  if (!width || !height) return;
+  splashSelection.width = width;
+  splashSelection.height = height;
+  splashVideoFrame.style.aspectRatio = `${width} / ${height}`;
+  splashPreviewDimensions.textContent = `${width}×${height}`;
+}
+
+function renderSplashEditor() {
+  if (splashPreviewVideo.src !== new URL(splashSelection.url, document.baseURI).href) {
+    splashPreviewVideo.src = splashSelection.url;
+    splashPreviewVideo.load();
+  }
+  splashPreviewName.textContent = splashSelection.name;
+  splashPreviewDimensions.textContent = splashSelection.width
+    ? `${splashSelection.width}×${splashSelection.height}`
+    : "Loading…";
+  if (splashSelection.width) splashVideoFrame.style.aspectRatio = `${splashSelection.width} / ${splashSelection.height}`;
+  splashSaveCopy.textContent = splashSelection.source === "default"
+    ? "Template splash screen selected"
+    : "Custom splash screen selected";
+}
+
+function selectSplashFile(file) {
+  if (!/\.mp4$/i.test(file.name)) {
+    splashDropStatus.textContent = "Choose an MP4 video file.";
+    return;
+  }
+  splashPreviewVideo.pause();
+  splashSelection = {
+    file,
+    height: 0,
+    name: file.name,
+    source: "upload",
+    url: URL.createObjectURL(file),
+    width: 0
+  };
+  splashDropStatus.textContent = `${file.name} is ready to preview with sound.`;
+  splashSaveStatus.textContent = "";
+  renderSplashEditor();
+}
+
+splashPreviewVideo.addEventListener("loadedmetadata", updateSplashVideoDimensions);
+splashFileInput.addEventListener("change", () => {
+  if (splashFileInput.files?.[0]) selectSplashFile(splashFileInput.files[0]);
+  splashFileInput.value = "";
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  splashDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    splashDropzone.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  splashDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    splashDropzone.classList.remove("is-dragging");
+  });
+});
+
+splashDropzone.addEventListener("drop", (event) => {
+  const file = event.dataTransfer?.files?.[0];
+  if (file) selectSplashFile(file);
+});
+
+function updateSavedSplashSummary() {
+  const saved = modBuildState.splashScreen;
+  savedSplashBox.hidden = !saved;
+  splashCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
+  savedSplashSummary.textContent = saved
+    ? `${saved.name} · ${saved.width}×${saved.height}`
+    : "";
+  updateCreateModAvailability();
+}
+
+splashSaveButton.addEventListener("click", () => {
+  if (!splashSelection.width || !splashSelection.height) {
+    splashSaveStatus.textContent = "Wait for the video dimensions to finish loading.";
+    return;
+  }
+  modBuildState.splashScreen = { ...splashSelection };
+  updateSavedSplashSummary();
+  splashSaveStatus.textContent = "Splash screen saved successfully";
+});
+
 const CURSOR_GROUPS = [
   {
     name: "Basic cursors",
@@ -2842,8 +2980,9 @@ function hasSavedModOptions() {
   const hasSavedBrowserSounds = Boolean(modBuildState.browserSounds);
   const hasSavedKeyboardSounds = Boolean(modBuildState.keyboardSounds);
   const hasSavedFonts = Boolean(modBuildState.fonts);
+  const hasSavedSplash = Boolean(modBuildState.splashScreen);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSplash || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -2886,12 +3025,14 @@ function appendBuildSummaryGroup(title, description, items) {
       if (item.preview.kind === "video") {
         const video = document.createElement("video");
         video.src = item.preview.url;
-        video.muted = true;
-        video.loop = true;
-        video.autoplay = true;
+        video.muted = !item.preview.controls;
+        video.loop = !item.preview.controls;
+        video.autoplay = !item.preview.controls;
         video.playsInline = true;
+        video.controls = Boolean(item.preview.controls);
+        video.preload = "metadata";
         video.setAttribute("aria-label", item.preview.alt);
-        video.play().catch(() => {});
+        if (!item.preview.controls) video.play().catch(() => {});
         preview.append(video);
       } else if (item.preview.kind === "audio") {
         const audio = document.createElement("audio");
@@ -3103,6 +3244,25 @@ function renderBuildSummary() {
     }));
   });
   appendBuildSummaryGroup("Fonts", "Saved header and body font variants", fontItems);
+
+  const splashItems = modBuildState.splashScreen
+    ? [{
+      title: "Splash screen",
+      preview: {
+        alt: `Splash screen preview for ${modBuildState.splashScreen.name}`,
+        controls: true,
+        kind: "video",
+        url: modBuildState.splashScreen.url
+      },
+      details: [
+        { label: "File", value: modBuildState.splashScreen.name },
+        { label: "Dimensions", value: `${modBuildState.splashScreen.width}×${modBuildState.splashScreen.height}` },
+        { label: "Audio", value: "Included" },
+        { label: "Source", value: modBuildState.splashScreen.source === "default" ? "Template splash screen" : "Local MP4 upload" }
+      ]
+    }]
+    : [];
+  appendBuildSummaryGroup("Splash screen", "Saved browser startup video", splashItems);
 
   const musicItems = modBuildState.music.tracks.map((track, index) => {
     const details = [
@@ -3479,6 +3639,7 @@ renderModIconEditor();
 renderWallpaperEditor();
 renderBrowserSoundsEditor();
 renderKeyboardSoundsEditor();
+renderSplashEditor();
 renderCursorEditor();
 ensureDefaultModIcon().catch(() => {});
 
@@ -3486,7 +3647,7 @@ if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -3499,6 +3660,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#browser-sounds-editor": browserSoundsEditorView,
     "#keyboard-sounds-editor": keyboardSoundsEditorView,
     "#font-editor": fontEditorView,
+    "#splash-editor": splashEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
   };
