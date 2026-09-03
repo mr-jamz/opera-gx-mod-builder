@@ -4466,11 +4466,17 @@ h1,
 .font-category-heading h3,
 .cursor-group-heading h3,
 .core-card .card-copy strong,
+.additional-section .card-copy strong,
 .corner-curve-reference h4,
 .app-icon-adjustments h4,
 .splash-upload-panel h3,
 .splash-preview-panel h3 {
   font-size: 1.35rem;
+}
+
+/* Major creator-page category dividers need stronger hierarchy than editor section headings. */
+.creator > .category-section > .section-heading h3 {
+  font-size: 2.4rem;
 }
 
 .brand,
