@@ -129,6 +129,9 @@ function switchView(fromView, toView) {
     fromView.setAttribute("aria-hidden", "true");
     toView.removeAttribute("aria-hidden");
     toView.classList.add("is-active");
+    if (toView === sidebarIconsEditorView) {
+      renderSidebarIconsEditor();
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     const focusTarget = toView.querySelector("h1, h2");
@@ -3908,7 +3911,6 @@ renderModIconEditor();
 renderWallpaperEditor();
 renderBrowserSoundsEditor();
 renderKeyboardSoundsEditor();
-renderSidebarIconsEditor();
 renderSplashEditor();
 renderCursorEditor();
 ensureDefaultModIcon().catch(() => {});
@@ -3953,6 +3955,9 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
   }
   if (initialView === modIconEditorView) {
     ensureDefaultModIcon().then(renderModIconEditor).catch(() => {});
+  }
+  if (initialView === sidebarIconsEditorView) {
+    renderSidebarIconsEditor();
   }
   if (initialView === buildReviewView) {
     renderBuildSummary();
