@@ -68,6 +68,14 @@
       payload.fonts = [fonts];
     }
 
+    if (build.sidebarIcons) {
+      payload.image_overrides = [{
+        id: "ImageOverrides",
+        name: defaultComponentName("image_overrides"),
+        images: Object.fromEntries(build.sidebarIcons.items.map(({ key, path }) => [key, path]))
+      }];
+    }
+
     if (build.splashScreen) {
       payload.splash_screen = [{
         id: "SplashScreen",

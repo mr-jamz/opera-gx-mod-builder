@@ -6,9 +6,10 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260903-6">
-    <script src="mod-packager.js?v=20260903-6" defer></script>
-    <script src="app.js?v=20260903-6" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260908-1">
+    <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
+    <script src="mod-packager.js?v=20260908-1" defer></script>
+    <script src="app.js?v=20260908-1" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -159,7 +160,13 @@
               </div>
             </div>
             <button class="category-card is-not-supported" type="button" data-category="Game strips" disabled><span class="card-copy"><strong>Game strips</strong><small>Not supported yet</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
-            <button class="category-card is-not-supported" type="button" data-category="Icons" disabled><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Icons"><span class="card-copy"><strong>Icons</strong><small>Sidebar overrides</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-sidebar-icons-box" hidden>
+                <strong>Saved sidebar icons</strong>
+                <div class="saved-browser-sounds-summary" id="saved-sidebar-icons-summary"></div>
+              </div>
+            </div>
             <div class="additional-category-item">
               <button class="category-card" type="button" data-category="Keyboard sounds"><span class="card-copy"><strong>Keyboard sounds</strong><small>Typing feedback</small></span><span class="card-arrow">↗</span></button>
               <div class="saved-content-box" id="saved-keyboard-sounds-box" hidden>
@@ -673,6 +680,34 @@
             <p class="theme-save-status cursor-save-status" id="font-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-fonts" type="button" disabled><span>Save fonts</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view sidebar-icons-editor" id="sidebar-icons-editor" aria-labelledby="sidebar-icons-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-sidebar-icons" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Sidebar icons</p>
+            <h2 id="sidebar-icons-editor-title">Sidebar icons editor</h2>
+            <p class="cursor-editor-intro">Preview the included icons or replace individual sidebar roles with your own Lottie JSON files.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>Self-contained Lottie JSON only</strong><span>Drop or choose a <code>.json</code> file. Only user-uploaded replacements will be saved.</span></div>
+        </div>
+
+        <div class="sidebar-icon-grid" id="sidebar-icon-grid"></div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="sidebar-icon-change-count">No custom sidebar icons selected</strong>
+            <span>Upload at least one JSON file to enable saving.</span>
+            <p class="theme-save-status cursor-save-status" id="sidebar-icon-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-sidebar-icons" type="button" disabled><span>Save sidebar icons</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 

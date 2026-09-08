@@ -128,6 +128,7 @@ button {
 .browser-sounds-editor,
 .keyboard-sounds-editor,
 .font-editor,
+.sidebar-icons-editor,
 .splash-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
@@ -505,6 +506,7 @@ h1 em {
 .browser-sounds-editor.is-active,
 .keyboard-sounds-editor.is-active,
 .font-editor.is-active,
+.sidebar-icons-editor.is-active,
 .splash-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
@@ -3593,6 +3595,7 @@ h1 em {
   .browser-sounds-editor.is-active,
   .keyboard-sounds-editor.is-active,
   .font-editor.is-active,
+  .sidebar-icons-editor.is-active,
   .splash-editor.is-active,
   .cursor-editor.is-active,
   .build-review.is-active {
@@ -3937,6 +3940,55 @@ h1 em {
 .saved-browser-sounds-summary span {
   color: var(--red);
   font: 650 0.61rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.sidebar-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sidebar-icon-tile {
+  display: grid;
+  grid-template-rows: auto minmax(112px, 1fr) auto auto;
+  gap: 14px;
+}
+
+.sidebar-icon-preview {
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #08070c;
+}
+
+.sidebar-icon-preview > div {
+  width: 64px;
+  height: 64px;
+}
+
+.sidebar-icon-preview canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.sidebar-icon-tile.is-dragging {
+  border-color: var(--red-bright);
+  background: color-mix(in hsl, var(--red) 10%, var(--surface));
+}
+
+.build-summary-media[data-kind="lottie"] {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  aspect-ratio: auto;
+}
+
+.build-summary-media[data-kind="lottie"] > div {
+  width: 72px;
+  height: 72px;
 }
 
 .font-category-list {
@@ -4389,6 +4441,10 @@ h1 em {
 }
 
 @media (max-width: 1120px) {
+  .sidebar-icon-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .browser-sound-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4399,6 +4455,10 @@ h1 em {
 }
 
 @media (max-width: 680px) {
+  .sidebar-icon-grid {
+    grid-template-columns: 1fr;
+  }
+
   .browser-sound-grid {
     grid-template-columns: 1fr;
   }

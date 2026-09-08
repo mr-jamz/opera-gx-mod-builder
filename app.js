@@ -8,6 +8,7 @@ const musicEditorView = document.querySelector("#music-editor");
 const browserSoundsEditorView = document.querySelector("#browser-sounds-editor");
 const keyboardSoundsEditorView = document.querySelector("#keyboard-sounds-editor");
 const fontEditorView = document.querySelector("#font-editor");
+const sidebarIconsEditorView = document.querySelector("#sidebar-icons-editor");
 const splashEditorView = document.querySelector("#splash-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
@@ -22,6 +23,7 @@ const backMusicButton = document.querySelector("#back-music");
 const backBrowserSoundsButton = document.querySelector("#back-browser-sounds");
 const backKeyboardSoundsButton = document.querySelector("#back-keyboard-sounds");
 const backFontsButton = document.querySelector("#back-fonts");
+const backSidebarIconsButton = document.querySelector("#back-sidebar-icons");
 const backSplashButton = document.querySelector("#back-splash");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
@@ -108,6 +110,7 @@ const modBuildState = {
   browserSounds: null,
   keyboardSounds: null,
   fonts: null,
+  sidebarIcons: null,
   splashScreen: null,
   cursors: null,
   music: {
@@ -230,6 +233,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Icons") {
+      switchView(creatorView, sidebarIconsEditorView);
+      window.history.replaceState(null, "", "#sidebar-icons-editor");
+      return;
+    }
+
     if (button.dataset.category === "Splash screen") {
       renderSplashEditor();
       switchView(creatorView, splashEditorView);
@@ -281,6 +290,11 @@ backKeyboardSoundsButton.addEventListener("click", () => {
 
 backFontsButton.addEventListener("click", () => {
   switchView(fontEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backSidebarIconsButton.addEventListener("click", () => {
+  switchView(sidebarIconsEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -339,7 +353,7 @@ downloadModButton.addEventListener("click", async () => {
 });
 
 const modTemplateDirectories = [
-  "app_icon", "cursors", "fonts", "game", "icons", "keyboard", "mobile_logo", "music",
+  "app_icon", "cursors", "fonts", "game", "keyboard", "mobile_logo", "music", "sidebar",
   "sd_effects", "shaders", "sound", "splash", "stickers", "wallpaper", "webmodding"
 ];
 
@@ -386,6 +400,7 @@ function validateBuildFileReferences(entries, build) {
   build.browserSounds?.items.forEach((item) => references.push(item.path));
   build.keyboardSounds?.items.forEach((item) => references.push(item.path));
   Object.values(build.fonts || {}).forEach((fontRole) => fontRole.variants.forEach((variant) => references.push(variant.path)));
+  build.sidebarIcons?.items.forEach((item) => references.push(item.path));
   if (build.splashScreen) references.push(build.splashScreen.path);
   if (build.cursors) {
     references.push(build.cursors.preview);
@@ -485,7 +500,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -570,6 +585,16 @@ async function buildModArchive() {
       });
       build.fonts[role] = { name: savedRole.name, variants };
     }
+  }
+
+  if (modBuildState.sidebarIcons?.items.length) {
+    const items = modBuildState.sidebarIcons.items.map((item) => {
+      const outputPath = `sidebar/${item.outputName}`;
+      entries.push({ path: outputPath, data: item.file });
+      addFileChangeLogEntry(fileChangeLog, item.file.name, outputPath);
+      return { key: item.key, path: outputPath };
+    });
+    build.sidebarIcons = { items };
   }
 
   if (modBuildState.splashScreen) {
@@ -2247,6 +2272,198 @@ keyboardSoundSaveButton.addEventListener("click", () => {
   keyboardSoundSaveStatus.textContent = `Saved ${items.length} keyboard ${items.length === 1 ? "sound" : "sounds"} successfully`;
 });
 
+const SIDEBAR_ICON_DEFINITIONS = [
+  ["sidebar_activity_button", "Activity and tabs", "gx_sidebar_tabs.json"],
+  ["sidebar_bookmarks_button", "Bookmarks", "gx_sidebar_bookmarks.json"],
+  ["sidebar_crypto_wallet_button", "Crypto wallet", "gx_sidebar_crypto_wallet.json"],
+  ["sidebar_downloads_button", "Downloads", "gx_sidebar_downloads.json"],
+  ["sidebar_easy_share_button", "My Flow", "gx_sidebar_myflow.json"],
+  ["sidebar_extensions_button", "Extensions", "gx_sidebar_extensions.json"],
+  ["sidebar_gx_booster_button", "GX Cleaner", "gx_sidebar_cleaner.json"],
+  ["sidebar_history_button", "History", "gx_sidebar_history.json"],
+  ["sidebar_limiters_button", "Limiters", "gx_sidebar_limiters.json"],
+  ["sidebar_mods_button", "Mods", "gx_sidebar_mods.json"],
+  ["sidebar_news_button", "News", "gx_sidebar_news.json"],
+  ["sidebar_pinboards_button", "Pinboards", "gx_sidebar_pinboards.json"],
+  ["sidebar_player_service_button", "Player", "gx_sidebar_player.json"],
+  ["sidebar_settings_button", "Settings", "gx_sidebar_settings.json"],
+  ["sidebar_shaders_button", "Shaders", "gx_sidebar_shaders.json"],
+  ["sidebar_speeddial_button", "Speed Dial", "gx_sidebar_speeddial.json"],
+  ["sidebar_sticky_site_button", "GX Corner", "gx_sidebar_gx_corner.json"]
+].map(([key, label, sampleFile]) => ({
+  key,
+  label,
+  outputName: sampleFile,
+  sampleFile,
+  sampleUrl: `ModTemplate2.0/sidebar/${sampleFile}`
+}));
+
+const sidebarIconGrid = document.querySelector("#sidebar-icon-grid");
+const sidebarIconChangeCount = document.querySelector("#sidebar-icon-change-count");
+const sidebarIconSaveButton = document.querySelector("#save-sidebar-icons");
+const sidebarIconSaveStatus = document.querySelector("#sidebar-icon-save-status");
+const savedSidebarIconsBox = document.querySelector("#saved-sidebar-icons-box");
+const savedSidebarIconsSummary = document.querySelector("#saved-sidebar-icons-summary");
+const sidebarIconsCategoryCard = document.querySelector('[data-category="Icons"]');
+const sidebarIconSelections = new Map();
+const sidebarIconDefaultData = new Map();
+
+function validateSidebarIconData(data) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("The file is not a Lottie JSON object");
+  if (!Array.isArray(data.layers)) throw new Error("The Lottie file is missing its layers array");
+  if (!Number.isFinite(data.w) || !Number.isFinite(data.h) || data.w <= 0 || data.h <= 0) {
+    throw new Error("The Lottie file needs valid width and height values");
+  }
+  if (data.w > 4096 || data.h > 4096) throw new Error("The Lottie canvas is too large");
+  if (Array.isArray(data.assets) && data.assets.length) {
+    throw new Error("Use self-contained vector JSON without external image assets");
+  }
+  return data;
+}
+
+function renderSidebarIconAnimation(container, data) {
+  container._lottieAnimation?.destroy();
+  container.replaceChildren();
+  if (!window.lottie) throw new Error("The Lottie preview renderer is unavailable");
+  container._lottieAnimation = window.lottie.loadAnimation({
+    animationData: JSON.parse(JSON.stringify(data)),
+    autoplay: true,
+    container,
+    loop: true,
+    renderer: "canvas",
+    rendererSettings: { clearCanvas: true }
+  });
+}
+
+async function loadDefaultSidebarIcon(definition) {
+  if (sidebarIconDefaultData.has(definition.key)) return sidebarIconDefaultData.get(definition.key);
+  const response = await fetch(definition.sampleUrl);
+  if (!response.ok) throw new Error("Default icon could not be loaded");
+  const data = validateSidebarIconData(await response.json());
+  sidebarIconDefaultData.set(definition.key, data);
+  return data;
+}
+
+function updateSidebarIconChangeCount() {
+  const count = sidebarIconSelections.size;
+  sidebarIconChangeCount.textContent = count
+    ? `${count} custom sidebar ${count === 1 ? "icon" : "icons"} selected`
+    : "No custom sidebar icons selected";
+  sidebarIconSaveButton.disabled = count === 0;
+  sidebarIconSaveStatus.textContent = "";
+}
+
+async function setSidebarIconSelection(tile, definition, file) {
+  const status = tile.querySelector(".browser-sound-status");
+  if (!/\.json$/i.test(file.name)) {
+    status.textContent = "Choose a Lottie JSON file";
+    return;
+  }
+  try {
+    const data = validateSidebarIconData(JSON.parse(await file.text()));
+    renderSidebarIconAnimation(tile.querySelector(".sidebar-icon-animation"), data);
+    sidebarIconSelections.set(definition.key, { data, file });
+    tile.classList.add("has-custom-sound");
+    tile.querySelector(".cursor-source-badge").textContent = "Custom";
+    tile.querySelector(".browser-sound-reset").hidden = false;
+    status.textContent = `${file.name} · ${data.w}×${data.h}`;
+    updateSidebarIconChangeCount();
+  } catch (error) {
+    status.textContent = error.message || "This JSON file could not be previewed";
+  }
+}
+
+async function resetSidebarIconTile(tile, definition) {
+  sidebarIconSelections.delete(definition.key);
+  tile.classList.remove("has-custom-sound", "is-dragging");
+  tile.querySelector(".cursor-source-badge").textContent = "Default";
+  tile.querySelector(".browser-sound-reset").hidden = true;
+  tile.querySelector(".browser-sound-file-input").value = "";
+  try {
+    const data = await loadDefaultSidebarIcon(definition);
+    renderSidebarIconAnimation(tile.querySelector(".sidebar-icon-animation"), data);
+    tile.querySelector(".browser-sound-status").textContent = `${definition.sampleFile} · ${data.w}×${data.h}`;
+  } catch (error) {
+    tile.querySelector(".browser-sound-status").textContent = error.message;
+  }
+  updateSidebarIconChangeCount();
+}
+
+function createSidebarIconTile(definition, index) {
+  const tile = document.createElement("article");
+  const inputId = `sidebar-icon-${index}`;
+  tile.className = "browser-sound-tile sidebar-icon-tile";
+  tile.innerHTML = `
+    <div class="browser-sound-heading">
+      <span><span class="browser-sound-title"><strong>${definition.label}</strong><small class="cursor-source-badge">Default</small></span><code>${definition.key}</code></span>
+    </div>
+    <div class="sidebar-icon-preview"><div class="sidebar-icon-animation" aria-label="${definition.label} icon preview"></div></div>
+    <input class="browser-sound-file-input" id="${inputId}" type="file" accept=".json,application/json">
+    <label class="browser-sound-dropzone" for="${inputId}"><strong>Drop Lottie JSON here</strong><small>or choose a local file</small></label>
+    <div class="browser-sound-footer">
+      <span class="browser-sound-status">Loading ${definition.sampleFile}…</span>
+      <button class="cursor-reset-button browser-sound-reset" type="button" hidden>Use default</button>
+    </div>`;
+  const input = tile.querySelector(".browser-sound-file-input");
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file) setSidebarIconSelection(tile, definition, file);
+  });
+  tile.querySelector(".browser-sound-reset").addEventListener("click", () => resetSidebarIconTile(tile, definition));
+  ["dragenter", "dragover"].forEach((eventName) => tile.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    tile.classList.add("is-dragging");
+  }));
+  tile.addEventListener("dragleave", (event) => {
+    if (!tile.contains(event.relatedTarget)) tile.classList.remove("is-dragging");
+  });
+  tile.addEventListener("drop", (event) => {
+    event.preventDefault();
+    tile.classList.remove("is-dragging");
+    const file = event.dataTransfer?.files?.[0];
+    if (file) setSidebarIconSelection(tile, definition, file);
+  });
+  loadDefaultSidebarIcon(definition)
+    .then((data) => {
+      renderSidebarIconAnimation(tile.querySelector(".sidebar-icon-animation"), data);
+      tile.querySelector(".browser-sound-status").textContent = `${definition.sampleFile} · ${data.w}×${data.h}`;
+    })
+    .catch((error) => { tile.querySelector(".browser-sound-status").textContent = error.message; });
+  return tile;
+}
+
+function renderSidebarIconsEditor() {
+  if (sidebarIconGrid.childElementCount) return;
+  SIDEBAR_ICON_DEFINITIONS.forEach((definition, index) => sidebarIconGrid.append(createSidebarIconTile(definition, index)));
+  updateSidebarIconChangeCount();
+}
+
+function updateSavedSidebarIconsSummary() {
+  const saved = modBuildState.sidebarIcons;
+  savedSidebarIconsSummary.replaceChildren();
+  saved?.items.forEach((item) => {
+    const summary = document.createElement("span");
+    summary.textContent = `${item.label} ← ${item.file.name}`;
+    savedSidebarIconsSummary.append(summary);
+  });
+  savedSidebarIconsBox.hidden = !saved;
+  sidebarIconsCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
+  updateCreateModAvailability();
+}
+
+sidebarIconSaveButton.addEventListener("click", () => {
+  if (!sidebarIconSelections.size) return;
+  const items = SIDEBAR_ICON_DEFINITIONS
+    .filter((definition) => sidebarIconSelections.has(definition.key))
+    .map((definition) => {
+      const selection = sidebarIconSelections.get(definition.key);
+      return { ...definition, data: selection.data, file: selection.file };
+    });
+  modBuildState.sidebarIcons = { items };
+  updateSavedSidebarIconsSummary();
+  sidebarIconSaveStatus.textContent = `Saved ${items.length} sidebar ${items.length === 1 ? "icon" : "icons"} successfully`;
+});
+
 const fontSelections = { header: [], body: [] };
 const fontInputs = {
   header: document.querySelector("#header-font-input"),
@@ -3001,9 +3218,10 @@ function hasSavedModOptions() {
   const hasSavedBrowserSounds = Boolean(modBuildState.browserSounds);
   const hasSavedKeyboardSounds = Boolean(modBuildState.keyboardSounds);
   const hasSavedFonts = Boolean(modBuildState.fonts);
+  const hasSavedSidebarIcons = Boolean(modBuildState.sidebarIcons);
   const hasSavedSplash = Boolean(modBuildState.splashScreen);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSplash || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedSplash || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -3070,6 +3288,18 @@ function appendBuildSummaryGroup(title, description, items) {
         sample.style.fontFamily = `"${item.preview.family}", sans-serif`;
         sample.setAttribute("aria-label", item.preview.alt);
         preview.append(sample);
+      } else if (item.preview.kind === "lottie") {
+        const animationContainer = document.createElement("div");
+        animationContainer.setAttribute("aria-label", item.preview.alt);
+        preview.append(animationContainer);
+        buildReviewLottieAnimations.push(window.lottie.loadAnimation({
+          animationData: JSON.parse(JSON.stringify(item.preview.data)),
+          autoplay: true,
+          container: animationContainer,
+          loop: true,
+          renderer: "canvas",
+          rendererSettings: { clearCanvas: true }
+        }));
       } else {
         const image = document.createElement("img");
         image.src = item.preview.url;
@@ -3101,8 +3331,11 @@ function appendBuildSummaryGroup(title, description, items) {
 }
 
 let buildReviewObjectUrls = [];
+let buildReviewLottieAnimations = [];
 
 function renderBuildSummary() {
+  buildReviewLottieAnimations.forEach((animation) => animation.destroy());
+  buildReviewLottieAnimations = [];
   buildReviewObjectUrls.forEach((url) => URL.revokeObjectURL(url));
   buildReviewObjectUrls = [];
   buildSummaryGroups.replaceChildren();
@@ -3265,6 +3498,21 @@ function renderBuildSummary() {
     }));
   });
   appendBuildSummaryGroup("Fonts", "Saved header and body font variants", fontItems);
+
+  const sidebarIconItems = (modBuildState.sidebarIcons?.items || []).map((item) => ({
+    title: item.label,
+    preview: {
+      alt: `${item.label} sidebar icon preview`,
+      data: item.data,
+      kind: "lottie"
+    },
+    details: [
+      { label: "Sidebar role", value: item.key },
+      { label: "Original file", value: item.file.name },
+      { label: "Output file", value: `sidebar/${item.outputName}` }
+    ]
+  }));
+  appendBuildSummaryGroup("Sidebar icons", "Saved interface icon overrides", sidebarIconItems);
 
   const splashItems = modBuildState.splashScreen
     ? [{
@@ -3660,6 +3908,7 @@ renderModIconEditor();
 renderWallpaperEditor();
 renderBrowserSoundsEditor();
 renderKeyboardSoundsEditor();
+renderSidebarIconsEditor();
 renderSplashEditor();
 renderCursorEditor();
 ensureDefaultModIcon().catch(() => {});
@@ -3668,7 +3917,7 @@ if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -3681,6 +3930,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#browser-sounds-editor": browserSoundsEditorView,
     "#keyboard-sounds-editor": keyboardSoundsEditorView,
     "#font-editor": fontEditorView,
+    "#sidebar-icons-editor": sidebarIconsEditorView,
     "#splash-editor": splashEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
