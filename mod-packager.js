@@ -80,6 +80,10 @@
       payload.shaders = [clone(build.shader)];
     }
 
+    if (build.speedDialEffects?.length) {
+      payload.sd_effects = clone(build.speedDialEffects);
+    }
+
     if (build.splashScreen) {
       payload.splash_screen = [{
         id: "SplashScreen",

@@ -10,6 +10,18 @@
     if (value && typeof value.delete === "function") value.delete();
   }
 
+  function getCanvasKit() {
+    if (!globalScope.GXCanvasKitRuntime) {
+      if (typeof globalScope.CanvasKitInit !== "function") {
+        return Promise.reject(new Error("The local Skia preview runtime is unavailable"));
+      }
+      globalScope.GXCanvasKitRuntime = globalScope.CanvasKitInit({
+        locateFile: (file) => `vendor/canvaskit/${file}`
+      });
+    }
+    return globalScope.GXCanvasKitRuntime;
+  }
+
   class ShaderPreview {
     constructor(canvas) {
       this.canvas = canvas;
@@ -33,12 +45,7 @@
     }
 
     async initializeRuntime() {
-      if (typeof globalScope.CanvasKitInit !== "function") {
-        throw new Error("The local Skia preview runtime is unavailable");
-      }
-      this.canvasKit = await globalScope.CanvasKitInit({
-        locateFile: (file) => `vendor/canvaskit/${file}`
-      });
+      this.canvasKit = await getCanvasKit();
       if (!this.canvasKit.rt_effect) {
         throw new Error("This Skia build does not include RuntimeEffect support");
       }
@@ -168,4 +175,5 @@
   }
 
   globalScope.GXShaderPreview = ShaderPreview;
+  globalScope.GXGetCanvasKit = getCanvasKit;
 })(window);

@@ -130,6 +130,7 @@ button {
 .font-editor,
 .sidebar-icons-editor,
 .shader-editor,
+.speed-dial-effects-editor,
 .splash-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
@@ -509,6 +510,7 @@ h1 em {
 .font-editor.is-active,
 .sidebar-icons-editor.is-active,
 .shader-editor.is-active,
+.speed-dial-effects-editor.is-active,
 .splash-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
@@ -3599,6 +3601,7 @@ h1 em {
   .font-editor.is-active,
   .sidebar-icons-editor.is-active,
   .shader-editor.is-active,
+  .speed-dial-effects-editor.is-active,
   .splash-editor.is-active,
   .cursor-editor.is-active,
   .build-review.is-active {
@@ -4133,6 +4136,129 @@ h1 em {
   aspect-ratio: 1.92 / 1;
 }
 
+.speed-effect-workspace {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.3fr) minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 22px;
+}
+
+.speed-effect-library,
+.speed-effect-preview-panel {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface) 92%, transparent);
+}
+
+.speed-effect-library {
+  align-content: start;
+  display: grid;
+  gap: 14px;
+}
+
+.speed-effect-option {
+  min-width: 0;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text);
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #0b0910;
+  cursor: pointer;
+}
+
+.speed-effect-option:hover,
+.speed-effect-option.is-selected {
+  border-color: var(--red);
+  background: color-mix(in hsl, var(--red) 8%, #0b0910);
+}
+
+.speed-effect-option > span {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.speed-effect-option strong {
+  overflow: hidden;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.speed-effect-option small {
+  color: var(--muted);
+  font: 600 0.57rem/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.speed-effect-option b {
+  padding: 5px 7px;
+  color: var(--red-bright);
+  border-radius: 999px;
+  background: color-mix(in hsl, var(--red) 18%, transparent);
+  font-size: 0.54rem;
+}
+
+.speed-effect-custom-list {
+  display: grid;
+  gap: 8px;
+}
+
+.speed-effect-dropzone {
+  min-height: 112px;
+}
+
+.speed-effect-dropzone.is-dragging {
+  color: var(--red-bright);
+  border-color: var(--red);
+  background: color-mix(in hsl, var(--red) 8%, transparent);
+}
+
+.speed-effect-preview-panel {
+  display: grid;
+  gap: 15px;
+}
+
+.speed-effect-preview-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.speed-effect-preview-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.speed-effect-preview-heading span {
+  color: var(--muted);
+  font: 650 0.61rem/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.speed-effect-preview-frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1.92 / 1;
+  border: 1px solid var(--line-strong);
+  background: #09080d;
+}
+
+.speed-effect-preview-frame canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.build-summary-media[data-kind="speed-effect"] {
+  aspect-ratio: 1.92 / 1;
+}
+
 .font-category-list {
   display: grid;
   gap: 24px;
@@ -4583,7 +4709,8 @@ h1 em {
 }
 
 @media (max-width: 1120px) {
-  .shader-workspace {
+  .shader-workspace,
+  .speed-effect-workspace {
     grid-template-columns: 1fr;
   }
 

@@ -6,12 +6,13 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260908-4">
+    <link rel="stylesheet" href="styles.css?v=20260908-5">
     <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
     <script src="vendor/canvaskit/canvaskit.js?v=0.42.0" defer></script>
-    <script src="shader-preview.js?v=20260908-4" defer></script>
-    <script src="mod-packager.js?v=20260908-4" defer></script>
-    <script src="app.js?v=20260908-4" defer></script>
+    <script src="shader-preview.js?v=20260908-5" defer></script>
+    <script src="speed-dial-preview.js?v=20260908-5" defer></script>
+    <script src="mod-packager.js?v=20260908-5" defer></script>
+    <script src="app.js?v=20260908-5" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -183,7 +184,13 @@
                 <span class="saved-app-icon-summary" id="saved-shader-summary"></span>
               </div>
             </div>
-            <button class="category-card is-not-supported" type="button" data-category="Speed Dial effects" disabled><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Speed Dial effects"><span class="card-copy"><strong>Speed Dial effects</strong><small>Interactive tile effects</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-speed-dial-effects-box" hidden>
+                <strong>Saved Speed Dial effects</strong>
+                <div class="saved-browser-sounds-summary" id="saved-speed-dial-effects-summary"></div>
+              </div>
+            </div>
             <div class="additional-category-item">
               <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
               <div class="saved-content-box" id="saved-splash-box" hidden>
@@ -772,6 +779,57 @@
             <p class="theme-save-status cursor-save-status" id="shader-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-shader" type="button" disabled><span>Save shader</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view speed-dial-effects-editor" id="speed-dial-effects-editor" aria-labelledby="speed-dial-effects-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-speed-dial-effects" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Speed Dial effects</p>
+            <h2 id="speed-dial-effects-editor-title">Speed Dial effects editor</h2>
+            <p class="cursor-editor-intro">Hover the store-style tiles to test a real Opera GX Speed Dial effect.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>Opera hover-effect format</strong><span>Shift FX is included. Custom <code>.txt</code> or <code>.sksl</code> files must use <code>iChunk</code> and the <code>iArgs</code> animation array.</span></div>
+        </div>
+
+        <div class="speed-effect-workspace">
+          <section class="speed-effect-library" aria-labelledby="speed-effect-library-title">
+            <div class="browser-sound-heading"><span><strong id="speed-effect-library-title">Effect library</strong><code>Select one to preview</code></span></div>
+            <button class="speed-effect-option is-selected" type="button" data-speed-effect-id="shift-fx">
+              <span><strong>Shift FX</strong><small>Included effect</small></span><b>DEFAULT</b>
+            </button>
+            <div class="speed-effect-custom-list" id="speed-effect-custom-list"></div>
+            <input class="browser-sound-file-input" id="speed-effect-file-input" type="file" accept=".txt,.sksl,text/plain">
+            <label class="browser-sound-dropzone speed-effect-dropzone" id="speed-effect-dropzone" for="speed-effect-file-input"><strong>Add custom effect</strong><small>Drop or choose .txt / .sksl</small></label>
+            <div class="shader-file-status" id="speed-effect-status" role="status" aria-live="polite">Loading Shift FX…</div>
+          </section>
+
+          <section class="speed-effect-preview-panel" aria-labelledby="speed-effect-preview-title">
+            <div class="speed-effect-preview-heading">
+              <div><strong id="speed-effect-preview-title">GX Store preview</strong><span id="speed-effect-preview-name">Shift FX</span></div>
+              <span>Hover any tile</span>
+            </div>
+            <div class="speed-effect-preview-frame">
+              <canvas id="speed-effect-preview-canvas" width="960" height="500" aria-label="Interactive Speed Dial effect preview"></canvas>
+              <div class="shader-preview-message" id="speed-effect-preview-message">Loading Shift FX preview…</div>
+            </div>
+            <p class="shader-preview-disclaimer">This emulates Opera’s standard hover-frame contract. Final rendering can vary slightly inside Opera GX.</p>
+          </section>
+        </div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="speed-effect-change-count">Preparing Shift FX</strong>
+            <span>Save the selected preview, then select or upload another effect to add more.</span>
+            <p class="theme-save-status cursor-save-status" id="speed-effect-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-speed-effect" type="button" disabled><span>Add selected effect</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 

@@ -10,6 +10,7 @@ const keyboardSoundsEditorView = document.querySelector("#keyboard-sounds-editor
 const fontEditorView = document.querySelector("#font-editor");
 const sidebarIconsEditorView = document.querySelector("#sidebar-icons-editor");
 const shaderEditorView = document.querySelector("#shader-editor");
+const speedDialEffectsEditorView = document.querySelector("#speed-dial-effects-editor");
 const splashEditorView = document.querySelector("#splash-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
@@ -26,6 +27,7 @@ const backKeyboardSoundsButton = document.querySelector("#back-keyboard-sounds")
 const backFontsButton = document.querySelector("#back-fonts");
 const backSidebarIconsButton = document.querySelector("#back-sidebar-icons");
 const backShaderButton = document.querySelector("#back-shader");
+const backSpeedDialEffectsButton = document.querySelector("#back-speed-dial-effects");
 const backSplashButton = document.querySelector("#back-splash");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
@@ -114,6 +116,7 @@ const modBuildState = {
   fonts: null,
   sidebarIcons: null,
   shader: null,
+  speedDialEffects: null,
   splashScreen: null,
   cursors: null,
   music: {
@@ -137,6 +140,9 @@ function switchView(fromView, toView) {
     }
     if (toView === shaderEditorView) {
       activateShaderEditor();
+    }
+    if (toView === speedDialEffectsEditorView) {
+      activateSpeedDialEffectsEditor();
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -171,6 +177,7 @@ brandHomeLink.addEventListener("click", (event) => {
   }
 
   if (activeView === shaderEditorView) shaderPreview.setActive(false);
+  if (activeView === speedDialEffectsEditorView) speedDialEffectPreview.setActive(false);
   resetPageTheme();
   switchView(activeView, landingView);
 });
@@ -255,6 +262,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Speed Dial effects") {
+      switchView(creatorView, speedDialEffectsEditorView);
+      window.history.replaceState(null, "", "#speed-dial-effects-editor");
+      return;
+    }
+
     if (button.dataset.category === "Splash screen") {
       renderSplashEditor();
       switchView(creatorView, splashEditorView);
@@ -317,6 +330,12 @@ backSidebarIconsButton.addEventListener("click", () => {
 backShaderButton.addEventListener("click", () => {
   shaderPreview.setActive(false);
   switchView(shaderEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backSpeedDialEffectsButton.addEventListener("click", () => {
+  speedDialEffectPreview.setActive(false);
+  switchView(speedDialEffectsEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -424,6 +443,7 @@ function validateBuildFileReferences(entries, build) {
   Object.values(build.fonts || {}).forEach((fontRole) => fontRole.variants.forEach((variant) => references.push(variant.path)));
   build.sidebarIcons?.items.forEach((item) => references.push(item.path));
   if (build.shader) references.push(build.shader.path);
+  build.speedDialEffects.forEach((effect) => references.push(effect.shader.path));
   if (build.splashScreen) references.push(build.splashScreen.path);
   if (build.cursors) {
     references.push(build.cursors.preview);
@@ -523,7 +543,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -631,6 +651,29 @@ async function buildModArchive() {
       name: shader.name,
       path: outputPath
     };
+  }
+
+  for (const effect of modBuildState.speedDialEffects?.items || []) {
+    const outputPath = reserveBuildPath("sd_effects", effect.fileName, usedPaths);
+    entries.push({ path: outputPath, data: effect.file });
+    addFileChangeLogEntry(fileChangeLog, effect.fileName, outputPath);
+    build.speedDialEffects.push({
+      id: effect.id,
+      name: effect.name,
+      shader: {
+        animations: [{
+          duration: 500,
+          infinite: false,
+          name: "hover",
+          preserve_last_frame: true,
+          reversible: true,
+          steps: 30,
+          type: "hover"
+        }],
+        args: ["__hover-shader-frame"],
+        path: outputPath
+      }
+    });
   }
 
   if (modBuildState.splashScreen) {
@@ -2646,6 +2689,193 @@ window.addEventListener("gx-shader-preview-error", (event) => {
   setShaderStatus(String(event.detail?.message || "The shader could not be rendered").slice(0, 900), "error");
 });
 
+const DEFAULT_SPEED_DIAL_EFFECT = {
+  id: "sd_effects_01",
+  key: "shift-fx",
+  name: "Shift FX",
+  fileName: "sd-shiftfx.txt",
+  source: "included",
+  url: "ModTemplate2.0/sd_effects/sd-shiftfx.txt"
+};
+const speedDialEffectPreview = new window.GXSpeedDialPreview(document.querySelector("#speed-effect-preview-canvas"));
+const speedEffectFileInput = document.querySelector("#speed-effect-file-input");
+const speedEffectDropzone = document.querySelector("#speed-effect-dropzone");
+const speedEffectStatus = document.querySelector("#speed-effect-status");
+const speedEffectPreviewMessage = document.querySelector("#speed-effect-preview-message");
+const speedEffectPreviewName = document.querySelector("#speed-effect-preview-name");
+const speedEffectSaveButton = document.querySelector("#save-speed-effect");
+const speedEffectSaveStatus = document.querySelector("#speed-effect-save-status");
+const speedEffectChangeCount = document.querySelector("#speed-effect-change-count");
+const speedEffectCustomList = document.querySelector("#speed-effect-custom-list");
+const savedSpeedDialEffectsBox = document.querySelector("#saved-speed-dial-effects-box");
+const savedSpeedDialEffectsSummary = document.querySelector("#saved-speed-dial-effects-summary");
+const speedDialEffectsCategoryCard = document.querySelector('[data-category="Speed Dial effects"]');
+const speedDialEffectLibrary = new Map([[DEFAULT_SPEED_DIAL_EFFECT.key, DEFAULT_SPEED_DIAL_EFFECT]]);
+let selectedSpeedDialEffect = null;
+let speedDialEffectSequence = 0;
+
+function setSpeedEffectStatus(message, type = "") {
+  speedEffectStatus.textContent = message;
+  speedEffectStatus.classList.toggle("is-error", type === "error");
+  speedEffectStatus.classList.toggle("is-success", type === "success");
+}
+
+function speedEffectKey(fileName) {
+  const base = fileName.replace(/\.(?:txt|sksl)$/i, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return base || `custom-${Date.now()}`;
+}
+
+function speedEffectName(fileName) {
+  return fileName.replace(/\.(?:txt|sksl)$/i, "").replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function updateSpeedEffectOptions(selectedKey) {
+  document.querySelectorAll("[data-speed-effect-id]").forEach((button) => {
+    button.classList.toggle("is-selected", button.dataset.speedEffectId === selectedKey);
+  });
+}
+
+function createCustomSpeedEffectOption(effect) {
+  let button = speedEffectCustomList.querySelector(`[data-speed-effect-id="${effect.key}"]`);
+  if (!button) {
+    button = document.createElement("button");
+    button.type = "button";
+    button.className = "speed-effect-option";
+    button.dataset.speedEffectId = effect.key;
+    button.addEventListener("click", () => selectSpeedDialEffect(speedDialEffectLibrary.get(effect.key)));
+    speedEffectCustomList.append(button);
+  }
+  button.innerHTML = `<span><strong></strong><small></small></span><b>CUSTOM</b>`;
+  button.querySelector("strong").textContent = effect.name;
+  button.querySelector("small").textContent = effect.fileName;
+}
+
+async function getSpeedDialEffectSource(effect) {
+  if (effect.sourceText && effect.file) return effect;
+  const response = await fetch(effect.url);
+  if (!response.ok) throw new Error("Shift FX could not be loaded");
+  const sourceText = await response.text();
+  const file = new File([sourceText], effect.fileName, { type: "text/plain" });
+  Object.assign(effect, { file, sourceText });
+  return effect;
+}
+
+async function selectSpeedDialEffect(effect) {
+  if (!effect) return;
+  const sequence = ++speedDialEffectSequence;
+  selectedSpeedDialEffect = null;
+  speedEffectSaveButton.disabled = true;
+  speedEffectSaveStatus.textContent = "";
+  speedEffectChangeCount.textContent = `Preparing ${effect.name}`;
+  speedEffectPreviewName.textContent = effect.name;
+  speedEffectPreviewMessage.hidden = false;
+  speedEffectPreviewMessage.textContent = `Compiling ${effect.name}…`;
+  updateSpeedEffectOptions(effect.key);
+  setSpeedEffectStatus(`Compiling ${effect.fileName}…`);
+  try {
+    const completeEffect = await getSpeedDialEffectSource(effect);
+    if (sequence !== speedDialEffectSequence) return;
+    await speedDialEffectPreview.compile(completeEffect.sourceText);
+    if (sequence !== speedDialEffectSequence) return;
+    selectedSpeedDialEffect = completeEffect;
+    speedEffectPreviewMessage.hidden = true;
+    speedEffectChangeCount.textContent = `${completeEffect.name} ready to add`;
+    speedEffectSaveButton.disabled = false;
+    setSpeedEffectStatus(`${completeEffect.fileName} compiled successfully`, "success");
+  } catch (error) {
+    speedEffectPreviewMessage.textContent = "Effect compilation failed";
+    speedEffectChangeCount.textContent = "Effect needs corrections";
+    setSpeedEffectStatus(String(error.message || "The effect could not be compiled").slice(0, 900), "error");
+  }
+}
+
+async function activateSpeedDialEffectsEditor() {
+  speedDialEffectPreview.setActive(true);
+  if (!selectedSpeedDialEffect) await selectSpeedDialEffect(DEFAULT_SPEED_DIAL_EFFECT);
+}
+
+async function addCustomSpeedDialEffect(file) {
+  if (!/\.(?:txt|sksl)$/i.test(file.name)) {
+    setSpeedEffectStatus("Choose an Opera GX .txt or .sksl Speed Dial effect", "error");
+    return;
+  }
+  if (file.size > 256 * 1024) {
+    setSpeedEffectStatus("The effect file must be 256 KB or smaller", "error");
+    return;
+  }
+  const key = speedEffectKey(file.name);
+  const effect = {
+    file,
+    fileName: file.name,
+    id: `sd_effect_${key.replace(/-/g, "_")}`,
+    key,
+    name: speedEffectName(file.name),
+    source: "custom",
+    sourceText: await file.text()
+  };
+  speedDialEffectLibrary.set(key, effect);
+  createCustomSpeedEffectOption(effect);
+  selectSpeedDialEffect(effect);
+}
+
+document.querySelector('[data-speed-effect-id="shift-fx"]').addEventListener("click", () => selectSpeedDialEffect(DEFAULT_SPEED_DIAL_EFFECT));
+
+speedEffectFileInput.addEventListener("change", () => {
+  const file = speedEffectFileInput.files?.[0];
+  if (file) addCustomSpeedDialEffect(file);
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  speedEffectDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    speedEffectDropzone.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  speedEffectDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    speedEffectDropzone.classList.remove("is-dragging");
+  });
+});
+
+speedEffectDropzone.addEventListener("drop", (event) => {
+  const file = event.dataTransfer?.files?.[0];
+  if (file) addCustomSpeedDialEffect(file);
+});
+
+function updateSavedSpeedDialEffectsSummary() {
+  const savedItems = modBuildState.speedDialEffects?.items || [];
+  savedSpeedDialEffectsSummary.replaceChildren();
+  savedItems.forEach((effect) => {
+    const summary = document.createElement("span");
+    summary.textContent = `${effect.name} · ${effect.fileName}`;
+    savedSpeedDialEffectsSummary.append(summary);
+  });
+  savedSpeedDialEffectsBox.hidden = savedItems.length === 0;
+  speedDialEffectsCategoryCard.classList.toggle("has-saved-data", savedItems.length > 0);
+  updateCreateModAvailability();
+}
+
+speedEffectSaveButton.addEventListener("click", () => {
+  if (!selectedSpeedDialEffect) return;
+  const items = [...(modBuildState.speedDialEffects?.items || [])];
+  const savedEffect = { ...selectedSpeedDialEffect };
+  const existingIndex = items.findIndex((item) => item.key === savedEffect.key);
+  if (existingIndex >= 0) items[existingIndex] = savedEffect;
+  else items.push(savedEffect);
+  modBuildState.speedDialEffects = { items };
+  updateSavedSpeedDialEffectsSummary();
+  speedEffectSaveStatus.textContent = `${savedEffect.name} added successfully`;
+});
+
+window.addEventListener("gx-speed-dial-preview-error", (event) => {
+  speedEffectSaveButton.disabled = true;
+  speedEffectPreviewMessage.hidden = false;
+  speedEffectPreviewMessage.textContent = "Effect rendering failed";
+  setSpeedEffectStatus(String(event.detail?.message || "The effect could not be rendered").slice(0, 900), "error");
+});
+
 const fontSelections = { header: [], body: [] };
 const fontInputs = {
   header: document.querySelector("#header-font-input"),
@@ -3402,9 +3632,10 @@ function hasSavedModOptions() {
   const hasSavedFonts = Boolean(modBuildState.fonts);
   const hasSavedSidebarIcons = Boolean(modBuildState.sidebarIcons);
   const hasSavedShader = Boolean(modBuildState.shader);
+  const hasSavedSpeedDialEffects = Boolean(modBuildState.speedDialEffects?.items.length);
   const hasSavedSplash = Boolean(modBuildState.splashScreen);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSplash || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSpeedDialEffects || hasSavedSplash || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -3713,6 +3944,17 @@ function renderBuildSummary() {
     }]
     : [];
   appendBuildSummaryGroup("Shader", "Saved full-screen browser effect", shaderItems);
+
+  const speedDialEffectItems = (modBuildState.speedDialEffects?.items || []).map((effect) => ({
+    title: effect.name,
+    details: [
+      { label: "Effect file", value: effect.fileName },
+      { label: "Source", value: effect.source === "included" ? "Included Shift FX" : "Local upload" },
+      { label: "Trigger", value: "Reversible hover animation" },
+      { label: "Output file", value: `sd_effects/${safeBuildFileName(effect.fileName, "effect.txt")}` }
+    ]
+  }));
+  appendBuildSummaryGroup("Speed Dial effects", "Saved interactive tile effects", speedDialEffectItems);
 
   const splashItems = modBuildState.splashScreen
     ? [{
@@ -4112,11 +4354,7 @@ renderSplashEditor();
 renderCursorEditor();
 ensureDefaultModIcon().catch(() => {});
 
-if (window.location.hash === "#speed-dial-effects-editor") {
-  window.history.replaceState(null, "", "#wallpaper-editor");
-}
-
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -4131,6 +4369,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#font-editor": fontEditorView,
     "#sidebar-icons-editor": sidebarIconsEditorView,
     "#shader-editor": shaderEditorView,
+    "#speed-dial-effects-editor": speedDialEffectsEditorView,
     "#splash-editor": splashEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
@@ -4159,6 +4398,9 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
   }
   if (initialView === shaderEditorView) {
     activateShaderEditor();
+  }
+  if (initialView === speedDialEffectsEditorView) {
+    activateSpeedDialEffectsEditor();
   }
   if (initialView === buildReviewView) {
     renderBuildSummary();
