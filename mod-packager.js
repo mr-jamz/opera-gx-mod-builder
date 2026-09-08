@@ -76,6 +76,10 @@
       }];
     }
 
+    if (build.shader) {
+      payload.shaders = [clone(build.shader)];
+    }
+
     if (build.splashScreen) {
       payload.splash_screen = [{
         id: "SplashScreen",

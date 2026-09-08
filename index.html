@@ -6,10 +6,12 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260908-2">
+    <link rel="stylesheet" href="styles.css?v=20260908-4">
     <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
-    <script src="mod-packager.js?v=20260908-2" defer></script>
-    <script src="app.js?v=20260908-2" defer></script>
+    <script src="vendor/canvaskit/canvaskit.js?v=0.42.0" defer></script>
+    <script src="shader-preview.js?v=20260908-4" defer></script>
+    <script src="mod-packager.js?v=20260908-4" defer></script>
+    <script src="app.js?v=20260908-4" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -174,7 +176,13 @@
                 <div class="saved-browser-sounds-summary" id="saved-keyboard-sounds-summary"></div>
               </div>
             </div>
-            <button class="category-card is-not-supported" type="button" data-category="Shaders" disabled><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Shaders"><span class="card-copy"><strong>Shaders</strong><small>Full-screen effects</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-shader-box" hidden>
+                <strong>Saved shader</strong>
+                <span class="saved-app-icon-summary" id="saved-shader-summary"></span>
+              </div>
+            </div>
             <button class="category-card is-not-supported" type="button" data-category="Speed Dial effects" disabled><span class="card-copy"><strong>Speed Dial effects</strong><small>Start-page effects</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
             <div class="additional-category-item">
               <button class="category-card" type="button" data-category="Splash screen"><span class="card-copy"><strong>Splash screen</strong><small>Startup animation</small></span><span class="card-arrow">↗</span></button>
@@ -708,6 +716,62 @@
             <p class="theme-save-status cursor-save-status" id="sidebar-icon-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-sidebar-icons" type="button" disabled><span>Save sidebar icons</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view shader-editor" id="shader-editor" aria-labelledby="shader-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-shader" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Shaders</p>
+            <h2 id="shader-editor-title">Shader editor</h2>
+            <p class="cursor-editor-intro">Preview an Opera GX SkSL effect over a light or dark webpage before packaging it.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>Opera GX SkSL shaders</strong><span>Upload one self-contained <code>.sksl</code> file. Compilation and previewing happen locally.</span></div>
+        </div>
+
+        <div class="shader-workspace">
+          <section class="shader-upload-panel" aria-labelledby="shader-upload-title">
+            <div class="browser-sound-heading">
+              <span><strong id="shader-upload-title">Shader file</strong><code>shaders/*.sksl</code></span>
+            </div>
+            <input class="browser-sound-file-input" id="shader-file-input" type="file" accept=".sksl,text/plain">
+            <label class="browser-sound-dropzone shader-dropzone" id="shader-dropzone" for="shader-file-input"><strong>Drop SkSL shader here</strong><small>or choose a local .sksl file</small></label>
+            <label class="shader-name-field" for="shader-name"><span>Display name</span><input id="shader-name" type="text" maxlength="80" placeholder="My browser shader" disabled></label>
+            <div class="shader-file-status" id="shader-file-status" role="status" aria-live="polite">Choose a shader to start the preview.</div>
+          </section>
+
+          <section class="shader-preview-panel" aria-labelledby="shader-preview-title">
+            <div class="shader-preview-toolbar">
+              <div>
+                <strong id="shader-preview-title">Browser preview</strong>
+                <span>Skia-rendered approximation</span>
+              </div>
+              <div class="mode-tabs shader-mode-tabs" role="tablist" aria-label="Shader preview webpage mode">
+                <button class="mode-tab is-active" type="button" role="tab" aria-selected="true" data-shader-mode="dark">Dark</button>
+                <button class="mode-tab" type="button" role="tab" aria-selected="false" data-shader-mode="light">Light</button>
+              </div>
+            </div>
+            <div class="shader-preview-frame">
+              <canvas id="shader-preview-canvas" width="960" height="500" aria-label="Animated shader browser preview"></canvas>
+              <div class="shader-preview-message" id="shader-preview-message">Upload a shader to preview it</div>
+            </div>
+            <p class="shader-preview-disclaimer">Preview behavior can differ slightly from Opera GX. Test the finished mod in Opera before publishing.</p>
+          </section>
+        </div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="shader-change-count">No shader selected</strong>
+            <span>A successfully compiled shader is required before saving.</span>
+            <p class="theme-save-status cursor-save-status" id="shader-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-shader" type="button" disabled><span>Save shader</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 

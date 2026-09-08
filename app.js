@@ -9,6 +9,7 @@ const browserSoundsEditorView = document.querySelector("#browser-sounds-editor")
 const keyboardSoundsEditorView = document.querySelector("#keyboard-sounds-editor");
 const fontEditorView = document.querySelector("#font-editor");
 const sidebarIconsEditorView = document.querySelector("#sidebar-icons-editor");
+const shaderEditorView = document.querySelector("#shader-editor");
 const splashEditorView = document.querySelector("#splash-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
@@ -24,6 +25,7 @@ const backBrowserSoundsButton = document.querySelector("#back-browser-sounds");
 const backKeyboardSoundsButton = document.querySelector("#back-keyboard-sounds");
 const backFontsButton = document.querySelector("#back-fonts");
 const backSidebarIconsButton = document.querySelector("#back-sidebar-icons");
+const backShaderButton = document.querySelector("#back-shader");
 const backSplashButton = document.querySelector("#back-splash");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
@@ -111,6 +113,7 @@ const modBuildState = {
   keyboardSounds: null,
   fonts: null,
   sidebarIcons: null,
+  shader: null,
   splashScreen: null,
   cursors: null,
   music: {
@@ -131,6 +134,9 @@ function switchView(fromView, toView) {
     toView.classList.add("is-active");
     if (toView === sidebarIconsEditorView) {
       renderSidebarIconsEditor();
+    }
+    if (toView === shaderEditorView) {
+      activateShaderEditor();
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -164,6 +170,7 @@ brandHomeLink.addEventListener("click", (event) => {
     return;
   }
 
+  if (activeView === shaderEditorView) shaderPreview.setActive(false);
   resetPageTheme();
   switchView(activeView, landingView);
 });
@@ -242,6 +249,12 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Shaders") {
+      switchView(creatorView, shaderEditorView);
+      window.history.replaceState(null, "", "#shader-editor");
+      return;
+    }
+
     if (button.dataset.category === "Splash screen") {
       renderSplashEditor();
       switchView(creatorView, splashEditorView);
@@ -298,6 +311,12 @@ backFontsButton.addEventListener("click", () => {
 
 backSidebarIconsButton.addEventListener("click", () => {
   switchView(sidebarIconsEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backShaderButton.addEventListener("click", () => {
+  shaderPreview.setActive(false);
+  switchView(shaderEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -404,6 +423,7 @@ function validateBuildFileReferences(entries, build) {
   build.keyboardSounds?.items.forEach((item) => references.push(item.path));
   Object.values(build.fonts || {}).forEach((fontRole) => fontRole.variants.forEach((variant) => references.push(variant.path)));
   build.sidebarIcons?.items.forEach((item) => references.push(item.path));
+  if (build.shader) references.push(build.shader.path);
   if (build.splashScreen) references.push(build.splashScreen.path);
   if (build.cursors) {
     references.push(build.cursors.preview);
@@ -503,7 +523,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -598,6 +618,19 @@ async function buildModArchive() {
       return { key: item.key, path: outputPath };
     });
     build.sidebarIcons = { items };
+  }
+
+  if (modBuildState.shader) {
+    const shader = modBuildState.shader;
+    const outputPath = `shaders/${safeBuildFileName(shader.file.name, "shader.sksl")}`;
+    entries.push({ path: outputPath, data: shader.file });
+    addFileChangeLogEntry(fileChangeLog, shader.file.name, outputPath);
+    build.shader = {
+      animation: { duration: 120, steps: 3600 },
+      id: "Shader",
+      name: shader.name,
+      path: outputPath
+    };
   }
 
   if (modBuildState.splashScreen) {
@@ -2467,6 +2500,152 @@ sidebarIconSaveButton.addEventListener("click", () => {
   sidebarIconSaveStatus.textContent = `Saved ${items.length} sidebar ${items.length === 1 ? "icon" : "icons"} successfully`;
 });
 
+const shaderFileInput = document.querySelector("#shader-file-input");
+const shaderDropzone = document.querySelector("#shader-dropzone");
+const shaderNameInput = document.querySelector("#shader-name");
+const shaderFileStatus = document.querySelector("#shader-file-status");
+const shaderPreviewMessage = document.querySelector("#shader-preview-message");
+const shaderSaveButton = document.querySelector("#save-shader");
+const shaderSaveStatus = document.querySelector("#shader-save-status");
+const shaderChangeCount = document.querySelector("#shader-change-count");
+const shaderModeButtons = [...document.querySelectorAll("[data-shader-mode]")];
+const savedShaderBox = document.querySelector("#saved-shader-box");
+const savedShaderSummary = document.querySelector("#saved-shader-summary");
+const shaderCategoryCard = document.querySelector('[data-category="Shaders"]');
+const shaderPreview = new window.GXShaderPreview(document.querySelector("#shader-preview-canvas"));
+let shaderSelection = null;
+let shaderLoadSequence = 0;
+
+function setShaderStatus(message, type = "") {
+  shaderFileStatus.textContent = message;
+  shaderFileStatus.classList.toggle("is-error", type === "error");
+  shaderFileStatus.classList.toggle("is-success", type === "success");
+}
+
+function shaderDisplayName(fileName) {
+  return fileName.replace(/\.sksl$/i, "").replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function updateShaderSaveAvailability() {
+  const ready = Boolean(shaderSelection && shaderNameInput.value.trim());
+  shaderSaveButton.disabled = !ready;
+  shaderChangeCount.textContent = shaderSelection ? "Shader compiled and ready" : "No shader selected";
+  shaderSaveStatus.textContent = "";
+}
+
+async function activateShaderEditor() {
+  shaderPreview.setActive(true);
+  if (!shaderSelection) shaderPreviewMessage.hidden = false;
+  try {
+    await shaderPreview.initialize();
+    if (!shaderSelection) shaderPreviewMessage.textContent = "Upload a shader to preview it";
+  } catch (error) {
+    shaderPreviewMessage.textContent = "Preview renderer unavailable";
+    setShaderStatus(error.message || "The local preview renderer could not start", "error");
+  }
+}
+
+async function setShaderFile(file) {
+  const sequence = ++shaderLoadSequence;
+  shaderSaveButton.disabled = true;
+  shaderSaveStatus.textContent = "";
+  if (!/\.sksl$/i.test(file.name)) {
+    setShaderStatus("Choose an Opera GX .sksl shader file", "error");
+    return;
+  }
+  if (file.size > 256 * 1024) {
+    setShaderStatus("The shader must be 256 KB or smaller", "error");
+    return;
+  }
+  shaderSelection = null;
+  shaderNameInput.disabled = true;
+  shaderChangeCount.textContent = "Compiling shader…";
+  shaderPreviewMessage.hidden = false;
+  shaderPreviewMessage.textContent = "Loading local Skia renderer…";
+  setShaderStatus(`Compiling ${file.name}…`);
+  try {
+    const source = await file.text();
+    if (sequence !== shaderLoadSequence) return;
+    await shaderPreview.compile(source);
+    if (sequence !== shaderLoadSequence) return;
+    shaderSelection = { file, source };
+    shaderNameInput.value = shaderDisplayName(file.name);
+    shaderNameInput.disabled = false;
+    shaderPreviewMessage.hidden = true;
+    setShaderStatus(`${file.name} compiled successfully · ${(file.size / 1024).toFixed(1)} KB`, "success");
+    updateShaderSaveAvailability();
+  } catch (error) {
+    shaderPreview.clearShader();
+    shaderPreviewMessage.textContent = "Shader compilation failed";
+    const message = String(error.message || "The shader could not be compiled").slice(0, 900);
+    setShaderStatus(message, "error");
+    shaderChangeCount.textContent = "Shader needs corrections";
+  }
+}
+
+shaderFileInput.addEventListener("change", () => {
+  const file = shaderFileInput.files?.[0];
+  if (file) setShaderFile(file);
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  shaderDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    shaderDropzone.classList.add("is-dragging");
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  shaderDropzone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    shaderDropzone.classList.remove("is-dragging");
+  });
+});
+
+shaderDropzone.addEventListener("drop", (event) => {
+  const file = event.dataTransfer?.files?.[0];
+  if (file) setShaderFile(file);
+});
+
+shaderNameInput.addEventListener("input", updateShaderSaveAvailability);
+
+shaderModeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    shaderModeButtons.forEach((candidate) => {
+      const active = candidate === button;
+      candidate.classList.toggle("is-active", active);
+      candidate.setAttribute("aria-selected", String(active));
+    });
+    shaderPreview.setMode(button.dataset.shaderMode);
+  });
+});
+
+function updateSavedShaderSummary() {
+  const saved = modBuildState.shader;
+  savedShaderBox.hidden = !saved;
+  savedShaderSummary.textContent = saved ? `${saved.name} · ${saved.file.name}` : "";
+  shaderCategoryCard.classList.toggle("has-saved-data", Boolean(saved));
+  updateCreateModAvailability();
+}
+
+shaderSaveButton.addEventListener("click", () => {
+  if (!shaderSelection) return;
+  const name = shaderNameInput.value.trim();
+  if (!name) return;
+  modBuildState.shader = { ...shaderSelection, name };
+  updateSavedShaderSummary();
+  shaderSaveStatus.textContent = "Shader saved successfully";
+});
+
+window.addEventListener("gx-shader-preview-error", (event) => {
+  shaderSelection = null;
+  shaderSaveButton.disabled = true;
+  shaderChangeCount.textContent = "Shader preview stopped";
+  shaderPreviewMessage.hidden = false;
+  shaderPreviewMessage.textContent = "Shader rendering failed";
+  setShaderStatus(String(event.detail?.message || "The shader could not be rendered").slice(0, 900), "error");
+});
+
 const fontSelections = { header: [], body: [] };
 const fontInputs = {
   header: document.querySelector("#header-font-input"),
@@ -3222,9 +3401,10 @@ function hasSavedModOptions() {
   const hasSavedKeyboardSounds = Boolean(modBuildState.keyboardSounds);
   const hasSavedFonts = Boolean(modBuildState.fonts);
   const hasSavedSidebarIcons = Boolean(modBuildState.sidebarIcons);
+  const hasSavedShader = Boolean(modBuildState.shader);
   const hasSavedSplash = Boolean(modBuildState.splashScreen);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedSplash || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSplash || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -3516,6 +3696,23 @@ function renderBuildSummary() {
     ]
   }));
   appendBuildSummaryGroup("Sidebar icons", "Saved interface icon overrides", sidebarIconItems);
+
+  const shaderItems = modBuildState.shader
+    ? [{
+      title: modBuildState.shader.name,
+      preview: {
+        alt: "Dark webpage used by the shader preview",
+        kind: "shader",
+        url: "media/shader-preview-dark.png"
+      },
+      details: [
+        { label: "Shader file", value: modBuildState.shader.file.name },
+        { label: "Format", value: "Opera GX SkSL" },
+        { label: "Output file", value: `shaders/${safeBuildFileName(modBuildState.shader.file.name, "shader.sksl")}` }
+      ]
+    }]
+    : [];
+  appendBuildSummaryGroup("Shader", "Saved full-screen browser effect", shaderItems);
 
   const splashItems = modBuildState.splashScreen
     ? [{
@@ -3919,7 +4116,7 @@ if (window.location.hash === "#speed-dial-effects-editor") {
   window.history.replaceState(null, "", "#wallpaper-editor");
 }
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -3933,6 +4130,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#keyboard-sounds-editor": keyboardSoundsEditorView,
     "#font-editor": fontEditorView,
     "#sidebar-icons-editor": sidebarIconsEditorView,
+    "#shader-editor": shaderEditorView,
     "#splash-editor": splashEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
@@ -3958,6 +4156,9 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
   }
   if (initialView === sidebarIconsEditorView) {
     renderSidebarIconsEditor();
+  }
+  if (initialView === shaderEditorView) {
+    activateShaderEditor();
   }
   if (initialView === buildReviewView) {
     renderBuildSummary();
