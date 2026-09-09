@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="styles.css?v=20260908-5">
     <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
     <script src="vendor/canvaskit/canvaskit.js?v=0.42.0" defer></script>
-    <script src="shader-preview.js?v=20260908-5" defer></script>
-    <script src="speed-dial-preview.js?v=20260908-5" defer></script>
-    <script src="mod-packager.js?v=20260908-5" defer></script>
-    <script src="app.js?v=20260908-5" defer></script>
+    <script src="shader-preview.js?v=20260908-6" defer></script>
+    <script src="speed-dial-preview.js?v=20260908-6" defer></script>
+    <script src="mod-packager.js?v=20260908-6" defer></script>
+    <script src="app.js?v=20260908-6" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -198,7 +198,13 @@
                 <span class="saved-app-icon-summary" id="saved-splash-summary"></span>
               </div>
             </div>
-            <button class="category-card is-not-supported" type="button" data-category="Stickers" disabled><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Stickers"><span class="card-copy"><strong>Stickers</strong><small>Expressive image sets</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-stickers-box" hidden>
+                <strong>Saved stickers</strong>
+                <div class="saved-browser-sounds-summary" id="saved-stickers-summary"></div>
+              </div>
+            </div>
             <button class="category-card is-not-supported" type="button" data-category="Web modding" disabled><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
           </div>
         </section>
@@ -830,6 +836,40 @@
             <p class="theme-save-status cursor-save-status" id="speed-effect-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-speed-effect" type="button" disabled><span>Add selected effect</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view sticker-editor" id="sticker-editor" aria-labelledby="sticker-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-stickers" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">More modding / Stickers</p>
+            <h2 id="sticker-editor-title">Sticker editor</h2>
+            <p class="cursor-editor-intro">Arrange the sticker set that will be included with your mod.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>WebP output</strong><span>PNG uploads are converted locally in your browser. Files are saved in this order as <code>sticker1.webp</code>, <code>sticker2.webp</code>, and so on.</span></div>
+        </div>
+
+        <section class="sticker-workspace" aria-labelledby="sticker-set-title">
+          <div class="browser-sound-heading"><span><strong id="sticker-set-title">Sticker set</strong><code id="sticker-count">4 stickers</code></span></div>
+          <div class="sticker-grid" id="sticker-grid"></div>
+          <input class="browser-sound-file-input" id="sticker-file-input" type="file" accept=".png,.webp,image/png,image/webp" multiple>
+          <label class="browser-sound-dropzone sticker-dropzone" id="sticker-dropzone" for="sticker-file-input"><strong>Add stickers</strong><small>Drop or choose PNG / WebP files</small></label>
+          <p class="shader-file-status" id="sticker-status" role="status" aria-live="polite">The four included stickers are ready.</p>
+        </section>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="sticker-change-count">4 stickers selected</strong>
+            <span>Remove any you do not want, or add more before saving.</span>
+            <p class="theme-save-status cursor-save-status" id="sticker-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-stickers" type="button"><span>Save sticker set</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 

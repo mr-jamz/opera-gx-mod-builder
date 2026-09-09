@@ -11,6 +11,7 @@ const fontEditorView = document.querySelector("#font-editor");
 const sidebarIconsEditorView = document.querySelector("#sidebar-icons-editor");
 const shaderEditorView = document.querySelector("#shader-editor");
 const speedDialEffectsEditorView = document.querySelector("#speed-dial-effects-editor");
+const stickerEditorView = document.querySelector("#sticker-editor");
 const splashEditorView = document.querySelector("#splash-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
@@ -28,6 +29,7 @@ const backFontsButton = document.querySelector("#back-fonts");
 const backSidebarIconsButton = document.querySelector("#back-sidebar-icons");
 const backShaderButton = document.querySelector("#back-shader");
 const backSpeedDialEffectsButton = document.querySelector("#back-speed-dial-effects");
+const backStickersButton = document.querySelector("#back-stickers");
 const backSplashButton = document.querySelector("#back-splash");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
@@ -117,6 +119,7 @@ const modBuildState = {
   sidebarIcons: null,
   shader: null,
   speedDialEffects: null,
+  stickers: null,
   splashScreen: null,
   cursors: null,
   music: {
@@ -144,6 +147,7 @@ function switchView(fromView, toView) {
     if (toView === speedDialEffectsEditorView) {
       activateSpeedDialEffectsEditor();
     }
+    if (toView === stickerEditorView) renderStickerEditor();
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     const focusTarget = toView.querySelector("h1, h2");
@@ -268,6 +272,13 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Stickers") {
+      renderStickerEditor();
+      switchView(creatorView, stickerEditorView);
+      window.history.replaceState(null, "", "#sticker-editor");
+      return;
+    }
+
     if (button.dataset.category === "Splash screen") {
       renderSplashEditor();
       switchView(creatorView, splashEditorView);
@@ -336,6 +347,11 @@ backShaderButton.addEventListener("click", () => {
 backSpeedDialEffectsButton.addEventListener("click", () => {
   speedDialEffectPreview.setActive(false);
   switchView(speedDialEffectsEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backStickersButton.addEventListener("click", () => {
+  switchView(stickerEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -444,6 +460,7 @@ function validateBuildFileReferences(entries, build) {
   build.sidebarIcons?.items.forEach((item) => references.push(item.path));
   if (build.shader) references.push(build.shader.path);
   build.speedDialEffects.forEach((effect) => references.push(effect.shader.path));
+  build.stickers?.images.forEach((path) => references.push(path));
   if (build.splashScreen) references.push(build.splashScreen.path);
   if (build.cursors) {
     references.push(build.cursors.preview);
@@ -543,7 +560,7 @@ async function buildModArchive() {
   modTemplateDirectories.forEach((directory) => entries.push({ path: `${directory}/`, data: "" }));
   if (licenseResponse.ok) entries.push({ path: "license.txt", data: await licenseResponse.blob() });
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], stickers: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -674,6 +691,18 @@ async function buildModArchive() {
         path: outputPath
       }
     });
+  }
+
+  if (modBuildState.stickers?.items.length) {
+    const images = [];
+    for (const [index, sticker] of modBuildState.stickers.items.entries()) {
+      const outputPath = `stickers/sticker${index + 1}.webp`;
+      const stickerBlob = sticker.file || await fetchBuildBlob(sticker.url, sticker.name);
+      entries.push({ path: outputPath, data: stickerBlob });
+      addFileChangeLogEntry(fileChangeLog, sticker.originalName || sticker.name, outputPath);
+      images.push(outputPath);
+    }
+    build.stickers = { images, preview: images[0] };
   }
 
   if (modBuildState.splashScreen) {
@@ -2876,6 +2905,136 @@ window.addEventListener("gx-speed-dial-preview-error", (event) => {
   setSpeedEffectStatus(String(event.detail?.message || "The effect could not be rendered").slice(0, 900), "error");
 });
 
+const stickerGrid = document.querySelector("#sticker-grid");
+const stickerFileInput = document.querySelector("#sticker-file-input");
+const stickerDropzone = document.querySelector("#sticker-dropzone");
+const stickerStatus = document.querySelector("#sticker-status");
+const stickerCount = document.querySelector("#sticker-count");
+const stickerChangeCount = document.querySelector("#sticker-change-count");
+const stickerSaveButton = document.querySelector("#save-stickers");
+const stickerSaveStatus = document.querySelector("#sticker-save-status");
+const savedStickersBox = document.querySelector("#saved-stickers-box");
+const savedStickersSummary = document.querySelector("#saved-stickers-summary");
+const stickersCategoryCard = document.querySelector('[data-category="Stickers"]');
+let stickerSequence = 4;
+const stickerSelections = Array.from({ length: 4 }, (_, index) => ({
+  id: `included-${index + 1}`,
+  name: `sticker${index + 1}.webp`,
+  originalName: `sticker${index + 1}.webp`,
+  source: "included",
+  url: `ModTemplate2.0/stickers/sticker${index + 1}.webp`
+}));
+
+function setStickerStatus(message, type = "") {
+  stickerStatus.textContent = message;
+  stickerStatus.classList.toggle("is-error", type === "error");
+  stickerStatus.classList.toggle("is-success", type === "success");
+}
+
+function renderStickerEditor() {
+  stickerGrid.replaceChildren();
+  stickerSelections.forEach((sticker, index) => {
+    const card = document.createElement("article");
+    card.className = "sticker-card";
+    const image = document.createElement("img");
+    image.src = sticker.url;
+    image.alt = `Preview of sticker ${index + 1}`;
+    const footer = document.createElement("footer");
+    const label = document.createElement("span");
+    label.textContent = `sticker${index + 1}.webp`;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "sticker-remove-button";
+    remove.textContent = "Remove";
+    remove.addEventListener("click", () => {
+      const selectedIndex = stickerSelections.findIndex((item) => item.id === sticker.id);
+      if (selectedIndex < 0) return;
+      const [removed] = stickerSelections.splice(selectedIndex, 1);
+      if (removed.source === "custom") URL.revokeObjectURL(removed.url);
+      stickerSaveStatus.textContent = "";
+      setStickerStatus("Sticker removed. Save the set to keep this change.");
+      renderStickerEditor();
+    });
+    footer.append(label, remove);
+    card.append(image, footer);
+    stickerGrid.append(card);
+  });
+  const count = stickerSelections.length;
+  stickerCount.textContent = `${count} ${count === 1 ? "sticker" : "stickers"}`;
+  stickerChangeCount.textContent = count ? `${count} ${count === 1 ? "sticker" : "stickers"} selected` : "No stickers selected";
+  stickerSaveButton.disabled = count === 0;
+}
+
+async function convertPngToWebp(file) {
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  canvas.getContext("2d").drawImage(bitmap, 0, 0);
+  bitmap.close();
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", 0.92));
+  if (!blob || blob.type !== "image/webp") throw new Error("This browser could not convert PNG to WebP");
+  return new File([blob], file.name.replace(/\.png$/i, ".webp"), { type: "image/webp" });
+}
+
+async function addStickerFiles(files) {
+  let added = 0;
+  for (const sourceFile of files) {
+    if (!/\.(?:png|webp)$/i.test(sourceFile.name)) {
+      setStickerStatus(`${sourceFile.name} was skipped. Choose PNG or WebP files.`, "error");
+      continue;
+    }
+    try {
+      const converted = /\.png$/i.test(sourceFile.name);
+      const file = converted ? await convertPngToWebp(sourceFile) : sourceFile;
+      stickerSelections.push({
+        converted,
+        file,
+        id: `custom-${++stickerSequence}`,
+        name: file.name,
+        originalName: sourceFile.name,
+        source: "custom",
+        url: URL.createObjectURL(file)
+      });
+      added += 1;
+    } catch (error) {
+      setStickerStatus(String(error.message || `Could not add ${sourceFile.name}`), "error");
+    }
+  }
+  renderStickerEditor();
+  if (added) setStickerStatus(`${added} ${added === 1 ? "sticker" : "stickers"} added${Array.from(files).some((file) => /\.png$/i.test(file.name)) ? "; PNG converted to WebP" : ""}.`, "success");
+  stickerFileInput.value = "";
+}
+
+stickerFileInput.addEventListener("change", () => addStickerFiles(stickerFileInput.files || []));
+["dragenter", "dragover"].forEach((eventName) => stickerDropzone.addEventListener(eventName, (event) => {
+  event.preventDefault();
+  stickerDropzone.classList.add("is-dragging");
+}));
+["dragleave", "drop"].forEach((eventName) => stickerDropzone.addEventListener(eventName, (event) => {
+  event.preventDefault();
+  stickerDropzone.classList.remove("is-dragging");
+}));
+stickerDropzone.addEventListener("drop", (event) => addStickerFiles(event.dataTransfer?.files || []));
+
+function updateSavedStickersSummary() {
+  const savedItems = modBuildState.stickers?.items || [];
+  savedStickersSummary.replaceChildren();
+  const summary = document.createElement("span");
+  summary.textContent = `${savedItems.length} ${savedItems.length === 1 ? "sticker" : "stickers"} · WebP`;
+  savedStickersSummary.append(summary);
+  savedStickersBox.hidden = savedItems.length === 0;
+  stickersCategoryCard.classList.toggle("has-saved-data", savedItems.length > 0);
+  updateCreateModAvailability();
+}
+
+stickerSaveButton.addEventListener("click", () => {
+  if (!stickerSelections.length) return;
+  modBuildState.stickers = { items: stickerSelections.map((sticker) => ({ ...sticker })) };
+  updateSavedStickersSummary();
+  stickerSaveStatus.textContent = `${stickerSelections.length} ${stickerSelections.length === 1 ? "sticker" : "stickers"} saved and numbered in order`;
+});
+
 const fontSelections = { header: [], body: [] };
 const fontInputs = {
   header: document.querySelector("#header-font-input"),
@@ -3633,9 +3792,10 @@ function hasSavedModOptions() {
   const hasSavedSidebarIcons = Boolean(modBuildState.sidebarIcons);
   const hasSavedShader = Boolean(modBuildState.shader);
   const hasSavedSpeedDialEffects = Boolean(modBuildState.speedDialEffects?.items.length);
+  const hasSavedStickers = Boolean(modBuildState.stickers?.items.length);
   const hasSavedSplash = Boolean(modBuildState.splashScreen);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSpeedDialEffects || hasSavedSplash || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSpeedDialEffects || hasSavedStickers || hasSavedSplash || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -3955,6 +4115,22 @@ function renderBuildSummary() {
     ]
   }));
   appendBuildSummaryGroup("Speed Dial effects", "Saved interactive tile effects", speedDialEffectItems);
+
+  const stickerItems = (modBuildState.stickers?.items || []).map((sticker, index) => ({
+    title: `Sticker ${index + 1}`,
+    preview: {
+      alt: `Preview of sticker ${index + 1}`,
+      kind: "image",
+      shape: "square",
+      url: sticker.url
+    },
+    details: [
+      { label: "Original file", value: sticker.originalName || sticker.name },
+      { label: "Source", value: sticker.converted ? "Converted from PNG" : sticker.source === "included" ? "Included sticker" : "Local WebP upload" },
+      { label: "Output file", value: `stickers/sticker${index + 1}.webp` }
+    ]
+  }));
+  appendBuildSummaryGroup("Stickers", "Saved expressive image set", stickerItems);
 
   const splashItems = modBuildState.splashScreen
     ? [{
@@ -4352,9 +4528,10 @@ renderBrowserSoundsEditor();
 renderKeyboardSoundsEditor();
 renderSplashEditor();
 renderCursorEditor();
+renderStickerEditor();
 ensureDefaultModIcon().catch(() => {});
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#sticker-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -4370,6 +4547,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
     "#sidebar-icons-editor": sidebarIconsEditorView,
     "#shader-editor": shaderEditorView,
     "#speed-dial-effects-editor": speedDialEffectsEditorView,
+    "#sticker-editor": stickerEditorView,
     "#splash-editor": splashEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
@@ -4402,6 +4580,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#wall
   if (initialView === speedDialEffectsEditorView) {
     activateSpeedDialEffectsEditor();
   }
+  if (initialView === stickerEditorView) renderStickerEditor();
   if (initialView === buildReviewView) {
     renderBuildSummary();
   }

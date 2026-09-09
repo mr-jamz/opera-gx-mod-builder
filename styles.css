@@ -131,6 +131,7 @@ button {
 .sidebar-icons-editor,
 .shader-editor,
 .speed-dial-effects-editor,
+.sticker-editor,
 .splash-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
@@ -511,6 +512,7 @@ h1 em {
 .sidebar-icons-editor.is-active,
 .shader-editor.is-active,
 .speed-dial-effects-editor.is-active,
+.sticker-editor.is-active,
 .splash-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
@@ -3226,6 +3228,74 @@ h1 em {
 
 .additional-category-item .category-card {
   width: 100%;
+}
+
+.sticker-workspace {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: rgba(17, 14, 24, 0.78);
+}
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.sticker-card {
+  position: relative;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: #09080e;
+}
+
+.sticker-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: repeating-conic-gradient(#17131f 0 25%, #100d17 0 50%) 50% / 18px 18px;
+}
+
+.sticker-card footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sticker-card footer span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font: 12px/1.3 var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sticker-remove-button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 38, 91, 0.45);
+  padding: 7px 10px;
+  color: var(--red);
+  background: rgba(255, 38, 91, 0.08);
+  cursor: pointer;
+}
+
+.sticker-dropzone {
+  min-height: 96px;
+}
+
+@media (max-width: 900px) {
+  .sticker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .sticker-grid { grid-template-columns: 1fr; }
 }
 
 .additional-grid {

@@ -84,6 +84,15 @@
       payload.sd_effects = clone(build.speedDialEffects);
     }
 
+    if (build.stickers?.images.length) {
+      payload.stickers = [{
+        id: "Stickers",
+        name: defaultComponentName("stickers"),
+        images: clone(build.stickers.images),
+        preview: build.stickers.preview
+      }];
+    }
+
     if (build.splashScreen) {
       payload.splash_screen = [{
         id: "SplashScreen",
