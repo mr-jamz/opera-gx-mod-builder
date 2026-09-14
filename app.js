@@ -2939,9 +2939,18 @@ function renderStickerEditor() {
     const image = document.createElement("img");
     image.src = sticker.url;
     image.alt = `Preview of sticker ${index + 1}`;
+    image.addEventListener("load", () => {
+      sticker.width = image.naturalWidth;
+      sticker.height = image.naturalHeight;
+      dimensions.textContent = `${sticker.width}×${sticker.height} px`;
+    }, { once: true });
     const footer = document.createElement("footer");
-    const label = document.createElement("span");
-    label.textContent = `sticker${index + 1}.webp`;
+    const label = document.createElement("div");
+    const fileName = document.createElement("strong");
+    fileName.textContent = `sticker${index + 1}.webp`;
+    const dimensions = document.createElement("small");
+    dimensions.textContent = sticker.width && sticker.height ? `${sticker.width}×${sticker.height} px` : "Reading image size…";
+    label.append(fileName, dimensions);
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "sticker-remove-button";

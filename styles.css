@@ -3268,13 +3268,27 @@ h1 em {
   margin-top: 12px;
 }
 
-.sticker-card footer span {
+.sticker-card footer div {
   min-width: 0;
+}
+
+.sticker-card footer strong,
+.sticker-card footer small {
+  display: block;
   overflow: hidden;
-  color: var(--muted);
-  font: 12px/1.3 var(--mono);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sticker-card footer strong {
+  color: var(--text);
+  font: 13px/1.35 var(--sans);
+}
+
+.sticker-card footer small {
+  margin-top: 3px;
+  color: var(--muted);
+  font: 11px/1.3 var(--mono);
 }
 
 .sticker-remove-button {
