@@ -186,6 +186,7 @@ button {
   place-items: center;
   border-radius: 50%;
   box-shadow: 0 0 22px rgba(255, 27, 77, 0.35);
+  perspective: 70px;
 }
 
 .brand-mark::before {
@@ -202,6 +203,7 @@ button {
   border-inline: 2px solid var(--red);
   border-radius: 50%;
   animation: brand-inner-ring-spin 3s linear infinite;
+  transform-style: preserve-3d;
 }
 
 .status {
@@ -5026,10 +5028,10 @@ h1,
 
 @keyframes brand-inner-ring-spin {
   from {
-    transform: rotate(16deg);
+    transform: rotateY(0deg);
   }
 
   to {
-    transform: rotate(376deg);
+    transform: rotateY(360deg);
   }
 }
