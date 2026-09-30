@@ -145,6 +145,10 @@ button {
   width: min(calc(100% - 48px), 1080px);
 }
 
+.license-editor {
+  width: min(calc(100% - 48px), 1080px);
+}
+
 .site-header {
   height: var(--header-height);
   display: flex;
@@ -505,6 +509,7 @@ h1 em {
 .theme-editor.is-active,
 .app-icon-editor.is-active,
 .mod-icon-editor.is-active,
+.license-editor.is-active,
 .wallpaper-editor.is-active,
 .speed-dial-effects-editor.is-active,
 .music-editor.is-active,
@@ -520,6 +525,56 @@ h1 em {
 .build-review.is-active {
   display: block;
   padding-block: 48px 100px;
+}
+
+.license-fields {
+  margin: 28px 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.license-fields label {
+  padding: 20px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  background: color-mix(in hsl, var(--surface) 94%, transparent);
+}
+
+.license-fields label:first-child {
+  grid-column: 1 / -1;
+}
+
+.license-fields label > span {
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.license-fields label > small {
+  color: var(--muted);
+  font: 0.67rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.license-fields textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--line-strong);
+  padding: 13px 14px;
+  color: var(--text);
+  background: #09080e;
+  font: 0.78rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.license-fields textarea:focus {
+  outline: 1px solid var(--red);
+  border-color: var(--red);
+}
+
+@media (max-width: 720px) {
+  .license-fields { grid-template-columns: 1fr; }
+  .license-fields label:first-child { grid-column: auto; }
 }
 
 .editor-topbar {
@@ -3679,8 +3734,10 @@ h1 em {
   .theme-editor.is-active,
   .app-icon-editor.is-active,
   .mod-icon-editor.is-active,
+  .license-editor.is-active,
   .wallpaper-editor.is-active,
   .speed-dial-effects-editor.is-active,
+  .sticker-editor.is-active,
   .music-editor.is-active,
   .browser-sounds-editor.is-active,
   .keyboard-sounds-editor.is-active,

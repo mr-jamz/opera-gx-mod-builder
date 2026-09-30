@@ -6,13 +6,13 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20260930-3">
+    <link rel="stylesheet" href="styles.css?v=20260930-4">
     <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
     <script src="vendor/canvaskit/canvaskit.js?v=0.42.0" defer></script>
     <script src="shader-preview.js?v=20260908-6" defer></script>
     <script src="speed-dial-preview.js?v=20260908-6" defer></script>
     <script src="mod-packager.js?v=20260908-6" defer></script>
-    <script src="app.js?v=20260914-1" defer></script>
+    <script src="app.js?v=20260930-4" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -71,7 +71,7 @@
         <section class="category-section" aria-labelledby="core-heading">
           <div class="section-heading">
             <div>
-              <h3 id="core-heading">Modding Foundation</h3>
+              <h3 id="core-heading">Mod Foundations</h3>
             </div>
             <p>Start with the essentials that define your mod</p>
           </div>
@@ -216,7 +216,7 @@
         <div class="editor-topbar">
           <button class="back-button" id="back-creator" type="button" aria-label="Return to mod categories">←</button>
           <div>
-            <p class="eyebrow">Modding Foundation / Theme</p>
+            <p class="eyebrow">Mod Foundations / Theme</p>
             <h2 id="theme-editor-title">Theme editor</h2>
           </div>
           <p class="schema-chip">Schema v2</p>
@@ -373,7 +373,7 @@
         <div class="editor-topbar">
           <button class="back-button" id="back-wallpaper" type="button" aria-label="Return to mod categories">←</button>
           <div>
-            <p class="eyebrow">Modding Foundation / Wallpaper</p>
+            <p class="eyebrow">Mod Foundations / Wallpaper</p>
             <h2 id="wallpaper-editor-title">Wallpaper editor</h2>
           </div>
           <p class="schema-chip">Schema v2</p>
@@ -549,7 +549,7 @@
         <div class="editor-topbar">
           <button class="back-button" id="back-music" type="button" aria-label="Return to mod categories">←</button>
           <div>
-            <p class="eyebrow">Modding Foundation / Music</p>
+            <p class="eyebrow">Mod Foundations / Music</p>
             <h2 id="music-editor-title">Music editor</h2>
           </div>
           <p class="schema-chip">Schema v2</p>
@@ -1025,6 +1025,35 @@
               <p id="mod-icon-preview-name">Loading icon_512.png</p>
             </div>
           </section>
+        </div>
+      </section>
+
+      <section class="view license-editor" id="license-editor" aria-labelledby="license-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-license" type="button" aria-label="Return to mod icon editor">←</button>
+          <div>
+            <p class="eyebrow">Final setup / License</p>
+            <h2 id="license-editor-title">License text editor</h2>
+            <p class="build-review-intro">Add the information that will replace each placeholder in <code>license.txt</code>.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="license-fields">
+          <label><span>Mod Description</span><small>Replaces “DESCRIPTIONS GO HERE”</small><textarea id="license-description" rows="6" placeholder="Describe your mod"></textarea></label>
+          <label><span>Credits</span><small>Replaces “CREDITS GO HERE”</small><textarea id="license-credits" rows="5" placeholder="List creators and contributors"></textarea></label>
+          <label><span>Licenses</span><small>Replaces “LICENCES GO HERE”</small><textarea id="license-licenses" rows="5" placeholder="List licenses and third-party terms"></textarea></label>
+          <label><span>Kudos / Thanks</span><small>Replaces “KUDOS GO HERE”</small><textarea id="license-kudos" rows="5" placeholder="Thank people or communities"></textarea></label>
+          <label><span>Miscellaneous</span><small>Replaces “OTHER STUFF GOES HERE”</small><textarea id="license-misc" rows="5" placeholder="Add anything else"></textarea></label>
+        </div>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong>License text is saved locally for this build</strong>
+            <span>Only these five entries replace text inside the packaged license file.</span>
+            <p class="theme-save-status cursor-save-status" id="license-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-license" type="button"><span>Save and review</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 
