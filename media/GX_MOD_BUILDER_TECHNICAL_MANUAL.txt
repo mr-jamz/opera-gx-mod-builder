@@ -1,0 +1,497 @@
+GX MOD BUILDER - TECHNICAL MANUAL
+=================================
+
+Purpose
+-------
+This document explains how the browser-based builder collects user input,
+previews or converts it, stores it during the current visit, translates it into
+Opera GX Schema v2 manifest data, and packages the final MyMod.zip file.
+
+The primary implementation files are:
+
+  index.html       Editor screens and form controls
+  styles.css       Interface and preview presentation
+  app.js           Editor state, validation, conversion, and build orchestration
+  mod-packager.js  Manifest construction and ZIP encoding
+  ModTemplate2.0/  Default assets, manifest template, and license template
+
+The file media/manifest.json is not used by the builder. The active manifest
+template is ModTemplate2.0/manifest.json.
+
+
+1. HIGH-LEVEL DATA FLOW
+-----------------------
+
+  User selects or enters content
+      -> editor validates and previews it
+      -> Save copies it into JavaScript state
+      -> Create Mod opens the final setup flow
+      -> Mod icon is exported
+      -> Mod Details supplies name, creator, and description
+      -> License fields are saved
+      -> Build Review reads the saved state
+      -> buildModArchive() creates file entries and a normalized build object
+      -> ModPackager.createManifest() creates manifest.json
+      -> file references are validated
+      -> ModPackager.createZipBlob() writes MyMod.zip
+
+Editor data is stored only in memory for the current browser visit. It is not
+uploaded to a server and is not restored after a page refresh or closed tab.
+Object URLs are used to preview local files without uploading them.
+
+
+2. STATE USED BY THE BUILDER
+----------------------------
+
+The main saved state is held in app.js.
+
+Separate state variables:
+
+  savedThemeValues              Dark/light theme colors
+  savedWallpaperSelections      Desktop/mobile wallpaper selections
+  savedSpeedDialEffectValues    Wallpaper-page display settings
+  savedAppIconValue             Opera GX application icon override
+  savedModIconValue             512x512 installed-mod icon
+  savedModDetails               Mod name, creator, and description
+  savedLicenseValues            Credits, licenses, kudos, and miscellaneous text
+
+modBuildState contains:
+
+  music.tracks
+  browserSounds
+  keyboardSounds
+  fonts
+  sidebarIcons
+  shader
+  speedDialEffects
+  stickers
+  splashScreen
+  cursors
+
+The editor selection state and saved state are intentionally separate. A local
+selection is not included in the ZIP until the user presses that editor's Save
+button.
+
+
+3. FINAL SETUP INFORMATION
+--------------------------
+
+Mod icon
+~~~~~~~~
+Accepted input: PNG, JPG, or WebP.
+
+The selected image is drawn onto a 512x512 canvas. Crop/fit, zoom, position,
+and corner-radius adjustments are applied before canvas.toBlob() exports PNG.
+
+Final ZIP path:
+
+  icon_512.png
+
+Manifest reference:
+
+  icons["512"] = "icon_512.png"
+
+If the user does not upload a different image, ModTemplate2.0/icon_512.png is
+used.
+
+Mod Details
+~~~~~~~~~~~
+The user must provide all three values:
+
+  Mod Name        -> manifest.name
+  Mod Creator     -> manifest.developer.name
+  Mod Description -> manifest.description
+
+The mod name is also used as the display name for generated payload components
+such as theme, wallpaper, app icon, sounds, cursors, fonts, and stickers.
+
+The same Mod Description replaces the line "DESCRIPTIONS GO HERE" in the
+license template.
+
+License editor
+~~~~~~~~~~~~~~
+The template is ModTemplate2.0/license.txt. Non-empty user values replace only
+these exact placeholder lines:
+
+  CREDITS GO HERE
+  LICENCES GO HERE
+  KUDOS GO HERE
+  OTHER STUFF GOES HERE
+
+An empty field leaves its original placeholder unchanged. The finished text is
+written to this final ZIP path:
+
+  license.txt
+
+
+4. MOD CONTENT EDITORS AND MANIFEST MAPPINGS
+--------------------------------------------
+
+Theme
+~~~~~
+The editor saves HSL values for dark mode and/or light mode.
+
+Manifest section:
+
+  mod.payload.theme[0].dark.gx_accent
+  mod.payload.theme[0].dark.gx_secondary_base
+  mod.payload.theme[0].light.gx_accent
+  mod.payload.theme[0].light.gx_secondary_base
+
+Only modes explicitly saved by the user are emitted.
+
+Wallpaper
+~~~~~~~~~
+Desktop and mobile dark/light selections are saved independently. Uploaded
+files keep their format; names are sanitized and collisions receive _2, _3,
+and so on.
+
+Final ZIP folder:
+
+  wallpaper/
+
+Manifest fields:
+
+  Desktop file -> mod.payload.wallpaper[0].[mode].image
+  Mobile file  -> mod.payload.wallpaper[0].[mode].image_mobile
+
+Wallpaper settings map to:
+
+  speeddial_position
+  text_color
+  text_shadow
+  ui_settings.background_opacity
+  ui_settings.background_blur
+  ui_settings.islands_opacity
+  ui_settings.vignette_strength
+  ui_settings.focus_mode
+
+For an animated desktop wallpaper, the builder decodes the first video frame,
+draws it to canvas, converts it to JPEG at quality 0.92, and saves:
+
+  wallpaper/first_frame_dark.jpg
+  or wallpaper/first_frame_light.jpg
+
+The path is referenced by the wallpaper mode's first_frame field.
+
+Background music
+~~~~~~~~~~~~~~~~
+Accepted input: MP3 or MP4.
+
+MP3 is stored unchanged. MP4 is processed locally by the bundled FFmpeg Web
+Assembly runtime. The video stream is removed and audio is encoded with
+libmp3lame using quality setting 2. The converted file receives an .mp3 name.
+
+Final ZIP folder:
+
+  music/
+
+Manifest section:
+
+  mod.payload.background_music[]
+
+Each saved track becomes:
+
+  author: user-entered author, or an empty string
+  id:     music_0, music_1, ...
+  name:   user-entered song name
+  tracks: ["music/<packaged filename>"]
+
+App icon
+~~~~~~~~
+Accepted input: PNG, JPG, or WebP. Like the mod icon, the image is rendered to
+a canvas and exported as PNG after sizing and corner adjustments.
+
+Final ZIP path:
+
+  app_icon/classic_GX_logo.png
+
+Manifest section:
+
+  mod.payload.app_icon[0]
+
+Its path is always app_icon/classic_GX_logo.png.
+
+Browser sounds
+~~~~~~~~~~~~~~
+Accepted input: MP3, WAV, or OGG. Audio is not transcoded. Each selected Opera
+event type becomes a lowercase filename while retaining its extension.
+
+Example:
+
+  CLICK + WAV -> sound/click.wav
+
+Manifest section:
+
+  mod.payload.browser_sounds[0].sounds
+
+The manifest maps each uppercase Opera event key to a one-item path array.
+
+Keyboard sounds
+~~~~~~~~~~~~~~~
+Accepted input: MP3, WAV, or OGG. Audio is not transcoded. Multiple sounds can
+be assigned to a keyboard event. Output filenames use the assigned slot name
+and original extension.
+
+Final ZIP folder:
+
+  keyboard/
+
+Manifest section:
+
+  mod.payload.keyboard_sounds[0].sounds
+
+Paths are grouped into arrays under the corresponding Opera keyboard event.
+
+Fonts
+~~~~~
+Accepted input: TTF. Header and body families are saved separately. Files are
+copied into fonts/ with sanitized, collision-safe names.
+
+Manifest section:
+
+  mod.payload.fonts[0].header
+  mod.payload.fonts[0].body
+
+Each role contains its chosen family name and a variants array of file paths.
+
+Sidebar icons
+~~~~~~~~~~~~~
+Accepted input: self-contained Lottie JSON.
+
+Validation requires:
+
+  A JSON object with a layers array
+  Positive numeric width and height
+  Canvas dimensions no larger than 4096x4096
+  No external image assets
+
+Each sidebar role has a fixed Opera key and fixed output filename. For example:
+
+  sidebar_activity_button -> sidebar/gx_sidebar_tabs.json
+  sidebar_bookmarks_button -> sidebar/gx_sidebar_bookmarks.json
+
+Manifest section:
+
+  mod.payload.image_overrides[0].images
+
+This is an object mapping each saved sidebar key to its packaged JSON path.
+
+Shaders
+~~~~~~~
+Accepted input: Opera GX SkSL shader files. CanvasKit compiles the source for
+the browser preview; a shader must compile before it can be saved.
+
+Final ZIP folder:
+
+  shaders/
+
+Manifest section:
+
+  mod.payload.shaders[]
+
+The generated entry includes the user-facing name, shader path, and animation
+metadata with duration 120 and 3600 steps.
+
+Speed Dial effects
+~~~~~~~~~~~~~~~~~~
+Accepted input: .txt or .sksl. The bundled Shift FX file can also be selected.
+CanvasKit compiles the source for the interactive tile preview.
+
+Final ZIP folder:
+
+  sd_effects/
+
+Manifest section:
+
+  mod.payload.sd_effects[]
+
+Each effect receives hover animation metadata:
+
+  duration: 500
+  steps: 30
+  reversible: true
+  preserve_last_frame: true
+  args: ["__hover-shader-frame"]
+
+Stickers
+~~~~~~~~
+Accepted input: WebP or PNG. PNG is decoded with createImageBitmap(), drawn to
+canvas at its original dimensions, and converted to WebP at quality 0.92.
+Existing WebP files are not recompressed.
+
+The current displayed order controls final names:
+
+  stickers/sticker1.webp
+  stickers/sticker2.webp
+  stickers/sticker3.webp
+  ...
+
+Manifest section:
+
+  mod.payload.stickers[0].images  Ordered array of all sticker paths
+  mod.payload.stickers[0].preview First sticker path
+
+The interface recommends 512x512 images but preserves uploaded dimensions.
+
+Splash screen
+~~~~~~~~~~~~~
+Accepted input: MP4. The video is previewed and copied without transcoding.
+
+Final ZIP folder:
+
+  splash/
+
+Manifest section:
+
+  mod.payload.splash_screen[0].path
+
+Cursors
+~~~~~~~
+Accepted input: Windows .cur and .ani files. The selected cursor files are
+copied unchanged. The builder extracts a displayable frame for previewing and
+saves the selected preview as PNG.
+
+Final ZIP layout:
+
+  cursors/MyCursor/<lowercase Opera cursor type>.cur or .ani
+  cursors/MyCursor/preview.png
+
+Example:
+
+  POINTER + CUR -> cursors/MyCursor/pointer.cur
+
+Manifest section:
+
+  mod.payload.cursors[0].items[] = { path, type }
+  mod.payload.cursors[0].preview = "cursors/MyCursor/preview.png"
+
+
+5. FILE-NAME RULES
+------------------
+
+safeBuildFileName() applies these rules where filenames are user-controlled:
+
+  Only the final path segment is used.
+  Whitespace becomes underscores.
+  Windows-invalid characters and control characters become underscores.
+  If a path is already reserved, _2, _3, etc. is added before the extension.
+
+Some categories intentionally use fixed names because Opera manifest keys or
+the builder's deterministic layout require them. These include the mod icon,
+app icon, stickers, cursor roles, sound roles, and sidebar icon roles.
+
+Change_Log.txt records each original filename and its final packaged filename:
+
+  Original filename -> Packaged filename
+
+
+6. MANIFEST GENERATION
+----------------------
+
+buildModArchive() first creates a normalized build object. This object contains
+only sections that were actually saved. ModPackager.createManifest() clones
+ModTemplate2.0/manifest.json and then replaces its payload with a new payload
+containing only those saved sections.
+
+Important consequences:
+
+  Unselected template payload sections do not leak into the final manifest.
+  Top-level template fields such as manifest_version and version are preserved.
+  Mod Details overwrite name, description, and developer.name.
+  Saved component names use the user's Mod Name.
+  Every media reference is a relative path inside the ZIP.
+
+manifest.json is formatted with three-space indentation and CRLF line endings.
+
+
+7. VALIDATION BEFORE PACKAGING
+------------------------------
+
+Before manifest.json is added, validateBuildFileReferences() checks:
+
+  No packaged file path contains whitespace.
+  No manifest media reference contains whitespace.
+  Every referenced media path exists in the ZIP entry list.
+  icon_512.png is always present.
+
+If a referenced file is missing, packaging stops and the user receives an
+error instead of a broken archive.
+
+
+8. ZIP ASSEMBLY
+---------------
+
+The final archive is built entirely in the browser by
+ModPackager.createZipBlob(). No server-side ZIP service is used.
+
+The packager:
+
+  Converts text and Blob entries to bytes.
+  Calculates CRC-32 for every entry.
+  Writes ZIP local-file headers.
+  Writes the central directory.
+  Writes the end-of-central-directory record.
+  Returns a Blob with MIME type application/zip.
+
+The browser creates a temporary object URL and downloads it as:
+
+  MyMod.zip
+
+The object URL is revoked after the download begins.
+
+
+9. FINAL ZIP STRUCTURE
+----------------------
+
+Depending on saved choices, MyMod.zip can contain:
+
+  manifest.json
+  license.txt
+  Change_Log.txt
+  icon_512.png
+  app_icon/
+  cursors/
+  fonts/
+  game/
+  keyboard/
+  mobile_logo/
+  music/
+  sidebar/
+  sd_effects/
+  shaders/
+  sound/
+  splash/
+  stickers/
+  wallpaper/
+  webmodding/
+
+The builder creates the known template directories even when some are empty.
+Only saved content receives manifest payload entries.
+
+
+10. CURRENTLY UNSUPPORTED OR UNUSED AREAS
+-----------------------------------------
+
+Game strips and Web modding are shown as unsupported in the interface. Their
+directories may exist in the ZIP layout, but the builder does not currently
+create payload entries for them.
+
+media/manifest.json is an unused example manifest and is not read during build.
+
+
+11. MAINTENANCE CHECKLIST
+-------------------------
+
+When adding a new editor or payload type:
+
+  1. Add controls and a Save action in index.html/app.js.
+  2. Store only explicitly saved data in state.
+  3. Add final media entries and paths in buildModArchive().
+  4. Add the matching payload translation in createManifest().
+  5. Add every manifest file reference to validateBuildFileReferences().
+  6. Add Build Review output so the user can inspect the result.
+  7. Test filename sanitization, collisions, blank values, and default assets.
+  8. Confirm every manifest path exactly matches a ZIP entry.
+
+End of manual.
