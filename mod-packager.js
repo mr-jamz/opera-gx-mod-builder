@@ -9,7 +9,13 @@
     const manifest = clone(templateManifest);
     const templatePayload = templateManifest.mod?.payload || {};
     const payload = {};
-    const defaultComponentName = (section) => templatePayload[section]?.[0]?.name || templateManifest.name;
+    const defaultComponentName = (section) => build.details?.modName || templatePayload[section]?.[0]?.name || templateManifest.name;
+
+    if (build.details) {
+      manifest.name = build.details.modName;
+      manifest.description = build.details.description;
+      manifest.developer = { name: build.details.creator };
+    }
 
     manifest.mod.payload = payload;
 

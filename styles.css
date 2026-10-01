@@ -145,7 +145,8 @@ button {
   width: min(calc(100% - 48px), 1080px);
 }
 
-.license-editor {
+.license-editor,
+.mod-details-editor {
   width: min(calc(100% - 48px), 1080px);
 }
 
@@ -190,7 +191,6 @@ button {
   place-items: center;
   border-radius: 50%;
   box-shadow: 0 0 22px rgba(255, 27, 77, 0.35);
-  perspective: 70px;
 }
 
 .brand-mark::before {
@@ -207,7 +207,6 @@ button {
   border-inline: 2px solid var(--red);
   border-radius: 50%;
   animation: brand-inner-ring-spin 3s linear infinite;
-  transform-style: preserve-3d;
 }
 
 .status {
@@ -509,6 +508,7 @@ h1 em {
 .theme-editor.is-active,
 .app-icon-editor.is-active,
 .mod-icon-editor.is-active,
+.mod-details-editor.is-active,
 .license-editor.is-active,
 .wallpaper-editor.is-active,
 .speed-dial-effects-editor.is-active,
@@ -542,10 +542,6 @@ h1 em {
   background: color-mix(in hsl, var(--surface) 94%, transparent);
 }
 
-.license-fields label:first-child {
-  grid-column: 1 / -1;
-}
-
 .license-fields label > span {
   color: var(--text);
   font-size: 0.92rem;
@@ -565,6 +561,24 @@ h1 em {
   color: var(--text);
   background: #09080e;
   font: 0.78rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.license-fields input {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  padding: 13px 14px;
+  color: var(--text);
+  background: #09080e;
+  font: 0.78rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.license-fields input:focus {
+  outline: 1px solid var(--red);
+  border-color: var(--red);
+}
+
+.mod-details-fields label:last-child {
+  grid-column: 1 / -1;
 }
 
 .license-fields textarea:focus {
@@ -3734,6 +3748,7 @@ h1 em {
   .theme-editor.is-active,
   .app-icon-editor.is-active,
   .mod-icon-editor.is-active,
+  .mod-details-editor.is-active,
   .license-editor.is-active,
   .wallpaper-editor.is-active,
   .speed-dial-effects-editor.is-active,
@@ -5085,10 +5100,10 @@ h1,
 
 @keyframes brand-inner-ring-spin {
   from {
-    transform: rotateY(0deg);
+    transform: rotate(16deg);
   }
 
   to {
-    transform: rotateY(360deg);
+    transform: rotate(376deg);
   }
 }

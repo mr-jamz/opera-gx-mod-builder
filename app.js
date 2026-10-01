@@ -3,6 +3,7 @@ const creatorView = document.querySelector("#creator");
 const themeEditorView = document.querySelector("#theme-editor");
 const appIconEditorView = document.querySelector("#app-icon-editor");
 const modIconEditorView = document.querySelector("#mod-icon-editor");
+const modDetailsEditorView = document.querySelector("#mod-details-editor");
 const licenseEditorView = document.querySelector("#license-editor");
 const wallpaperEditorView = document.querySelector("#wallpaper-editor");
 const musicEditorView = document.querySelector("#music-editor");
@@ -22,6 +23,7 @@ const backButton = document.querySelector("#back-home");
 const backCreatorButton = document.querySelector("#back-creator");
 const backAppIconButton = document.querySelector("#back-app-icon");
 const backModIconButton = document.querySelector("#back-mod-icon");
+const backModDetailsButton = document.querySelector("#back-mod-details");
 const backLicenseButton = document.querySelector("#back-license");
 const backWallpaperButton = document.querySelector("#back-wallpaper");
 const backMusicButton = document.querySelector("#back-music");
@@ -48,13 +50,13 @@ const transitionDuration = 260;
 let noticeTimer;
 
 const licenseFieldConfig = [
-  { key: "description", input: document.querySelector("#license-description"), placeholder: "DESCRIPTIONS GO HERE" },
   { key: "credits", input: document.querySelector("#license-credits"), placeholder: "CREDITS GO HERE" },
   { key: "licenses", input: document.querySelector("#license-licenses"), placeholder: "LICENCES GO HERE" },
   { key: "kudos", input: document.querySelector("#license-kudos"), placeholder: "KUDOS GO HERE" },
   { key: "misc", input: document.querySelector("#license-misc"), placeholder: "OTHER STUFF GOES HERE" }
 ];
 let savedLicenseValues = null;
+let savedModDetails = null;
 
 const themeValues = {
   dark: {
@@ -322,9 +324,14 @@ backModIconButton.addEventListener("click", () => {
   window.history.replaceState(null, "", "#creator");
 });
 
-backLicenseButton.addEventListener("click", () => {
-  switchView(licenseEditorView, modIconEditorView);
+backModDetailsButton.addEventListener("click", () => {
+  switchView(modDetailsEditorView, modIconEditorView);
   window.history.replaceState(null, "", "#mod-icon-editor");
+});
+
+backLicenseButton.addEventListener("click", () => {
+  switchView(licenseEditorView, modDetailsEditorView);
+  window.history.replaceState(null, "", "#mod-details-editor");
 });
 
 backMusicButton.addEventListener("click", () => {
@@ -579,7 +586,7 @@ async function buildModArchive() {
     entries.push({ path: "license.txt", data: new Blob([licenseText], { type: "text/plain;charset=utf-8" }) });
   }
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], stickers: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, details: savedModDetails, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], stickers: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -1499,11 +1506,9 @@ saveModIconButton.addEventListener("click", async () => {
       width: 512
     };
     modIconSaveStatus.textContent = "icon_512.png saved for this visit";
-    licenseFieldConfig.forEach(({ key, input }) => {
-      input.value = savedLicenseValues?.[key] || "";
-    });
-    switchView(modIconEditorView, licenseEditorView);
-    window.history.replaceState(null, "", "#license-editor");
+    renderModDetailsEditor();
+    switchView(modIconEditorView, modDetailsEditorView);
+    window.history.replaceState(null, "", "#mod-details-editor");
   } catch (error) {
     modIconSaveStatus.textContent = error.message;
   } finally {
@@ -1511,14 +1516,55 @@ saveModIconButton.addEventListener("click", async () => {
   }
 });
 
+const modDetailNameInput = document.querySelector("#mod-detail-name");
+const modDetailCreatorInput = document.querySelector("#mod-detail-creator");
+const modDetailDescriptionInput = document.querySelector("#mod-detail-description");
+const modDetailsStatus = document.querySelector("#mod-details-status");
+const saveModDetailsButton = document.querySelector("#save-mod-details");
+
+function updateModDetailsAvailability() {
+  const complete = [modDetailNameInput, modDetailCreatorInput, modDetailDescriptionInput]
+    .every((input) => input.value.trim());
+  saveModDetailsButton.disabled = !complete;
+  modDetailsStatus.textContent = complete ? "Mod details ready to save" : "Complete all three fields to continue";
+}
+
+function renderModDetailsEditor() {
+  modDetailNameInput.value = savedModDetails?.modName || modDetailNameInput.value;
+  modDetailCreatorInput.value = savedModDetails?.creator || modDetailCreatorInput.value;
+  modDetailDescriptionInput.value = savedModDetails?.description || modDetailDescriptionInput.value;
+  updateModDetailsAvailability();
+}
+
+[modDetailNameInput, modDetailCreatorInput, modDetailDescriptionInput].forEach((input) => {
+  input.addEventListener("input", updateModDetailsAvailability);
+});
+
+saveModDetailsButton.addEventListener("click", () => {
+  if (saveModDetailsButton.disabled) return;
+  savedModDetails = {
+    creator: modDetailCreatorInput.value.trim(),
+    description: modDetailDescriptionInput.value.trim(),
+    modName: modDetailNameInput.value.trim()
+  };
+  licenseFieldConfig.forEach(({ key, input }) => {
+    input.value = savedLicenseValues?.[key] || "";
+  });
+  switchView(modDetailsEditorView, licenseEditorView);
+  window.history.replaceState(null, "", "#license-editor");
+});
+
 const saveLicenseButton = document.querySelector("#save-license");
 const licenseSaveStatus = document.querySelector("#license-save-status");
 
 function buildLicenseText(templateText) {
+  const withDescription = savedModDetails?.description
+    ? templateText.replace("DESCRIPTIONS GO HERE", savedModDetails.description)
+    : templateText;
   return licenseFieldConfig.reduce((text, { key, placeholder }) => {
     const value = savedLicenseValues?.[key]?.trim();
     return value ? text.replace(placeholder, value) : text;
-  }, templateText);
+  }, withDescription);
 }
 
 saveLicenseButton.addEventListener("click", () => {
@@ -3982,10 +4028,22 @@ function renderBuildSummary() {
     : [];
   appendBuildSummaryGroup("Mod icon", "Installed mod preview image", modIconItems);
 
-  const licenseItems = licenseFieldConfig.map(({ key, placeholder }) => ({
+  const modDetailItems = savedModDetails ? [{
+    title: savedModDetails.modName,
+    details: [
+      { label: "Creator", value: savedModDetails.creator },
+      { label: "Description", value: savedModDetails.description }
+    ]
+  }] : [];
+  appendBuildSummaryGroup("Mod Details", "Identity saved in manifest.json", modDetailItems);
+
+  const licenseItems = [{
+    title: "Description",
+    details: [{ label: "Saved text", value: savedModDetails?.description || "DESCRIPTIONS GO HERE" }]
+  }, ...licenseFieldConfig.map(({ key, placeholder }) => ({
     title: key === "misc" ? "Miscellaneous" : key === "kudos" ? "Kudos / Thanks" : key.charAt(0).toUpperCase() + key.slice(1),
     details: [{ label: "Saved text", value: savedLicenseValues?.[key]?.trim() || placeholder }]
-  }));
+  }))];
   appendBuildSummaryGroup("License", "Text packaged in license.txt", licenseItems);
 
   const appIconItems = savedAppIconValue
@@ -4577,6 +4635,7 @@ saveMusicTracksButton.addEventListener("click", () => {
 renderThemeEditor();
 renderAppIconEditor();
 renderModIconEditor();
+renderModDetailsEditor();
 renderWallpaperEditor();
 renderBrowserSoundsEditor();
 renderKeyboardSoundsEditor();
@@ -4585,7 +4644,7 @@ renderCursorEditor();
 renderStickerEditor();
 ensureDefaultModIcon().catch(() => {});
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#license-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#sticker-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#mod-details-editor", "#license-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#sticker-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -4593,6 +4652,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#lice
     "#theme-editor": themeEditorView,
     "#app-icon-editor": appIconEditorView,
     "#mod-icon-editor": modIconEditorView,
+    "#mod-details-editor": modDetailsEditorView,
     "#license-editor": licenseEditorView,
     "#wallpaper-editor": wallpaperEditorView,
     "#music-editor": musicEditorView,
@@ -4626,6 +4686,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#lice
   if (initialView === modIconEditorView) {
     ensureDefaultModIcon().then(renderModIconEditor).catch(() => {});
   }
+  if (initialView === modDetailsEditorView) renderModDetailsEditor();
   if (initialView === sidebarIconsEditorView) {
     renderSidebarIconsEditor();
   }
