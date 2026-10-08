@@ -4481,6 +4481,45 @@ h1 em {
   overflow-wrap: anywhere;
 }
 
+.splash-resolution-options {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.splash-resolution-options legend {
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.splash-resolution-options label {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: #09080e;
+  cursor: pointer;
+}
+
+.splash-resolution-options input {
+  margin-top: 3px;
+  accent-color: var(--red);
+}
+
+.splash-resolution-options span {
+  display: grid;
+  gap: 4px;
+}
+
+.splash-resolution-options small {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .font-category {
   padding: 28px;
   display: grid;

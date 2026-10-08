@@ -336,7 +336,10 @@ The interface recommends 512x512 images but preserves uploaded dimensions.
 
 Splash screen
 ~~~~~~~~~~~~~
-Accepted input: MP4. The video is previewed and copied without transcoding.
+Accepted input: MP4. The user can preserve the video's original resolution or
+save it at the recommended 540x540 resolution. Recommended mode scales the
+picture proportionally, adds black padding where needed, and outputs an MP4
+without stretching the image. Original mode copies the MP4 without transcoding.
 
 Final ZIP folder:
 

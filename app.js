@@ -3291,6 +3291,8 @@ const splashPreviewVideo = document.querySelector("#splash-preview-video");
 const splashVideoFrame = document.querySelector("#splash-video-frame");
 const splashPreviewName = document.querySelector("#splash-preview-name");
 const splashPreviewDimensions = document.querySelector("#splash-preview-dimensions");
+const splashOutputDimensions = document.querySelector("#splash-output-dimensions");
+const splashResolutionInputs = [...document.querySelectorAll('input[name="splash-resolution"]')];
 const splashSaveCopy = document.querySelector("#splash-save-copy");
 const splashSaveButton = document.querySelector("#save-splash");
 const splashSaveStatus = document.querySelector("#splash-save-status");
@@ -3301,6 +3303,7 @@ const defaultSplashSelection = {
   file: null,
   height: 0,
   name: "splash1.mp4",
+  resolutionMode: "recommended",
   source: "default",
   url: "ModTemplate2.0/splash/splash1.mp4",
   width: 0
@@ -3313,8 +3316,9 @@ function updateSplashVideoDimensions() {
   if (!width || !height) return;
   splashSelection.width = width;
   splashSelection.height = height;
-  splashVideoFrame.style.aspectRatio = `${width} / ${height}`;
+  splashVideoFrame.style.aspectRatio = splashSelection.resolutionMode === "recommended" ? "1 / 1" : `${width} / ${height}`;
   splashPreviewDimensions.textContent = `${width}×${height}`;
+  splashOutputDimensions.textContent = splashSelection.resolutionMode === "recommended" ? "540×540" : `${width}×${height}`;
 }
 
 function renderSplashEditor() {
@@ -3326,7 +3330,14 @@ function renderSplashEditor() {
   splashPreviewDimensions.textContent = splashSelection.width
     ? `${splashSelection.width}×${splashSelection.height}`
     : "Loading…";
-  if (splashSelection.width) splashVideoFrame.style.aspectRatio = `${splashSelection.width} / ${splashSelection.height}`;
+  splashResolutionInputs.forEach((input) => { input.checked = input.value === splashSelection.resolutionMode; });
+  const useRecommendedResolution = splashSelection.resolutionMode === "recommended";
+  splashOutputDimensions.textContent = useRecommendedResolution
+    ? "540×540"
+    : splashSelection.width ? `${splashSelection.width}×${splashSelection.height}` : "Original resolution";
+  splashVideoFrame.style.aspectRatio = useRecommendedResolution
+    ? "1 / 1"
+    : splashSelection.width ? `${splashSelection.width} / ${splashSelection.height}` : "1 / 1";
   splashSaveCopy.textContent = splashSelection.source === "default"
     ? "Template splash screen selected"
     : "Custom splash screen selected";
@@ -3342,6 +3353,7 @@ function selectSplashFile(file) {
     file,
     height: 0,
     name: file.name,
+    resolutionMode: "recommended",
     source: "upload",
     url: URL.createObjectURL(file),
     width: 0
@@ -3376,6 +3388,13 @@ splashDropzone.addEventListener("drop", (event) => {
   if (file) selectSplashFile(file);
 });
 
+splashResolutionInputs.forEach((input) => input.addEventListener("change", () => {
+  if (!input.checked) return;
+  splashSelection.resolutionMode = input.value;
+  splashSaveStatus.textContent = "";
+  renderSplashEditor();
+}));
+
 function updateSavedSplashSummary() {
   const saved = modBuildState.splashScreen;
   savedSplashBox.hidden = !saved;
@@ -3386,14 +3405,37 @@ function updateSavedSplashSummary() {
   updateCreateModAvailability();
 }
 
-splashSaveButton.addEventListener("click", () => {
+splashSaveButton.addEventListener("click", async () => {
   if (!splashSelection.width || !splashSelection.height) {
     splashSaveStatus.textContent = "Wait for the video dimensions to finish loading.";
     return;
   }
-  modBuildState.splashScreen = { ...splashSelection };
-  updateSavedSplashSummary();
-  splashSaveStatus.textContent = "Splash screen saved successfully";
+  splashSaveButton.disabled = true;
+  try {
+    let savedSelection = { ...splashSelection };
+    if (splashSelection.resolutionMode === "recommended") {
+      splashSaveStatus.textContent = "Converting the splash screen to 540×540…";
+      const sourceFile = splashSelection.file || await fetchBuildBlob(splashSelection.url, splashSelection.name);
+      const convertedFile = await queueSplashConversion(sourceFile, splashSelection.name);
+      savedSelection = {
+        ...savedSelection,
+        file: convertedFile,
+        height: 540,
+        url: URL.createObjectURL(convertedFile),
+        width: 540
+      };
+    }
+    modBuildState.splashScreen = savedSelection;
+    updateSavedSplashSummary();
+    splashSaveStatus.textContent = splashSelection.resolutionMode === "recommended"
+      ? "Splash screen converted to 540×540 and saved"
+      : "Splash screen saved at its original resolution";
+  } catch (error) {
+    console.error(error);
+    splashSaveStatus.textContent = "The video could not be resized. Choose original resolution or try another MP4.";
+  } finally {
+    splashSaveButton.disabled = false;
+  }
 });
 
 const CURSOR_GROUPS = [
@@ -4410,6 +4452,40 @@ async function convertMp4ToMp3(file) {
     await ffmpeg.deleteFile(inputName).catch(() => {});
     await ffmpeg.deleteFile(outputName).catch(() => {});
   }
+}
+
+async function convertSplashTo540(file, displayName) {
+  const conversionId = ++musicConversionUid;
+  const inputName = `splash-input-${conversionId}.mp4`;
+  const outputName = `splash-output-${conversionId}.mp4`;
+  const { ffmpeg, fetchFile } = await getMusicConverter();
+
+  try {
+    await ffmpeg.writeFile(inputName, await fetchFile(file));
+    const exitCode = await ffmpeg.exec([
+      "-i", inputName,
+      "-vf", "scale=540:540:force_original_aspect_ratio=decrease,pad=540:540:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1",
+      "-c:v", "libx264",
+      "-preset", "ultrafast",
+      "-crf", "22",
+      "-pix_fmt", "yuv420p",
+      "-c:a", "copy",
+      "-movflags", "+faststart",
+      outputName
+    ]);
+    if (exitCode !== 0) throw new Error("FFmpeg could not resize the splash screen video");
+    const data = await ffmpeg.readFile(outputName);
+    return new File([data], displayName, { type: "video/mp4" });
+  } finally {
+    await ffmpeg.deleteFile(inputName).catch(() => {});
+    await ffmpeg.deleteFile(outputName).catch(() => {});
+  }
+}
+
+function queueSplashConversion(file, displayName) {
+  const conversion = musicConversionQueue.then(() => convertSplashTo540(file, displayName));
+  musicConversionQueue = conversion.catch(() => {});
+  return conversion;
 }
 
 function queueMp4Conversion(file) {

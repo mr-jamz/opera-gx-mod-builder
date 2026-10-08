@@ -6,13 +6,13 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20261001-2">
+    <link rel="stylesheet" href="styles.css?v=20261008-2">
     <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
     <script src="vendor/canvaskit/canvaskit.js?v=0.42.0" defer></script>
     <script src="shader-preview.js?v=20260908-6" defer></script>
     <script src="speed-dial-preview.js?v=20260908-6" defer></script>
     <script src="mod-packager.js?v=20261001-1" defer></script>
-    <script src="app.js?v=20261001-1" defer></script>
+    <script src="app.js?v=20261008-2" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -900,6 +900,18 @@
             </label>
             <p class="wallpaper-file-types">MP4</p>
             <p class="wallpaper-drop-status" id="splash-drop-status" role="status" aria-live="polite"></p>
+
+            <fieldset class="splash-resolution-options">
+              <legend>Saved resolution</legend>
+              <label>
+                <input type="radio" name="splash-resolution" value="recommended" checked>
+                <span><strong>Recommended 540×540</strong><small>Fits the video inside a square frame without stretching it.</small></span>
+              </label>
+              <label>
+                <input type="radio" name="splash-resolution" value="original">
+                <span><strong>Original resolution</strong><small>Keeps the uploaded video dimensions unchanged.</small></span>
+              </label>
+            </fieldset>
           </section>
 
           <section class="splash-preview-panel" aria-labelledby="splash-preview-heading">
@@ -911,6 +923,7 @@
             <dl class="splash-video-details">
               <div><dt>File</dt><dd id="splash-preview-name">splash1.mp4</dd></div>
               <div><dt>Dimensions</dt><dd id="splash-preview-dimensions">Loading…</dd></div>
+              <div><dt>Save as</dt><dd id="splash-output-dimensions">540×540</dd></div>
             </dl>
           </section>
         </div>
