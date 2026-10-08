@@ -3326,10 +3326,24 @@ const savedWebModdingBox = document.querySelector("#saved-webmodding-box");
 const savedWebModdingSummary = document.querySelector("#saved-webmodding-summary");
 const webModdingCategoryCard = document.querySelector('[data-category="Web modding"]');
 let webModdingWebsiteUid = 1;
-const webModdingWebsites = [{ id: webModdingWebsiteUid, match: "https://*.youtube.com/*", files: [] }];
+const webModdingWebsites = [{ id: webModdingWebsiteUid, match: "", files: [] }];
+
+function normalizeWebModdingMatch(value) {
+  let candidate = value.trim();
+  if (!candidate) return "";
+  if (!/^[a-z][a-z\d+.-]*:\/\//i.test(candidate)) candidate = `https://${candidate}`;
+  try {
+    const url = new URL(candidate.replace(/:\/\/\*\./, "://"));
+    if (!/^https?:$/.test(url.protocol) || !url.hostname.includes(".")) return "";
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    return `${url.protocol}//*.${hostname}/*`;
+  } catch {
+    return "";
+  }
+}
 
 function isValidWebModdingMatch(value) {
-  return /^(?:https?|\*):\/\/[^\s/]+(?:\/[^\s]*)?$/.test(value.trim());
+  return Boolean(normalizeWebModdingMatch(value));
 }
 
 function webModdingMatchLabel(match) {
@@ -3375,19 +3389,20 @@ function renderWebModdingEditor() {
     const matchLabel = document.createElement("label");
     matchLabel.className = "webmodding-match-label";
     const matchCaption = document.createElement("span");
-    matchCaption.textContent = `Website ${websiteIndex + 1} match pattern`;
+    matchCaption.textContent = `Website ${websiteIndex + 1} URL`;
     const matchInput = document.createElement("input");
     matchInput.className = "webmodding-match-input";
     matchInput.type = "text";
     matchInput.value = website.match;
-    matchInput.placeholder = "https://*.youtube.com/*";
-    matchInput.setAttribute("aria-label", `Website ${websiteIndex + 1} match pattern`);
+    matchInput.placeholder = "Paste website URL here";
+    matchInput.setAttribute("aria-label", `Website ${websiteIndex + 1} URL`);
     matchInput.setAttribute("aria-invalid", String(!isValidWebModdingMatch(website.match)));
     matchInput.addEventListener("input", () => {
       website.match = matchInput.value.trim();
       matchInput.setAttribute("aria-invalid", String(!isValidWebModdingMatch(website.match)));
       const summary = card.querySelector(".webmodding-site-summary");
-      summary.textContent = isValidWebModdingMatch(website.match) ? `Applies to ${webModdingMatchLabel(website.match)}` : "Enter a valid pattern such as https://*.youtube.com/*";
+      const normalizedMatch = normalizeWebModdingMatch(website.match);
+      summary.textContent = normalizedMatch ? `Manifest match: ${normalizedMatch}` : "Paste a valid website URL";
       webModdingSaveStatus.textContent = "";
       updateWebModdingAvailability();
     });
@@ -3400,7 +3415,7 @@ function renderWebModdingEditor() {
     removeSite.addEventListener("click", () => {
       const index = webModdingWebsites.indexOf(website);
       if (index >= 0) webModdingWebsites.splice(index, 1);
-      if (!webModdingWebsites.length) webModdingWebsites.push({ id: ++webModdingWebsiteUid, match: "https://*.youtube.com/*", files: [] });
+      if (!webModdingWebsites.length) webModdingWebsites.push({ id: ++webModdingWebsiteUid, match: "", files: [] });
       renderWebModdingEditor();
     });
     header.append(matchLabel, removeSite);
@@ -3439,12 +3454,24 @@ function renderWebModdingEditor() {
     const addFiles = document.createElement("label");
     addFiles.className = "webmodding-add-file";
     addFiles.htmlFor = fileInput.id;
-    addFiles.textContent = website.files.length ? "＋ Add another CSS file" : "＋ Select CSS files";
+    addFiles.textContent = website.files.length ? "＋ Add or drop another CSS file" : "＋ Drop CSS files here or choose files";
+    ["dragenter", "dragover"].forEach((eventName) => addFiles.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      addFiles.classList.add("is-dragging");
+    }));
+    ["dragleave", "drop"].forEach((eventName) => addFiles.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      addFiles.classList.remove("is-dragging");
+    }));
+    addFiles.addEventListener("drop", (event) => addWebModdingFiles(website, event.dataTransfer?.files || []));
     fileSection.append(fileHeading, fileList, fileInput, addFiles);
 
     const summary = document.createElement("p");
     summary.className = "webmodding-site-summary";
-    summary.textContent = isValidWebModdingMatch(website.match) ? `Applies to ${webModdingMatchLabel(website.match)}` : "Enter a valid pattern such as https://*.youtube.com/*";
+    const normalizedMatch = normalizeWebModdingMatch(website.match);
+    summary.textContent = normalizedMatch ? `Manifest match: ${normalizedMatch}` : "Paste a valid website URL";
     card.append(header, fileSection, summary);
     webModdingList.append(card);
   });
@@ -3474,7 +3501,7 @@ webModdingSaveButton.addEventListener("click", () => {
   updateWebModdingAvailability();
   if (webModdingSaveButton.disabled) return;
   modBuildState.webModding = {
-    websites: webModdingWebsites.map((website) => ({ match: website.match, files: [...website.files] }))
+    websites: webModdingWebsites.map((website) => ({ match: normalizeWebModdingMatch(website.match), files: [...website.files] }))
   };
   updateSavedWebModdingSummary();
   webModdingSaveStatus.textContent = `${webModdingWebsites.length} website ${webModdingWebsites.length === 1 ? "style group" : "style groups"} saved`;

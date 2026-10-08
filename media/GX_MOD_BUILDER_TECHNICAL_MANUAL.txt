@@ -337,9 +337,11 @@ The interface recommends 512x512 images but preserves uploaded dimensions.
 Web Modding CSS
 ~~~~~~~~~~~~~~~
 Accepted input: one or more CSS files up to 2 MB each. Files are grouped by
-website. Every group stores one Opera/Chromium match pattern, such as:
+website. The user pastes a normal website URL. On Save, the builder removes a
+leading www subdomain and adds the wildcard subdomain and path required by the
+Opera/Chromium manifest. For example:
 
-  https://*.youtube.com/*
+  https://youtube.com -> https://*.youtube.com/*
 
 Users may add multiple CSS files to the same website group or create another
 group for a different website. CSS files are copied without conversion.
