@@ -4643,8 +4643,8 @@ async function getMusicConverter() {
   if (!musicConverterPromise) {
     musicConverterPromise = (async () => {
       const [{ FFmpeg }, { fetchFile }] = await Promise.all([
-        import("./vendor/ffmpeg/ffmpeg/index.js"),
-        import("./vendor/ffmpeg/util/index.js")
+        import(new URL("vendor/ffmpeg/ffmpeg/index.js", document.baseURI).href),
+        import(new URL("vendor/ffmpeg/util/index.js", document.baseURI).href)
       ]);
       const ffmpeg = new FFmpeg();
       const coreBaseUrl = new URL("./vendor/ffmpeg/core/", document.baseURI);
