@@ -3443,6 +3443,21 @@ h1 em {
   cursor: pointer;
 }
 
+.webmodding-add-file {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  text-align: center;
+}
+
+.webmodding-add-file.is-dragging {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(255, 38, 91, 0.08);
+}
+
 .webmodding-remove-site,
 .webmodding-remove-file {
   color: var(--red);
