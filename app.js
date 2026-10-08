@@ -3032,13 +3032,14 @@ const stickerSaveStatus = document.querySelector("#sticker-save-status");
 const savedStickersBox = document.querySelector("#saved-stickers-box");
 const savedStickersSummary = document.querySelector("#saved-stickers-summary");
 const stickersCategoryCard = document.querySelector('[data-category="Stickers"]');
-let stickerSequence = 4;
-const stickerSelections = Array.from({ length: 4 }, (_, index) => ({
+const includedStickerFileNames = ["1.webp", "2.webp", "3.webp", "4.webp", "10.webp", "20.webp", "30.webp", "40.webp"];
+let stickerSequence = includedStickerFileNames.length;
+const stickerSelections = includedStickerFileNames.map((fileName, index) => ({
   id: `included-${index + 1}`,
-  name: `sticker${index + 1}.webp`,
-  originalName: `sticker${index + 1}.webp`,
+  name: fileName,
+  originalName: fileName,
   source: "included",
-  url: `ModTemplate2.0/stickers/sticker${index + 1}.webp`
+  url: `ModTemplate2.0/stickers/${fileName}`
 }));
 
 function setStickerStatus(message, type = "") {

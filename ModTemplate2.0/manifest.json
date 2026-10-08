@@ -102,8 +102,8 @@
          "stickers": [ {
             "id": "Stickers",
             "name": "InsertModNameOrSomethingHere",
-            "images": [ "stickers/sticker1.webp", "stickers/sticker2.webp", "stickers/sticker3.webp", "stickers/sticker4.webp" ],
-            "preview": "stickers/sticker1.webp"
+            "images": [ "stickers/1.webp", "stickers/2.webp", "stickers/3.webp", "stickers/4.webp", "stickers/10.webp", "stickers/20.webp", "stickers/30.webp", "stickers/40.webp" ],
+            "preview": "stickers/1.webp"
          } ],
          "shaders": [ {
             "animation": {
