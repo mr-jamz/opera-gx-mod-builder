@@ -132,6 +132,7 @@ button {
 .shader-editor,
 .speed-dial-effects-editor,
 .sticker-editor,
+.webmodding-editor,
 .splash-editor,
 .cursor-editor {
   width: min(calc(100% - 48px), 1440px);
@@ -520,6 +521,7 @@ h1 em {
 .shader-editor.is-active,
 .speed-dial-effects-editor.is-active,
 .sticker-editor.is-active,
+.webmodding-editor.is-active,
 .splash-editor.is-active,
 .cursor-editor.is-active,
 .build-review.is-active {
@@ -3375,6 +3377,119 @@ h1 em {
   min-height: 96px;
 }
 
+.webmodding-workspace {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: rgba(17, 14, 24, 0.78);
+}
+
+.webmodding-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.webmodding-site-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: #09080e;
+}
+
+.webmodding-site-header,
+.webmodding-file-row,
+.webmodding-file-list {
+  display: flex;
+  gap: 12px;
+}
+
+.webmodding-site-header {
+  align-items: end;
+}
+
+.webmodding-match-label {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+}
+
+.webmodding-match-label span,
+.webmodding-file-heading {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.webmodding-match-input {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  padding: 11px 12px;
+  color: var(--text);
+  background: #050407;
+  font: 0.75rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.webmodding-match-input[aria-invalid="true"] {
+  border-color: var(--red);
+}
+
+.webmodding-remove-site,
+.webmodding-remove-file,
+.webmodding-add-site,
+.webmodding-add-file {
+  border: 1px solid var(--line-strong);
+  padding: 10px 12px;
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.webmodding-remove-site,
+.webmodding-remove-file {
+  color: var(--red);
+  border-color: rgba(255, 38, 91, 0.45);
+}
+
+.webmodding-file-section {
+  margin-top: 18px;
+}
+
+.webmodding-file-list {
+  flex-direction: column;
+  margin: 10px 0 14px;
+}
+
+.webmodding-file-row {
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+}
+
+.webmodding-file-row code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.webmodding-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.webmodding-site-summary {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font: 0.68rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+@media (max-width: 700px) {
+  .webmodding-site-header { align-items: stretch; flex-direction: column; }
+  .webmodding-remove-site { align-self: start; }
+}
+
 @media (max-width: 900px) {
   .sticker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -3753,6 +3868,7 @@ h1 em {
   .wallpaper-editor.is-active,
   .speed-dial-effects-editor.is-active,
   .sticker-editor.is-active,
+  .webmodding-editor.is-active,
   .music-editor.is-active,
   .browser-sounds-editor.is-active,
   .keyboard-sounds-editor.is-active,

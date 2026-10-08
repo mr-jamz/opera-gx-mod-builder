@@ -14,6 +14,7 @@ const sidebarIconsEditorView = document.querySelector("#sidebar-icons-editor");
 const shaderEditorView = document.querySelector("#shader-editor");
 const speedDialEffectsEditorView = document.querySelector("#speed-dial-effects-editor");
 const stickerEditorView = document.querySelector("#sticker-editor");
+const webModdingEditorView = document.querySelector("#webmodding-editor");
 const splashEditorView = document.querySelector("#splash-editor");
 const cursorEditorView = document.querySelector("#cursor-editor");
 const buildReviewView = document.querySelector("#build-review");
@@ -34,6 +35,7 @@ const backSidebarIconsButton = document.querySelector("#back-sidebar-icons");
 const backShaderButton = document.querySelector("#back-shader");
 const backSpeedDialEffectsButton = document.querySelector("#back-speed-dial-effects");
 const backStickersButton = document.querySelector("#back-stickers");
+const backWebModdingButton = document.querySelector("#back-webmodding");
 const backSplashButton = document.querySelector("#back-splash");
 const backCursorsButton = document.querySelector("#back-cursors");
 const backBuildReviewButton = document.querySelector("#back-build-review");
@@ -133,6 +135,7 @@ const modBuildState = {
   shader: null,
   speedDialEffects: null,
   stickers: null,
+  webModding: null,
   splashScreen: null,
   cursors: null,
   music: {
@@ -161,6 +164,7 @@ function switchView(fromView, toView) {
       activateSpeedDialEffectsEditor();
     }
     if (toView === stickerEditorView) renderStickerEditor();
+    if (toView === webModdingEditorView) renderWebModdingEditor();
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     const focusTarget = toView.querySelector("h1, h2");
@@ -299,6 +303,13 @@ categoryButtons.forEach((button) => {
       return;
     }
 
+    if (button.dataset.category === "Web modding") {
+      renderWebModdingEditor();
+      switchView(creatorView, webModdingEditorView);
+      window.history.replaceState(null, "", "#webmodding-editor");
+      return;
+    }
+
     showEditorNotice(button.dataset.category);
   });
 });
@@ -375,6 +386,11 @@ backSpeedDialEffectsButton.addEventListener("click", () => {
 
 backStickersButton.addEventListener("click", () => {
   switchView(stickerEditorView, creatorView);
+  window.history.replaceState(null, "", "#creator");
+});
+
+backWebModdingButton.addEventListener("click", () => {
+  switchView(webModdingEditorView, creatorView);
   window.history.replaceState(null, "", "#creator");
 });
 
@@ -484,6 +500,7 @@ function validateBuildFileReferences(entries, build) {
   if (build.shader) references.push(build.shader.path);
   build.speedDialEffects.forEach((effect) => references.push(effect.shader.path));
   build.stickers?.images.forEach((path) => references.push(path));
+  build.webModding.forEach((style) => style.css.forEach((path) => references.push(path)));
   if (build.splashScreen) references.push(build.splashScreen.path);
   if (build.cursors) {
     references.push(build.cursors.preview);
@@ -586,7 +603,7 @@ async function buildModArchive() {
     entries.push({ path: "license.txt", data: new Blob([licenseText], { type: "text/plain;charset=utf-8" }) });
   }
 
-  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, details: savedModDetails, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], stickers: null, splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
+  const build = { appIcon: Boolean(savedAppIconValue), browserSounds: null, details: savedModDetails, keyboardSounds: null, fonts: {}, sidebarIcons: null, shader: null, speedDialEffects: [], stickers: null, webModding: [], splashScreen: null, cursors: null, music: [], theme: {}, wallpaper: {} };
   const modIconBlob = savedModIconValue?.file
     || await fetchBuildBlob("ModTemplate2.0/icon_512.png", "The default mod icon");
   entries.push({ path: "icon_512.png", data: modIconBlob });
@@ -729,6 +746,20 @@ async function buildModArchive() {
       images.push(outputPath);
     }
     build.stickers = { images, preview: images[0] };
+  }
+
+  for (const [index, website] of (modBuildState.webModding?.websites || []).entries()) {
+    const css = website.files.map((file) => {
+      const outputPath = reserveBuildPath("webmodding", file.name, usedPaths);
+      entries.push({ path: outputPath, data: file });
+      addFileChangeLogEntry(fileChangeLog, file.name, outputPath);
+      return outputPath;
+    });
+    build.webModding.push({
+      css,
+      id: `Webmodding${index + 1}`,
+      matches: [website.match]
+    });
   }
 
   if (modBuildState.splashScreen) {
@@ -3284,6 +3315,171 @@ fontSaveButton.addEventListener("click", () => {
   fontSaveStatus.textContent = `Saved ${count} font ${count === 1 ? "file" : "files"} successfully`;
 });
 
+const webModdingList = document.querySelector("#webmodding-list");
+const addWebModdingSiteButton = document.querySelector("#add-webmodding-site");
+const webModdingCount = document.querySelector("#webmodding-count");
+const webModdingStatus = document.querySelector("#webmodding-status");
+const webModdingChangeCount = document.querySelector("#webmodding-change-count");
+const webModdingSaveButton = document.querySelector("#save-webmodding");
+const webModdingSaveStatus = document.querySelector("#webmodding-save-status");
+const savedWebModdingBox = document.querySelector("#saved-webmodding-box");
+const savedWebModdingSummary = document.querySelector("#saved-webmodding-summary");
+const webModdingCategoryCard = document.querySelector('[data-category="Web modding"]');
+let webModdingWebsiteUid = 1;
+const webModdingWebsites = [{ id: webModdingWebsiteUid, match: "https://*.youtube.com/*", files: [] }];
+
+function isValidWebModdingMatch(value) {
+  return /^(?:https?|\*):\/\/[^\s/]+(?:\/[^\s]*)?$/.test(value.trim());
+}
+
+function webModdingMatchLabel(match) {
+  return match.replace(/^[^:]+:\/\//, "").replace(/^\*\./, "").replace(/\/.*$/, "") || match;
+}
+
+function updateWebModdingAvailability() {
+  const fileCount = webModdingWebsites.reduce((count, website) => count + website.files.length, 0);
+  const ready = webModdingWebsites.length > 0 && webModdingWebsites.every((website) => website.files.length && isValidWebModdingMatch(website.match));
+  const label = fileCount ? `${fileCount} CSS ${fileCount === 1 ? "file" : "files"} across ${webModdingWebsites.length} ${webModdingWebsites.length === 1 ? "website" : "websites"}` : "No CSS files selected";
+  webModdingCount.textContent = label;
+  webModdingChangeCount.textContent = ready ? `${label} ready to save` : label;
+  webModdingSaveButton.disabled = !ready;
+}
+
+function addWebModdingFiles(website, fileList) {
+  let added = 0;
+  [...fileList].forEach((file) => {
+    if (!/\.css$/i.test(file.name)) {
+      webModdingStatus.textContent = `${file.name} was skipped. Only .css files are supported.`;
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      webModdingStatus.textContent = `${file.name} was skipped because it exceeds 2 MB.`;
+      return;
+    }
+    website.files.push(file);
+    added += 1;
+  });
+  if (added) webModdingStatus.textContent = `${added} CSS ${added === 1 ? "file" : "files"} added for ${webModdingMatchLabel(website.match)}.`;
+  webModdingSaveStatus.textContent = "";
+  renderWebModdingEditor();
+}
+
+function renderWebModdingEditor() {
+  webModdingList.replaceChildren();
+  webModdingWebsites.forEach((website, websiteIndex) => {
+    const card = document.createElement("article");
+    card.className = "webmodding-site-card";
+
+    const header = document.createElement("div");
+    header.className = "webmodding-site-header";
+    const matchLabel = document.createElement("label");
+    matchLabel.className = "webmodding-match-label";
+    const matchCaption = document.createElement("span");
+    matchCaption.textContent = `Website ${websiteIndex + 1} match pattern`;
+    const matchInput = document.createElement("input");
+    matchInput.className = "webmodding-match-input";
+    matchInput.type = "text";
+    matchInput.value = website.match;
+    matchInput.placeholder = "https://*.youtube.com/*";
+    matchInput.setAttribute("aria-label", `Website ${websiteIndex + 1} match pattern`);
+    matchInput.setAttribute("aria-invalid", String(!isValidWebModdingMatch(website.match)));
+    matchInput.addEventListener("input", () => {
+      website.match = matchInput.value.trim();
+      matchInput.setAttribute("aria-invalid", String(!isValidWebModdingMatch(website.match)));
+      const summary = card.querySelector(".webmodding-site-summary");
+      summary.textContent = isValidWebModdingMatch(website.match) ? `Applies to ${webModdingMatchLabel(website.match)}` : "Enter a valid pattern such as https://*.youtube.com/*";
+      webModdingSaveStatus.textContent = "";
+      updateWebModdingAvailability();
+    });
+    matchLabel.append(matchCaption, matchInput);
+
+    const removeSite = document.createElement("button");
+    removeSite.className = "webmodding-remove-site";
+    removeSite.type = "button";
+    removeSite.textContent = "Remove website";
+    removeSite.addEventListener("click", () => {
+      const index = webModdingWebsites.indexOf(website);
+      if (index >= 0) webModdingWebsites.splice(index, 1);
+      if (!webModdingWebsites.length) webModdingWebsites.push({ id: ++webModdingWebsiteUid, match: "https://*.youtube.com/*", files: [] });
+      renderWebModdingEditor();
+    });
+    header.append(matchLabel, removeSite);
+
+    const fileSection = document.createElement("div");
+    fileSection.className = "webmodding-file-section";
+    const fileHeading = document.createElement("p");
+    fileHeading.className = "webmodding-file-heading";
+    fileHeading.textContent = "CSS files for this website";
+    const fileList = document.createElement("div");
+    fileList.className = "webmodding-file-list";
+    website.files.forEach((file) => {
+      const row = document.createElement("div");
+      row.className = "webmodding-file-row";
+      const name = document.createElement("code");
+      name.textContent = file.name;
+      const removeFile = document.createElement("button");
+      removeFile.className = "webmodding-remove-file";
+      removeFile.type = "button";
+      removeFile.textContent = "Remove";
+      removeFile.addEventListener("click", () => {
+        website.files.splice(website.files.indexOf(file), 1);
+        renderWebModdingEditor();
+      });
+      row.append(name, removeFile);
+      fileList.append(row);
+    });
+
+    const fileInput = document.createElement("input");
+    fileInput.className = "webmodding-file-input";
+    fileInput.id = `webmodding-files-${website.id}`;
+    fileInput.type = "file";
+    fileInput.accept = ".css,text/css";
+    fileInput.multiple = true;
+    fileInput.addEventListener("change", () => addWebModdingFiles(website, fileInput.files || []));
+    const addFiles = document.createElement("label");
+    addFiles.className = "webmodding-add-file";
+    addFiles.htmlFor = fileInput.id;
+    addFiles.textContent = website.files.length ? "＋ Add another CSS file" : "＋ Select CSS files";
+    fileSection.append(fileHeading, fileList, fileInput, addFiles);
+
+    const summary = document.createElement("p");
+    summary.className = "webmodding-site-summary";
+    summary.textContent = isValidWebModdingMatch(website.match) ? `Applies to ${webModdingMatchLabel(website.match)}` : "Enter a valid pattern such as https://*.youtube.com/*";
+    card.append(header, fileSection, summary);
+    webModdingList.append(card);
+  });
+  updateWebModdingAvailability();
+}
+
+addWebModdingSiteButton.addEventListener("click", () => {
+  webModdingWebsites.push({ id: ++webModdingWebsiteUid, match: "", files: [] });
+  webModdingSaveStatus.textContent = "";
+  renderWebModdingEditor();
+});
+
+function updateSavedWebModdingSummary() {
+  const websites = modBuildState.webModding?.websites || [];
+  savedWebModdingSummary.replaceChildren();
+  websites.forEach((website) => {
+    const summary = document.createElement("span");
+    summary.textContent = `${webModdingMatchLabel(website.match)} · ${website.files.length} CSS ${website.files.length === 1 ? "file" : "files"}`;
+    savedWebModdingSummary.append(summary);
+  });
+  savedWebModdingBox.hidden = websites.length === 0;
+  webModdingCategoryCard.classList.toggle("has-saved-data", websites.length > 0);
+  updateCreateModAvailability();
+}
+
+webModdingSaveButton.addEventListener("click", () => {
+  updateWebModdingAvailability();
+  if (webModdingSaveButton.disabled) return;
+  modBuildState.webModding = {
+    websites: webModdingWebsites.map((website) => ({ match: website.match, files: [...website.files] }))
+  };
+  updateSavedWebModdingSummary();
+  webModdingSaveStatus.textContent = `${webModdingWebsites.length} website ${webModdingWebsites.length === 1 ? "style group" : "style groups"} saved`;
+});
+
 const splashFileInput = document.querySelector("#splash-file");
 const splashDropzone = document.querySelector("#splash-dropzone");
 const splashDropStatus = document.querySelector("#splash-drop-status");
@@ -3929,9 +4125,10 @@ function hasSavedModOptions() {
   const hasSavedShader = Boolean(modBuildState.shader);
   const hasSavedSpeedDialEffects = Boolean(modBuildState.speedDialEffects?.items.length);
   const hasSavedStickers = Boolean(modBuildState.stickers?.items.length);
+  const hasSavedWebModding = Boolean(modBuildState.webModding?.websites.length);
   const hasSavedSplash = Boolean(modBuildState.splashScreen);
   const hasSavedCursors = Boolean(modBuildState.cursors);
-  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSpeedDialEffects || hasSavedStickers || hasSavedSplash || hasSavedCursors;
+  return hasSavedAppIcon || hasSavedTheme || hasSavedWallpaper || hasSavedMusic || hasSavedBrowserSounds || hasSavedKeyboardSounds || hasSavedFonts || hasSavedSidebarIcons || hasSavedShader || hasSavedSpeedDialEffects || hasSavedStickers || hasSavedWebModding || hasSavedSplash || hasSavedCursors;
 }
 
 function updateCreateModAvailability() {
@@ -4285,6 +4482,16 @@ function renderBuildSummary() {
     ]
   }));
   appendBuildSummaryGroup("Stickers", "Saved expressive image set", stickerItems);
+
+  const webModdingItems = (modBuildState.webModding?.websites || []).map((website, index) => ({
+    title: webModdingMatchLabel(website.match),
+    details: [
+      { label: "Match", value: website.match },
+      { label: "CSS files", value: website.files.map((file) => file.name).join(", ") },
+      { label: "Manifest ID", value: `Webmodding${index + 1}` }
+    ]
+  }));
+  appendBuildSummaryGroup("Web Modding", "Saved site-specific CSS", webModdingItems);
 
   const splashItems = modBuildState.splashScreen
     ? [{
@@ -4718,9 +4925,10 @@ renderKeyboardSoundsEditor();
 renderSplashEditor();
 renderCursorEditor();
 renderStickerEditor();
+renderWebModdingEditor();
 ensureDefaultModIcon().catch(() => {});
 
-if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#mod-details-editor", "#license-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#sticker-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
+if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#mod-details-editor", "#license-editor", "#wallpaper-editor", "#music-editor", "#browser-sounds-editor", "#keyboard-sounds-editor", "#font-editor", "#sidebar-icons-editor", "#shader-editor", "#speed-dial-effects-editor", "#sticker-editor", "#webmodding-editor", "#splash-editor", "#cursor-editor", "#build-review"].includes(window.location.hash)) {
   landingView.classList.remove("is-active");
   landingView.setAttribute("aria-hidden", "true");
   const initialViews = {
@@ -4739,6 +4947,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#mod-
     "#shader-editor": shaderEditorView,
     "#speed-dial-effects-editor": speedDialEffectsEditorView,
     "#sticker-editor": stickerEditorView,
+    "#webmodding-editor": webModdingEditorView,
     "#splash-editor": splashEditorView,
     "#cursor-editor": cursorEditorView,
     "#build-review": buildReviewView
@@ -4773,6 +4982,7 @@ if (["#creator", "#theme-editor", "#app-icon-editor", "#mod-icon-editor", "#mod-
     activateSpeedDialEffectsEditor();
   }
   if (initialView === stickerEditorView) renderStickerEditor();
+  if (initialView === webModdingEditorView) renderWebModdingEditor();
   if (initialView === buildReviewView) {
     renderBuildSummary();
   }

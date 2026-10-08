@@ -99,6 +99,15 @@
       }];
     }
 
+    if (build.webModding?.length) {
+      payload.page_styles = build.webModding.map((style) => ({
+        css: clone(style.css),
+        id: style.id,
+        matches: clone(style.matches),
+        name: defaultComponentName("page_styles")
+      }));
+    }
+
     if (build.splashScreen) {
       payload.splash_screen = [{
         id: "SplashScreen",

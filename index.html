@@ -6,13 +6,13 @@
     <meta name="description" content="Build a custom Opera GX mod with a guided visual editor">
     <meta name="theme-color" content="#251f33">
     <title>GX Mod Builder</title>
-    <link rel="stylesheet" href="styles.css?v=20261008-2">
+    <link rel="stylesheet" href="styles.css?v=20261008-3">
     <script src="vendor/lottie/lottie_light_canvas.min.js?v=5.13.0" defer></script>
     <script src="vendor/canvaskit/canvaskit.js?v=0.42.0" defer></script>
     <script src="shader-preview.js?v=20260908-6" defer></script>
     <script src="speed-dial-preview.js?v=20260908-6" defer></script>
-    <script src="mod-packager.js?v=20261001-1" defer></script>
-    <script src="app.js?v=20261008-2" defer></script>
+    <script src="mod-packager.js?v=20261008-3" defer></script>
+    <script src="app.js?v=20261008-3" defer></script>
   </head>
   <body>
     <div class="ambient-grid" aria-hidden="true"></div>
@@ -205,7 +205,13 @@
                 <div class="saved-browser-sounds-summary" id="saved-stickers-summary"></div>
               </div>
             </div>
-            <button class="category-card is-not-supported" type="button" data-category="Web modding" disabled><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="unsupported-mark" aria-hidden="true">—</span></button>
+            <div class="additional-category-item">
+              <button class="category-card" type="button" data-category="Web modding"><span class="card-copy"><strong>Web modding</strong><small>Site-specific CSS</small></span><span class="card-arrow">↗</span></button>
+              <div class="saved-content-box" id="saved-webmodding-box" hidden>
+                <strong>Saved website styles</strong>
+                <div class="saved-browser-sounds-summary" id="saved-webmodding-summary"></div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -963,6 +969,41 @@
             <p class="theme-save-status cursor-save-status" id="cursor-save-status" role="status" aria-live="polite"></p>
           </div>
           <button class="save-theme-button cursor-save-button" id="save-cursors" type="button" disabled><span>Save custom cursors</span><b aria-hidden="true">→</b></button>
+        </div>
+      </section>
+
+      <section class="view webmodding-editor" id="webmodding-editor" aria-labelledby="webmodding-editor-title" aria-hidden="true">
+        <div class="editor-topbar">
+          <button class="back-button" id="back-webmodding" type="button" aria-label="Return to mod categories">←</button>
+          <div>
+            <p class="eyebrow">Advanced Options / Web modding</p>
+            <h2 id="webmodding-editor-title">Web Modding CSS</h2>
+            <p class="cursor-editor-intro">Group one or more CSS files by the website where they should run.</p>
+          </div>
+          <p class="schema-chip">Schema v2</p>
+        </div>
+
+        <div class="cursor-format-note" role="note">
+          <i aria-hidden="true"></i>
+          <div><strong>Website match pattern</strong><span>Use an Opera match such as <code>https://*.youtube.com/*</code>. Every CSS file in that website group uses the same match.</span></div>
+        </div>
+
+        <section class="webmodding-workspace" aria-labelledby="webmodding-files-title">
+          <div class="browser-sound-heading">
+            <span><strong id="webmodding-files-title">Website styles</strong><code id="webmodding-count">No CSS files selected</code></span>
+            <button class="webmodding-add-site" id="add-webmodding-site" type="button">＋ Add another website</button>
+          </div>
+          <div class="webmodding-list" id="webmodding-list"></div>
+          <p class="shader-file-status" id="webmodding-status" role="status" aria-live="polite"></p>
+        </section>
+
+        <div class="cursor-save-bar">
+          <div>
+            <strong id="webmodding-change-count">No CSS files selected</strong>
+            <span>Each website needs a valid match pattern and at least one CSS file.</span>
+            <p class="theme-save-status cursor-save-status" id="webmodding-save-status" role="status" aria-live="polite"></p>
+          </div>
+          <button class="save-theme-button cursor-save-button" id="save-webmodding" type="button" disabled><span>Save website styles</span><b aria-hidden="true">→</b></button>
         </div>
       </section>
 

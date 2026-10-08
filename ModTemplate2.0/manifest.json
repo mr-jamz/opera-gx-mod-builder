@@ -399,6 +399,11 @@
             "id": "Webmodding1",
             "matches": [ "https://*.opera.com/*" ],
             "name": "InsertModNameOrSomethingHere"
+         }, {
+            "css": [ "webmodding/yt.css" ],
+            "id": "Webmodding2",
+            "matches": [ "https://*.youtube.com/*" ],
+            "name": "InsertModNameOrSomethingHere"
          }
 		],
         "fonts": [ {

@@ -334,6 +334,27 @@ Manifest section:
 
 The interface recommends 512x512 images but preserves uploaded dimensions.
 
+Web Modding CSS
+~~~~~~~~~~~~~~~
+Accepted input: one or more CSS files up to 2 MB each. Files are grouped by
+website. Every group stores one Opera/Chromium match pattern, such as:
+
+  https://*.youtube.com/*
+
+Users may add multiple CSS files to the same website group or create another
+group for a different website. CSS files are copied without conversion.
+
+Final ZIP folder:
+
+  webmodding/
+
+Manifest section:
+
+  mod.payload.page_styles[]
+
+Each website becomes one page_styles entry. Its css array contains every file
+saved for that website, while matches contains the website match pattern.
+
 Splash screen
 ~~~~~~~~~~~~~
 Accepted input: MP4. The user can preserve the video's original resolution or
@@ -476,9 +497,9 @@ Only saved content receives manifest payload entries.
 10. CURRENTLY UNSUPPORTED OR UNUSED AREAS
 -----------------------------------------
 
-Game strips and Web modding are shown as unsupported in the interface. Their
-directories may exist in the ZIP layout, but the builder does not currently
-create payload entries for them.
+Game strips are shown as unsupported in the interface. Their directory may
+exist in the ZIP layout, but the builder does not currently create payload
+entries for it.
 
 media/manifest.json is an unused example manifest and is not read during build.
 

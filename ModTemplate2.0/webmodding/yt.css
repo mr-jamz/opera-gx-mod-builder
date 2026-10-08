@@ -1,0 +1,116 @@
+/* Subscribe to my channel at: https://www.youtube.com/@MrJamzOG */
+/* Find modding resources on my GitHub at:  https://github.com/mr-jamz/opera-gx-mods/tree/main */
+
+/* Use these variables if you want a color to match your Opera GX theme */
+:root{
+    --OperaColor1: env(-opera-gx-accent-color);                       /* var(--OperaColor1) */
+    --OperaColor2: env(-opera-gx-background-color);                   /* var(--OperaColor2) */
+    --CustomImg: url(https://cdn.britannica.com/60/174560-050-5A33606F/cherries-Cluster.jpg);  /* var(--CustomImg) */
+    /*Make sure the image you are trying to use a link for is opened in its own tab, the end of the url should say .jpg or .png, etc., like the example given above */
+}
+
+/* Examples using custom variables:
+body {
+    color: var(OperaColor1) !important;                               // Uses the primary Opera GX theme color
+    background-color: var(OperaColor2) !important;                    // Uses the secondary Opera GX theme color
+    other-color: var(--CustomImg) !important;                         // Uses the referenced custom image
+}
+*/
+
+/*Most of this section applies to overall UI elements and the elements on your home menu */
+html[darker-dark-theme][dark], [darker-dark-theme] [dark] {
+    --yt-spec-text-primary: #fff !important;                        /*Changes color of all the primary text on the page, also color of the spyglass in the search icon */
+    --yt-spec-text-primary-inverse: #9e9e9e !important;             /*Changes color of the text for the "all, gaming, mixes, etc" buttons that stick to the bottom of the header(when they are clicked) */
+}
+yt-formatted-string[has-link-only_]:not([force-default-style]) a.yt-simple-endpoint.yt-formatted-string {
+    color: #fff !important;                                         /*Changes color of channel name text descriptor */
+}
+#metadata-line.ytd-video-meta-block {
+    color: #9e9e9e !important;                                      /*Changes the text color for # of views and how long ago the video was posted */
+}
+#container.ytd-searchbox input.ytd-searchbox {
+    color: #000 !important;                                         /*Changes color of the text you type into the search box */
+}
+html[dark], [dark] {
+    --yt-spec-base-background: #000 !important;                     /*Changes main background color*/
+    --ytd-searchbox-background: #fff !important;                    /*Changes the background color of the top search box */
+    --yt-spec-raised-background: #fff !important;                   /*Changes background color of the search box popup */
+    --ytd-searchbox-legacy-border-color: #fff !important;           /*Changes the outline color of the top search box */ 
+    --ytd-searchbox-legacy-button-border-color: #fff !important;    /*Changes the outline color of the search button on the right side of the top search box */
+}
+html[dark] #guide-wrapper {
+    --yt-spec-base-background: #000 !important;                     /*Changes background color of the YouTube sidebar on the left */
+}
+html[dark] .style-scope ytd-masthead {
+    --yt-spec-base-background: #000 !important;                     /*Changes background color of the sticky header bar at the top of the screen */
+}
+.yt-spec-button-shape-next--overlay.yt-spec-button-shape-next--text {
+    color: #fff !important;                                         /*Changes color of the microphone icon on the header */
+}
+.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--text {
+    color: #fff !important;                                         /*Changes color of the upload icon on the header, also the like/dislike/reply text on comments */
+}
+.yt-spec-icon-badge-shape--style-overlay .yt-spec-icon-badge-shape__icon {
+    color: #fff !important;                                         /*Changes color of the notification bell icon on the header */
+}
+#guide-icon.ytd-masthead {
+    color: #fff !important;                                         /*Changes color of the 3 lines dropdown menu on the left of the header */
+}
+ytd-guide-entry-renderer[active] .guide-icon.ytd-guide-entry-renderer {
+    color: #fff !important;                                         /*Changes color of the home icon on left sidebar */
+}
+.guide-icon.ytd-guide-entry-renderer {
+    color: #fff !important;                                         /*Changes color of all other icons on left sidebar */
+}
+#newness-dot.ytd-guide-entry-renderer {
+    background-color: #fff !important;                              /*Changes the color of the dot that appears next to subscriptions when new content has been posted */
+}
+yt-icon.ytd-compact-link-renderer {
+    color: #fff !important;                                         /*Changes the color of most of the icons on the "account" popout when you click your user icon */
+}
+yt-icon.ytd-toggle-theme-compact-link-renderer {
+    color: #fff !important;                                         /*Chnages the color of the last icon, "Appearance: Device Theme", on the "account" popout */
+}
+
+/*The section below is primarily for editing elements on the page when you have a video open */
+.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--tonal {
+    color: #fff !important;                                         /*Changes the color of the like/dislike/share/download text color when watching a video (works on each part except for the like thumb, I believe this is because an animation plays when you like a video) */
+}
+#owner-sub-count.ytd-video-owner-renderer {
+    color: #fff !important;                                         /*Changes the color of the subscriber count under the name of the channel you are watching */
+}
+ytd-comment-action-buttons-renderer {
+    color: #fff !important;                                         /*Changes the color of the # of likes by the like button in comments */
+}
+.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--outline {
+    color: #fff !important;                                         /*Changes the color of the join button text when watching a video */
+    border-color: rgba(255, 255, 255, .2) !important;               /*Changes the color of the outline for the join button */
+}
+.yt-spec-button-shape-next--mono.yt-spec-button-shape-next--filled {
+    color: #fff !important;                                         /*Changes the color of the subscribe button text */
+    background-color: #fff !important;                              /*Changes the color of the subscribe button body (when unsubscribed) */
+}
+#channel-name.ytd-video-meta-block {
+    color: #fff !important;                                         /*Changes the color of the channel name text on video previews */
+}
+.badge-style-type-simple.ytd-badge-supported-renderer {
+    color: #fff !important;                                         /*Changes the color of the "new" text on video previews */
+}
+yt-icon.ytd-badge-supported-renderer {
+    color: #fff !important;                                         /*Changes the color of the "verified badge" on video previews */
+}
+#button.ytd-menu-renderer yt-icon.ytd-menu-renderer {
+    color: #fff !important;                                         /*Changes the color of the 3 dots that appear when you hover over a video preview */
+}
+#call-to-action.ytd-rich-metadata-renderer {
+    color: #fff !important;                                         /*Changes the color of the category/game secondary text */
+}
+#subtitle.ytd-rich-metadata-renderer {
+    color: #fff !important;                                         /*Changes the color of the category/game tertiary text (year released) */
+}
+#simplebox-placeholder.ytd-comment-simplebox-renderer {
+    color: #fff !important;                                         /*Changes the color of the "Add a comment..." text */
+}
+.yt-spec-button-shape-next--call-to-action.yt-spec-button-shape-next--text {
+    color: #fff !important;                                         /*Changes the color of the "## replies" text on comments */
+}
