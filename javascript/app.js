@@ -4304,11 +4304,11 @@ function renderBuildSummary() {
 
   const licenseItems = [{
     title: "Description",
-    details: [{ label: "Saved text", value: savedModDetails?.description || "DESCRIPTIONS GO HERE" }]
-  }, ...licenseFieldConfig.map(({ key, placeholder }) => ({
+    details: [{ label: "Saved text", value: savedModDetails?.description?.trim() || "" }]
+  }, ...licenseFieldConfig.map(({ key }) => ({
     title: key === "misc" ? "Miscellaneous" : key === "kudos" ? "Kudos / Thanks" : key.charAt(0).toUpperCase() + key.slice(1),
-    details: [{ label: "Saved text", value: savedLicenseValues?.[key]?.trim() || placeholder }]
-  }))];
+    details: [{ label: "Saved text", value: savedLicenseValues?.[key]?.trim() || "" }]
+  }))].filter((item) => item.details[0].value);
   appendBuildSummaryGroup("License", "Text packaged in license.txt", licenseItems);
 
   const appIconItems = savedAppIconValue
