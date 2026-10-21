@@ -715,6 +715,22 @@ h1 em {
   line-height: 1.55;
 }
 
+.wallpaper-override-note {
+  margin: -8px 0 24px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--red);
+  color: var(--muted);
+  background: color-mix(in hsl, var(--red) 7%, var(--surface-deep));
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.wallpaper-override-note strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text);
+}
+
 .hsl-picker {
   display: grid;
   gap: 20px;
