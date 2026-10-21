@@ -1851,9 +1851,7 @@ function selectIncludedWallpaper(kind) {
     source: "included",
     url: preset.url
   };
-  wallpaperDropStatus.textContent = kind === "video"
-    ? "Sample animated wallpaper ready for preview"
-    : "Sample static wallpaper ready for preview";
+  wallpaperDropStatus.textContent = "";
   wallpaperSaveStatus.textContent = "";
   renderWallpaperEditor();
 }
